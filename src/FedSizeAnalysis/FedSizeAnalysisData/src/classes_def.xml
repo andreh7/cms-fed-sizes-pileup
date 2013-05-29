@@ -1,0 +1,4 @@
+<lcgdict>
+  <class name="FedSizeAnalysisData" />
+  <class name="edm::Wrapper<FedSizeAnalysisData>" />
+</lcgdict>
