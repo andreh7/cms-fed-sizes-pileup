@@ -11,3 +11,22 @@
 *.lai
 *.la
 *.a
+
+# CMSSW top level stuff
+.SCRAM
+bin/
+cfipython/
+config/
+doc/
+external/
+include/
+lib/
+logs/
+objs/
+python/
+test/  
+tmp/
+
+*~
+
+*.pyc
