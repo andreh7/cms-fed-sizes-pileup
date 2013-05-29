@@ -1,0 +1,4 @@
+
+mailme --subject $RUN plots/**/average-sizes-vs-*.png
+
+eog plots/**/average-sizes-vs-*.png
