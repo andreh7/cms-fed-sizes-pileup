@@ -31,8 +31,9 @@ quantile_histo_defs = [
 
 draw_mean = False
 
-subdet_range_arrow_ypos = 3000
-subdet_range_label_ypos = 3200
+# default values
+subdet_range_arrow_ypos = 0.3
+subdet_range_label_ypos = 0.35
 
 subdet_range_arrow_size = 0.005
 
@@ -373,9 +374,26 @@ def makePlot(quantile_values, fed_ids, min_fedid = None, max_fedid = None, canva
 
             det_mid_fed = (det_max_fed + det_min_fed) / 2.0
 
-            arrow = ROOT.TArrow(det_min_fed-0.5, subdet_range_arrow_ypos,
-                                det_max_fed+0.5, subdet_range_arrow_ypos,
-                                subdet_range_arrow_size,
+
+            configParams = getattr(parameters, 'fedSizeQuantilePlotsParams',{})
+
+            plotParams = {}
+
+            # check the configuration for the y position
+            for paramName in ('subdet_range_arrow_ypos',
+                              'subdet_range_arrow_size',
+                              'subdet_range_label_ypos',
+                              ):
+                plotParams[paramName] = configParams.get(paramName,{}).get(det_name, globals()[paramName])
+
+            # interpret the y position as relative with respect to the
+            # full y axis range
+            plotParams['subdet_range_arrow_ypos'] = plotParams['subdet_range_arrow_ypos'] * hs.GetMaximum()
+            plotParams['subdet_range_label_ypos'] = plotParams['subdet_range_label_ypos'] * hs.GetMaximum()
+
+            arrow = ROOT.TArrow(det_min_fed-0.5, plotParams['subdet_range_arrow_ypos'],
+                                det_max_fed+0.5, plotParams['subdet_range_arrow_ypos'],
+                                plotParams['subdet_range_arrow_size'],
                                 "<>")
             arrow.SetLineWidth(4)
 
@@ -402,7 +420,7 @@ def makePlot(quantile_values, fed_ids, min_fedid = None, max_fedid = None, canva
             if missingFedsThisSubdet:
                 print len(missingFedsThisSubdet),"missing feds in",det_name,":",missingFedsThisSubdet
 
-            label = ROOT.TText(det_mid_fed,subdet_range_label_ypos,arrowText)
+            label = ROOT.TText(det_mid_fed,plotParams['subdet_range_label_ypos'],arrowText)
 
             # how to center the text ?
 
