@@ -87,6 +87,12 @@ class MainClass:
         # exclude the special DAQ fed 
         self.fed_ids = [ x for x in self.fed_ids if not x == 1023 ]
 
+        # excluded feds given by the configuration parameters
+        if hasattr(parameters, 'fedSizeQuantilePlotsParams'):
+
+            for fed in parameters.fedSizeQuantilePlotsParams.get('excludeFeds',[]):
+                if fed in self.fed_ids:
+                    self.fed_ids.remove(fed)
     
     #----------------------------------------
 
