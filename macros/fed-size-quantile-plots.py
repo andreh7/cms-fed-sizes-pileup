@@ -347,7 +347,8 @@ def makePlot(quantile_values, fed_ids, min_fedid = None, max_fedid = None, canva
     if addRangeArrows:
 
         import utils
-        for fed_range in utils.getFedRanges(fed_ids):
+        for fed_range in utils.getFedRanges(fed_ids,
+                                            dict(splitHCAL = True)):
 
             det_name = fed_range['name']
 
