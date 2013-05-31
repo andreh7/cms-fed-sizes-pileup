@@ -138,13 +138,13 @@ else:
 process.fedSizeData = cms.EDProducer('FedSizeAnalyzer',
                                      )
 
-if os.environ['RUN'] >= 190000:
+if int(os.environ['RUN']) >= 190000:
     # for 2012 (e.g. for runs >= 190000)
     #  FEDRawDataCollection                  "rawDataCollector"          ""                "LHC"     
     process.fedSizeData.rawDataSource = cms.InputTag("rawDataCollector")
 else:
     # for 2011 (and before ?)
-    process.fedSizeData.rawDataSource = cms.InputTag("source"),
+    process.fedSizeData.rawDataSource = cms.InputTag("source")
 
 if locals().has_key('useRECO'):
     process.fedSizeData.useRECO = cms.untracked.bool(useRECO)
