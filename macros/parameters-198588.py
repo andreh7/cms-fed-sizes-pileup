@@ -162,6 +162,8 @@ allSubsysToPlot = [
 
                 # special request on 2011-09-27
                 "HF",
+                "HBHE",
+                "HO", 
 
                 #--------------------
                 # requests 2011-10-04 by Christoph
