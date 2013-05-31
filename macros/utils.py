@@ -55,19 +55,34 @@ cscFeds   = range(750, 757 + 1)  # CSC
 #----------------------------------------------------------------------
 
 # from http://cmsdoc.cern.ch/cms/TRIDAS/horizontal/RUWG/DAQ_IF_guide/DAQ_IF_guide.html
-def getSubsystemFromFed(fed):
+def getSubsystemFromFed(fed,
+                        splitHCAL = False,
+                        splitPixel = True,
+                        ):
     """ given a FED number, returns the subsystem it belongs to """
 
 
-    if fed >= 0	        and fed <= 31	: return "BPIX"
-    if fed >= 32        and fed <= 39	: return "FPIX"
+    # Pixel
+    if splitPixel:
+        if fed >= 0	        and fed <= 31	: return "BPIX"
+        if fed >= 32        and fed <= 39	: return "FPIX"
+    else:
+        if fed >= 0	        and fed <= 39	: return "Pixel"
 
-    # if fed >= 0	        and fed <= 39	: return "Pixel"
     if fed >= 50	and fed <= 489	: return "Tracker"
     if fed >= 520	and fed <= 575	: return "Preshower"
     if fed >= 600	and fed <= 670	: return "ECAL"
     if fed >= 690	and fed <= 693	: return "CASTOR"
-    if fed >= 700	and fed <= 731	: return "HCAL"
+
+    # HCAL
+    if splitHCAL:
+        if fed >= 700	and fed <= 717	: return "HBHE"
+        if fed >= 718	and fed <= 723	: return "HF"
+        if fed >= 724	and fed <= 731	: return "HO"
+    else:
+        if fed >= 700	and fed <= 731	: return "HCAL"
+
+
     if fed >= 735	and fed <= 735	: return "LumiScalers"
     if fed >= 745	and fed <= 749	: return "GCT"
     if fed >= 750	and fed <= 757	: return "CSC"
@@ -86,7 +101,7 @@ def getSubsystemFromFed(fed):
 
 #----------------------------------------------------------------------
 
-def getFedRanges(all_feds):
+def getFedRanges(all_feds, fedNameGroupOptions = {}):
     """given the list of all feds found in a dataset, returns a list of
      dicts with elements 'start', 'end' and 'name' corresponding
      to the first and last FED of the corresponding subdetector
@@ -102,7 +117,7 @@ def getFedRanges(all_feds):
 
     for fed in sorted(all_feds):
 
-        this_name = getSubsystemFromFed(fed)
+        this_name = getSubsystemFromFed(fed, *fedNameGroupOptions)
 
         if this_name != previous_name:
             # start a new range

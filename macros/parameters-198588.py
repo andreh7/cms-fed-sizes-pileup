@@ -321,7 +321,7 @@ if False:
 
 #--------------------
 
-if True:
+if False:
     # per FRL
     #
     # all FRLs (i.e. tracker FEDs paired but
@@ -330,3 +330,23 @@ if True:
     frlTuples = FEDtoFRLMappingData.makeFRLtuples(utils.normalFEDlist)
     allSubsysToPlot = [ "+".join([ "size%03d" % x for x in thisFeds]) for thisFeds in frlTuples ]
 #--------------------
+
+# allSubsysToPlot = []
+
+#----------------------------------------
+
+fedSizeQuantilePlotsParams = dict(
+
+    # no CASTOR in 2012
+    excludeFeds = [ 690, 691, 692],
+
+    subdet_range_label_ypos = dict(BPIX = 0.4,
+                                   FPIX = 0.4,
+                                   ),
+    
+    )
+    
+
+
+
+#----------------------------------------
