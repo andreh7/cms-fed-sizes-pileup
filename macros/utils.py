@@ -327,8 +327,18 @@ def loadParameters():
       See also http://stackoverflow.com/questions/6811902
 
     """
-    import sys, imp
-    fname = sys.argv[1]
+    import sys, imp, os
+
+    ARGV = sys.argv[1:]
+
+    if len(ARGV) >= 1:
+        fname = ARGV[0]
+    else:
+        if not os.environ.has_key('RUN'):
+            print >> sys.stderr,"no configuration file specified and the environment variable $RUN is not set, exiting"
+            sys.exit(1)
+
+        fname = "parameters-{RUN}.py".format(RUN=os.environ['RUN'])
 
     with open(fname, "U") as module_file:
         mod = imp.load_module(

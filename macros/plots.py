@@ -9,8 +9,8 @@ import array, sys, os, pprint
 
 ARGV = sys.argv[1:]
 
-if len(ARGV) != 1:
-    print >> sys.stderr,"must specify exactly one command line argument (a file with plotting parameters)"
+if len(ARGV) > 1:
+    print >> sys.stderr,"must specify at most one command line argument (a file with plotting parameters)"
     sys.exit(1)
 
 # import parameters
