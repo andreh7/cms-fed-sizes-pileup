@@ -144,7 +144,7 @@ for index,datasetSpec in enumerate(ARGV):
         if thisDataSetLumiSections:
             print >> sys.stderr, "found",len(thisDataSetLumiSections),"lumi sections (%d..%d)" % (min(thisDataSetLumiSections),max(thisDataSetLumiSections))
         else:
-            print >> sys.stderr, "found NO lumisections"
+            raise Exception("found NO lumisections for dataset " + datasetSpec)
 
     # end loop over datasets
 
