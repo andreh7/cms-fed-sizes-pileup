@@ -6,7 +6,8 @@ run = 176201
 dataset = "minbias"
 
 
-hlt_description = "HLT_ZeroBias"
+# hlt_description = "HLT_ZeroBias"
+hlt_description = "HLT_Physics"
 # hlt_description = "HLT_L1Tech_BSC_minBias_threshold1"
 
 # maximum number of vertices for the plots
