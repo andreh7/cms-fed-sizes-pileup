@@ -436,6 +436,11 @@ void PerNumVertexNtupleMaker::initializeFedIDranges()
   // special group: HF only (718, 719, 720, 721, 722, 723), taken from DAQ_ru.html
   fedIDRanges.push_back(FedIdRangeData(718                                                  ,  723                                              , "HF"));
 
+  // added 2013-05: HBHE (700..717) and HO (724..731)
+  fedIDRanges.push_back(FedIdRangeData(700                                                  ,  717                                              , "HBHE"));
+  fedIDRanges.push_back(FedIdRangeData(724                                                  ,  731                                              , "HO"));
+
+
   fedIDRanges.push_back(FedIdRangeData(FEDNumbering::MINSiStripFEDID 		            ,  FEDNumbering::MAXSiStripFEDID 		  	, "Tracker"));
   fedIDRanges.push_back(FedIdRangeData(FEDNumbering::MINPreShowerFEDID                      ,  FEDNumbering::MAXPreShowerFEDID 		        , "Preshower"));  
   fedIDRanges.push_back(FedIdRangeData(FEDNumbering::MINECALFEDID 			    ,  FEDNumbering::MAXECALFEDID 			, "ECAL"));  
