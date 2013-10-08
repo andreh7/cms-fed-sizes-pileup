@@ -1,4 +1,4 @@
-import utils
+import utils, os
 
 
 #----------------------------------------------------------------------
@@ -30,14 +30,21 @@ max_num_vertices = 61
 
 input_data_dir = "../data/%s-%d" % (dataset,run)
 
+if not os.path.exists(input_data_dir):
+    # use the EOS dir
+    input_data_dir = os.path.expanduser("~aholz/eos/cms/store/user/aholz/castor/fed-size-analysis/%s-%d" % (dataset,run))
+
+
 output_data_dir = "data/%s-%d/%s"  % (dataset,run, hlt_description)
+
+    
 
 #----------------------------------------
 
 import os
 
 if not os.path.exists(output_data_dir):
-    os.mkdir(output_data_dir)
+    os.makedirs(output_data_dir)
 
 
 plots_output_dir = "plots/%s-%d/%s"  % (dataset,run, hlt_description)
