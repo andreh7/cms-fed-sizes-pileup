@@ -125,7 +125,7 @@ def getSmallTuple():
 
     # the file name of the file
     # containing the cached data
-    fname = parameters.output_data_dir + "/small-tuples.root"
+    fname = parameters.input_data_dir + "/small-tuples.root"
 
     if small_tuple != None:
         return small_tuple

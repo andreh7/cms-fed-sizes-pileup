@@ -172,7 +172,7 @@ def getFedIdsFromTuple(ntuple):
 
 #----------------------------------------------------------------------
 
-def openSizePerFedNtuples(output_data_dir, max_num_vertices):
+def openSizePerFedNtuples(input_data_dir, max_num_vertices):
     """ returns a dict the ntuples
         per number of reconstructed vertices which contain
         one variable per fed and sums per subsystem.
@@ -186,10 +186,10 @@ def openSizePerFedNtuples(output_data_dir, max_num_vertices):
     # new: the tuples are now all in one file (produced by CMSSW)
 
     import os
-    if not os.path.exists(output_data_dir + "/small-tuples.root"):
-        raise Exception("file " + output_data_dir + "/small-tuples.root" + " does not exist")
+    if not os.path.exists(input_data_dir + "/small-tuples.root"):
+        raise Exception("file " + input_data_dir + "/small-tuples.root" + " does not exist")
 
-    fin = ROOT.TFile.Open(output_data_dir + "/small-tuples.root")
+    fin = ROOT.TFile.Open(input_data_dir + "/small-tuples.root")
     for nv in range(max_num_vertices+1):
         
         ntuple[nv] = fin.Get("tupler/all_sizes_%dvtx" % nv)
@@ -197,7 +197,7 @@ def openSizePerFedNtuples(output_data_dir, max_num_vertices):
     return ntuple
 #----------------------------------------------------------------------
 
-def getNumFedsPerFedGroup(output_data_dir):
+def getNumFedsPerFedGroup(input_data_dir):
     """ returns a dict of subsystem / fed group name
         (as defined in PerNumVertexNtupleMaker.cc)
         to the number of FEDs seen in the first event
@@ -211,11 +211,11 @@ def getNumFedsPerFedGroup(output_data_dir):
     # new: the tuples are now all in one file (produced by CMSSW)
 
     import os
-    if not os.path.exists(output_data_dir + "/small-tuples.root"):
-        raise Exception("file " + output_data_dir + "/small-tuples.root" + " does not exist")
+    if not os.path.exists(input_data_dir + "/small-tuples.root"):
+        raise Exception("file " + input_data_dir + "/small-tuples.root" + " does not exist")
 
     olddir = ROOT.gDirectory
-    fin = ROOT.TFile.Open(output_data_dir + "/small-tuples.root")
+    fin = ROOT.TFile.Open(input_data_dir + "/small-tuples.root")
 
     tree = fin.Get("tupler/fedGroupSize")
 

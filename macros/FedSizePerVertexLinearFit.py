@@ -104,7 +104,7 @@ class FedSizePerVertexLinearFit:
 
         if subsys_name != 'total':
             # add a protection for custom plotting expressions
-            self.numFeds = utils.getNumFedsPerFedGroup(parameters.output_data_dir).get(subsys_name, None)
+            self.numFeds = utils.getNumFedsPerFedGroup(parameters.input_data_dir).get(subsys_name, None)
 
             # if not found, estimate from the number of occurrences of 'size'
             # in the plot expression (assuming it's basically a sum)
@@ -133,7 +133,7 @@ class FedSizePerVertexLinearFit:
 
         # produce histograms of the fed size distributions
 
-        ntuple = utils.openSizePerFedNtuples(parameters.output_data_dir, parameters.max_num_vertices)
+        ntuple = utils.openSizePerFedNtuples(parameters.input_data_dir, parameters.max_num_vertices)
 
         for num_vertices in range(parameters.size_evolution_min_num_vertices,
                                   parameters.size_evolution_max_num_vertices + 1):

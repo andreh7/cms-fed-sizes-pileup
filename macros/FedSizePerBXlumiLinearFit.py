@@ -144,7 +144,7 @@ class FedSizePerBXlumiLinearFit:
 
         # produce histograms of the fed size distributions
 
-        ntuple = utils.openSizePerFedNtuples(parameters.output_data_dir, parameters.max_num_vertices)
+        ntuple = utils.openSizePerFedNtuples(parameters.input_data_dir, parameters.max_num_vertices)
 
         outputFiles = {}
 
