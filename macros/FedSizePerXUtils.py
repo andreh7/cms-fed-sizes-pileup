@@ -133,6 +133,9 @@ class Plotter:
 
                  yaxis_unit_size = None,
 
+                 linear_fit_extrapolation_min_num_vertices = None,
+
+                 linear_fit_extrapolation_max_num_vertices = None,
                  ):
 
         self.xpos = xpos
@@ -171,6 +174,11 @@ class Plotter:
         self.xbinWidth = xbinWidth
 
         self.averageNumVertices = averageNumVertices
+
+        self.linear_fit_extrapolation_min_num_vertices = linear_fit_extrapolation_min_num_vertices
+
+        self.linear_fit_extrapolation_max_num_vertices = linear_fit_extrapolation_max_num_vertices
+
 
         print "UUU ymaxScale=",ymaxScale
 
@@ -365,6 +373,23 @@ class Plotter:
             globals()['gc_saver'] = []
 
         if hasattr(self,'fittedFunc'):
+
+            # first draw the extrapolation if requested
+            # (should be below the fitted line)
+
+            if self.linear_fit_extrapolation_min_num_vertices != None and self.linear_fit_extrapolation_max_num_vertices != None:
+                # just draw a line through the two endpoints
+                xvalues = [ self.linear_fit_extrapolation_min_num_vertices, self.linear_fit_extrapolation_max_num_vertices]
+                yvalues = [ self.fittedFunc.Eval(x) for x in xvalues ]
+
+                line = ROOT.TLine(xvalues[0], yvalues[0], xvalues[1], yvalues[1]); gc_saver.append(line)
+                line.SetLineWidth(3)
+                line.SetLineColor(ROOT.kRed)
+                line.SetLineStyle(ROOT.kDashed)
+                
+                line.Draw()
+
+
             self.fittedFunc.Draw("same")
 
             ROOT.gPad.SetLogy(0)

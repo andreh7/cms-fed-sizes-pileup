@@ -271,6 +271,10 @@ class FedSizePerVertexLinearFit:
 
             yaxis_unit_size = yaxis_unit_size,
 
+            # for drawing the extrapolation
+            linear_fit_extrapolation_min_num_vertices = getattr(parameters, 'linear_fit_extrapolation_min_num_vertices', None),
+            linear_fit_extrapolation_max_num_vertices = getattr(parameters, 'linear_fit_extrapolation_max_num_vertices', None),
+
             )
 
         plotter.fitAverage(linear_fit_min_value = parameters.linear_fit_min_num_vertices - 0.5,
