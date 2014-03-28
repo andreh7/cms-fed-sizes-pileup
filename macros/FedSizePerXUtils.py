@@ -443,64 +443,81 @@ class Plotter:
 
         #--------------------
         # arrow for average number of vertices
+        # (and also other user specified)
         #--------------------
 
-        if self.averageNumVertices != None and hasattr(self, 'fittedFunc'):
-            global gc_saver
+        linear_fit_arrows = getattr(parameters, "linear_fit_arrows", [ dict(vtx = "avg") ])
 
-            ypos = self.fittedFunc(self.averageNumVertices)
+        if hasattr(self, 'fittedFunc'):
+            # left end for horizontal arrows
+            xmin, xmax = self.mg.GetXaxis().GetXmin(), self.mg.GetXaxis().GetXmax()
+            xleft = xmin + 0.05 * (xmax - xmin)
 
-            #----------
+            # lower end for vertical arrows
+            ymin, ymax = self.mg.GetYaxis().GetXmin(), self.mg.GetYaxis().GetXmax()
+            ymin = 0
+            ybot  = ymin + 0.08 * (ymax - ymin)
+            print "ymin,ymax=",ymin,ymax
 
-            arrow = ROOT.TArrow(self.averageNumVertices, ypos,
-                                self.averageNumVertices, 0.1 * ypos)
+            for line in linear_fit_arrows:
 
-            gc_saver.append(arrow)
+                xpos = line['vtx']
 
-            arrow.SetLineWidth(2)
-            arrow.Draw()
+                if xpos == "avg":
+                    if self.averageNumVertices == None:
+                        # can't draw this
+                        continue
+                    xpos = self.averageNumVertices
 
-            # add a label with the average number of vertices
-            xlabel = ROOT.TLatex(self.averageNumVertices, ypos * 0.5,"  %.1f vtx" % self.averageNumVertices)
-            xlabel.SetTextSize(xlabel.GetTextSize() * 0.5)
-            gc_saver.append(xlabel)
+                ypos = self.fittedFunc(xpos)
 
-            xlabel.Draw()
+                #----------
+                # vertical arrow
+                #----------
 
-            #----------
-            # horizontal arrow
-            #----------
+                arrow = ROOT.TArrow(xpos, ypos,
+                                    xpos, ybot)
 
-            xleft = self.mg.GetXaxis().GetXmin()
+                gc_saver.append(arrow)
 
-            xdist = self.averageNumVertices - xleft
-            xpos = xleft + 0.1 * xdist
+                arrow.SetLineWidth(2)
+                arrow.Draw()
 
-            arrow = ROOT.TArrow(self.averageNumVertices, ypos,
-                                xpos, ypos)
+                # add a label with the average number of vertices
+                xlabel = ROOT.TLatex(xpos, ybot + (ypos - ybot) * 0.5,"  %.1f vtx" % xpos)
+                xlabel.SetTextSize(xlabel.GetTextSize() * 0.5)
+                gc_saver.append(xlabel)
 
-            gc_saver.append(arrow)
+                xlabel.Draw()
 
-            arrow.SetLineWidth(2)
-            arrow.Draw()
+                #----------
+                # horizontal arrow
+                #----------
 
-            # add a label with the average number of vertices
+                print "PP",xpos,ypos,xleft
 
-            if self.yaxis_unit_label.lower() == 'kb':
-                yval = ypos
-            elif self.yaxis_unit_label.lower() == 'mb':
-                yval = ypos * 1000.0
+                arrow = ROOT.TArrow(xpos, ypos,
+                                    xleft, ypos)
 
-            ylabel = ROOT.TLatex(xpos, ypos * 1.1,"  %.1f kByte" % yval)
-            ylabel.SetTextSize(xlabel.GetTextSize() * 0.9)
-            gc_saver.append(ylabel)
+                gc_saver.append(arrow)
 
-            ylabel.Draw()
+                arrow.SetLineWidth(2)
+                arrow.Draw()
 
+                # add a label with the average number of vertices
 
-            
-            
+                if self.yaxis_unit_label.lower() == 'kb':
+                    yval = ypos
+                elif self.yaxis_unit_label.lower() == 'mb':
+                    yval = ypos * 1000.0
 
+                ylabel = ROOT.TLatex(xleft, ypos * 1.1,"  %.1f kByte" % yval)
+                ylabel.SetTextSize(xlabel.GetTextSize() * 0.9)
+                gc_saver.append(ylabel)
 
+                ylabel.Draw()
 
+            # end of loop over arrows
+
+        # if has a fitted function
 
