@@ -251,6 +251,10 @@ class Plotter:
     #----------------------------------------
     def plot(self):
         """ produces the graph from the data supplied """
+
+        if not globals().has_key('gc_saver'):
+            globals()['gc_saver'] = []
+        global gc_saver
         
         #--------------------
         # produce and draw the standard graphs
@@ -317,6 +321,26 @@ class Plotter:
             self.drawOptions.append("P")
 
             self.legend.AddEntry(self.avgGraph,"average","P")
+        
+
+        # draw an extrapolation line if requested
+        # (draw before the fitted line so )
+
+        if hasattr(self,'fittedFunc') and \
+               self.linear_fit_extrapolation_min_num_vertices != None and \
+               self.linear_fit_extrapolation_max_num_vertices != None:
+            # just draw a line through the two endpoints
+            xvalues = [ self.linear_fit_extrapolation_min_num_vertices, self.linear_fit_extrapolation_max_num_vertices]
+            yvalues = [ self.fittedFunc.Eval(x) for x in xvalues ]
+
+            gr = ROOT.TGraph(2, array.array('f',xvalues), array.array('f',yvalues)); gc_saver.append(gr)
+            gr.SetLineWidth(3)
+            gr.SetLineColor(ROOT.kRed)
+            gr.SetLineStyle(ROOT.kDashed)
+            
+            self.graphs.append(gr)
+            self.drawOptions.append("L")
+
 
         #--------------------
         # draw all the graphs
@@ -365,30 +389,9 @@ class Plotter:
         #--------------------
         # plot the linear fit to the average values
         #--------------------
-
-
         # global fittedFunc
 
-        if not globals().has_key('gc_saver'):
-            globals()['gc_saver'] = []
-
         if hasattr(self,'fittedFunc'):
-
-            # first draw the extrapolation if requested
-            # (should be below the fitted line)
-
-            if self.linear_fit_extrapolation_min_num_vertices != None and self.linear_fit_extrapolation_max_num_vertices != None:
-                # just draw a line through the two endpoints
-                xvalues = [ self.linear_fit_extrapolation_min_num_vertices, self.linear_fit_extrapolation_max_num_vertices]
-                yvalues = [ self.fittedFunc.Eval(x) for x in xvalues ]
-
-                line = ROOT.TLine(xvalues[0], yvalues[0], xvalues[1], yvalues[1]); gc_saver.append(line)
-                line.SetLineWidth(3)
-                line.SetLineColor(ROOT.kRed)
-                line.SetLineStyle(ROOT.kDashed)
-                
-                line.Draw()
-
 
             self.fittedFunc.Draw("same")
 
@@ -402,7 +405,6 @@ class Plotter:
             label.Draw()
 
 
-            global gc_saver
             gc_saver.append(label)
             gc_saver.append(self.fittedFunc)
 
