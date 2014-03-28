@@ -130,8 +130,22 @@ poisson_fit_end = max_num_vertices   + 0.5
 # parameters for the linear fit of event size
 # vs. number of vertices
 
+# where to fit
 linear_fit_min_num_vertices = 10
 linear_fit_max_num_vertices = 40
+
+# where to draw the extrapolation
+linear_fit_extrapolation_min_num_vertices = 10
+linear_fit_extrapolation_max_num_vertices = 130
+
+# additional arrow positions at other number of vertices
+linear_fit_arrows = [ dict(vtx = "avg"), # the standard vertex
+                      # dict(vtx = 140 * 0.7), # LHC Phase II
+                      dict(vtx = (2 - 0.262561079388) / 0.0151176047105), # line which goes through 2 MByte
+
+                       
+
+                      ]
 
 # parameters for the corresponding plot
 size_evolution_min_num_vertices = 0
