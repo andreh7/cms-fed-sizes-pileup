@@ -260,8 +260,7 @@ class Plotter:
         # produce and draw the standard graphs
         #--------------------
 
-        self.graphs = []
-        self.drawOptions = []
+        self.mg = ROOT.TMultiGraph(); gc_saver.append(self.mg)
 
         self.legend = ROOT.TLegend(self.legendXLeft, self.legendYBottom,
                                    self.legendXLeft + self.legendWidth, self.legendYBottom + self.legendHeight)
@@ -270,11 +269,8 @@ class Plotter:
         self.minMaxGraph = self.__makeMinMaxGraph()
 
         if self.plotMinMax:
-            # self.minMaxGraph.Draw("AP,E2")
-            self.graphs.append(self.minMaxGraph)
-            self.drawOptions.append("E2")
+            self.mg.Add(self.minMaxGraph, "E2")
             self.legend.AddEntry(self.minMaxGraph, "Min/Max","F")
-            
 
         #--------------------
         # produce and draw the quantile graphs
@@ -290,15 +286,7 @@ class Plotter:
                 self.xbinWidth / 2.0,
                 )
 
-            # if self.graphs:
-            #     # not the first graph
-            #     gr.Draw("E2,SAME")
-            # else:
-            #     # this is the first graph
-            #     gr.Draw("E2,A")
-
-            self.graphs.append(gr)
-            self.drawOptions.append("E2")
+            self.mg.Add(gr,"E2")
 
             quantile_lower = 100 * quantile_histo_def['quantile']
             quantile_upper = 100 - quantile_lower
@@ -311,14 +299,8 @@ class Plotter:
         # plot the average graph (bullets) last
         #--------------------
         if self.plotAvg:
-            # if self.graphs:
-            #     self.avgGraph.Draw("P,SAME")
-            # else:
-            #     # not the first graph
-            #     self.avgGraph.Draw("AP")
 
-            self.graphs.append(self.avgGraph)
-            self.drawOptions.append("P")
+            self.mg.Add(self.avgGraph,"P")
 
             self.legend.AddEntry(self.avgGraph,"average","P")
         
@@ -338,39 +320,27 @@ class Plotter:
             gr.SetLineColor(ROOT.kRed)
             gr.SetLineStyle(ROOT.kDashed)
             
-            self.graphs.append(gr)
-            self.drawOptions.append("L")
+            self.mg.Add(gr,"L")
 
 
         #--------------------
         # draw all the graphs
         #--------------------
 
-        assert(len(self.graphs) == len(self.drawOptions))
-
-        for index, graph in enumerate(self.graphs):
-            drawOption = self.drawOptions[index]
-
-            if index == 0:
-                drawOption += ",A"
-            else:
-                drawOption += ",SAME"
-
-            graph.Draw(drawOption)
+        ROOT.gPad.Clear()         # avoid drawing over the previous plot
+        self.mg.Draw("A")
 
         if self.ymaxScale != None:
 
             # find out the global maximum
-            overallMax = max(graph.GetHistogram().GetMaximum() for graph in self.graphs)
+            overallMax = self.mg.GetHistogram().GetMaximum()
 
             overallMax *= self.ymaxScale
 
             print "VVV applying ymaxscale",self.ymaxScale,overallMax
 
-            for graph in self.graphs:
-                graph.SetMaximum(overallMax)
-                graph.SetMinimum(0)
-                
+            self.mg.SetMaximum(overallMax)
+            self.mg.SetMinimum(0)
 
             ROOT.gPad.Modified()
                 
@@ -383,8 +353,8 @@ class Plotter:
 
         ROOT.gPad.SetGrid()
 
-        self.graphs[0].GetXaxis().SetTitle(self.xaxisTitle)
-        self.graphs[0].GetYaxis().SetTitle(self.yaxisTitle)
+        self.mg.GetXaxis().SetTitle(self.xaxisTitle)
+        self.mg.GetYaxis().SetTitle(self.yaxisTitle)
 
         #--------------------
         # plot the linear fit to the average values
@@ -449,13 +419,10 @@ class Plotter:
             # just multiply by the trigger rate in kHz
             # and divide by the number of FEDs
 
-            # yaxisMin = self.graphs[0].GetHistogram().GetYaxis().GetXmin()
-            # yaxisMax = self.graphs[0].GetHistogram().GetYaxis().GetXmax()
+            yaxisMin = self.mg.GetHistogram().GetMinimum()
+            yaxisMax = self.mg.GetHistogram().GetMaximum()
 
-            yaxisMin = self.graphs[0].GetHistogram().GetMinimum()
-            yaxisMax = self.graphs[0].GetHistogram().GetMaximum()
-
-            xaxisMax = self.graphs[0].GetHistogram().GetXaxis().GetXmax()
+            xaxisMax = self.mg.GetHistogram().GetXaxis().GetXmax()
 
             # print "XXX yaxisMin=",yaxisMin,"yaxisMax=",yaxisMax
 
@@ -504,7 +471,7 @@ class Plotter:
             # horizontal arrow
             #----------
 
-            xleft = self.graphs[0].GetXaxis().GetXmin()
+            xleft = self.mg.GetXaxis().GetXmin()
 
             xdist = self.averageNumVertices - xleft
             xpos = xleft + 0.1 * xdist
