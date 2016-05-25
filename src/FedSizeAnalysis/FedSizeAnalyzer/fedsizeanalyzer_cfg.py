@@ -72,9 +72,9 @@ def getInputFiles(min_ls, max_ls):
 #----------------------------------------------------------------------
 
 if os.path.basename(sys.argv[0]) == 'cmsRun':
-    ARGV = sys.argv[1:]
+    ARGV = sys.argv[2:]
 else:
-    ARGV = sys.argv[:]
+    ARGV = sys.argv[1:]
 
 min_ls = int(ARGV[1])
 max_ls = int(ARGV[2])
