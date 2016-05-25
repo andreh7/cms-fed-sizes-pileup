@@ -87,7 +87,9 @@ import HLTrigger.HLTfilters.triggerResultsFilter_cfi as hlt
 if run != 198588:
     process.rejectHltRandom = hlt.triggerResultsFilter.clone(
              hltResults = cms.InputTag( "TriggerResults","","HLT"),
-            triggerConditions = ( 'NOT HLT_Random_v*', ),
+
+             # there seem to be no HLT randoms anymore ? (not in HLTPhysics* ?)
+            triggerConditions = ( 'TRUE', ),
             l1tResults = '',
             throw = False
             )
