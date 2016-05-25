@@ -31,43 +31,12 @@ script_dir = os.environ['CMSSW_BASE'] + "/src" + "/FedSizeAnalysis/FedSizeAnalyz
 # print "script_dir=",script_dir
 # print "locals=",locals().keys()
 
-def getInputFiles(min_ls, max_ls):
-    global files_list
-
+def getInputFiles():
     """ returns a pair of lists of raw, reco files for the given luminosity section range """
 
-    # do it this way because the script might be
-    # copied to a temporary directory...
+    global files_list
 
-
-    # files_list = locals()['files_list']
-
-    raw_files = set()
-    reco_files = set()
-
-    for entry in files_list:
-        # check whether the luminosity section range of these files
-        # have an overlap with the specified range
-
-        if max_ls < entry['start_ls']:
-            continue
-
-        if min_ls > entry['end_ls']:
-            continue
-
-        # the first file in the list is the RAW file, the second is the RECO file
-
-        # before 2011-12-14
-        # raw_files.add(entry['files'][0])
-        # reco_files.add(entry['files'][1])
-
-        # from 2011-12-14 on: multiple files possible
-        # for RECO and RAW thus entry['files'][X] is a list,
-        # not a string any more
-        raw_files = raw_files.union(entry['files'][0])
-        reco_files = reco_files.union(entry['files'][1])
-
-    return list(raw_files), list(reco_files)
+    return files_list['raw'], files_list['reco']
 
 #----------------------------------------------------------------------
 
@@ -76,21 +45,16 @@ if os.path.basename(sys.argv[0]) == 'cmsRun':
 else:
     ARGV = sys.argv[1:]
 
-min_ls = int(ARGV[1])
-max_ls = int(ARGV[2])
+dataset = ARGV.pop(0)
+run = int(ARGV.pop(0))
 
-dataset = ARGV[3]
-run = int(ARGV[4])
-
-print "min_ls=",min_ls
-print "max_ls=",max_ls
 print "dataset=",dataset
 print "run=",run
 
 # read the list of files vs. lumisection
 execfile(script_dir + "/file_list_%s_%s.py" % (dataset, run))
 
-raw_files, reco_files = getInputFiles(min_ls, max_ls)
+raw_files, reco_files = getInputFiles()
 
 print len(reco_files),"reco files"
 pprint.pprint(reco_files)
@@ -155,7 +119,7 @@ process.out = cms.OutputModule("PoolOutputModule",
     # running interactively                           
     # fileName = cms.untracked.string('/tmp/myOutputFile.root'),
 
-    fileName = cms.untracked.string('out-%04d-%04d.root' % (min_ls, max_ls)),
+    fileName = cms.untracked.string('out.root'),
                                
     # dropMetaDataForDroppedData = cms.untracked.bool(True),
     outputCommands = cms.untracked.vstring([
@@ -262,16 +226,10 @@ if good_lumi_section_json_file != None:
     selected_ls_ranges = []
 
     for ls_range in lumi_sections_from_json:
-        if ls_range[0] > max_ls:
-            continue
-        if ls_range[1] < min_ls:
-            continue
-
-        # there is some overlap
 
         selected_ls_ranges.append([
-            max(min_ls, ls_range[0]),
-            min(max_ls, ls_range[1])
+            ls_range[0],
+            ls_range[1]
             ])
 
     print "selected_ls_ranges=",
