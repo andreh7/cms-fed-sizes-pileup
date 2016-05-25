@@ -48,8 +48,12 @@ class FedSizeAnalyzer : public edm::EDProducer {
 
   size_t maxNumVerticesSeen;
   
-  /** input tag for the raw data (changed from 2011 to 2012) */
-  edm::InputTag rawDataSourceTag;
+  /** token for the raw data */
+  edm::EDGetTokenT<FEDRawDataCollection> rawDataSourceToken;
+
+  edm::EDGetTokenT<reco::BeamSpot> beamSpotToken;
+
+  edm::EDGetTokenT<std::vector<reco::Vertex> > primaryVerticesToken;
 
   bool useRECO;
 };
@@ -60,7 +64,12 @@ FedSizeAnalyzer::FedSizeAnalyzer(const edm::ParameterSet& iConfig) :
 {
    produces<FedSizeAnalysisData>();
 
-   rawDataSourceTag = iConfig.getParameter<edm::InputTag>("rawDataSource");
+   rawDataSourceToken = consumes<FEDRawDataCollection>(iConfig.getParameter<edm::InputTag>("rawDataSource"));
+
+   beamSpotToken = consumes<reco::BeamSpot>(edm::InputTag("offlineBeamSpot"));
+
+   // see https://hypernews.cern.ch/HyperNews/CMS/get/recoTracking/1000/1.html
+   primaryVerticesToken = consumes<std::vector<reco::Vertex> >(edm::InputTag("offlinePrimaryVertices"));
 
    useRECO = iConfig.getUntrackedParameter<bool>("useRECO", true);
 
@@ -124,7 +133,7 @@ FedSizeAnalyzer::addPrimaryVertices(edm::Event& iEvent, FedSizeAnalysisData &dat
   // (see https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideFindingBeamSpot#Access_to_the_beam_spot_data )
   reco::BeamSpot beamSpot;
   edm::Handle<reco::BeamSpot> beamSpotHandle;
-  iEvent.getByLabel("offlineBeamSpot", beamSpotHandle);
+  iEvent.getByToken(beamSpotToken, beamSpotHandle);
   
   if ( beamSpotHandle.isValid() )
     beamSpot = *beamSpotHandle;
@@ -163,13 +172,13 @@ FedSizeAnalyzer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   Handle< FEDRawDataCollection> fedRawData;
   // FEDRawDataCollection                  "rawDataCollector"          ""                "LHC"     
 
-  iEvent.getByLabel(rawDataSourceTag,fedRawData);
+  iEvent.getByToken(rawDataSourceToken,fedRawData);
 
   // get primary vertex information
   Handle<std::vector<reco::Vertex> > primaryVertices;
 
   // see https://hypernews.cern.ch/HyperNews/CMS/get/recoTracking/1000/1.html
-  iEvent.getByLabel("offlinePrimaryVertices",primaryVertices);
+  iEvent.getByToken(primaryVerticesToken,primaryVertices);
 
   // create the output data
   FedSizeAnalysisData *data = new FedSizeAnalysisData();
