@@ -44,9 +44,25 @@ class LuminosityEvolution:
         import csv
         csv_reader = csv.reader(open(fname))
 
-        line = csv_reader.next()
-        assert(line == ['run', 'ls', 'delivered', 'recorded'])
+        if False:
+            # LHC RUN I lumiCalc.py
+            line = csv_reader.next()
+            assert(line == ['run', 'ls', 'delivered', 'recorded'])
+            posLS = 1
+            posDelivered = 2
+            posRecorded = 3
+        if True:
+            # LHC RUN II brilcalc
+            line = csv_reader.next()
+            line = csv_reader.next()
+            print "line=",line
+            assert(line == ['#run:fill', 'ls', 'time' , 'beamstatus' , 'E(GeV)', 'delivered(/ub)', 'recorded(/ub)', 'avgpu', 'source'])
+            posLS = 1
+            posDelivered = 5
+            posRecorded = 6
 
+
+        import ROOT
         lumi_tuple = ROOT.TNtuple("lumi_tuple","lumi_tuple",":".join([
             "lumisection",
             "delivered",
@@ -57,15 +73,24 @@ class LuminosityEvolution:
         total_del_lumi = 0
 
         for line in csv_reader:
-            lumisection = int(line[1])
+            if line[0].startswith('#'):
+                continue
+
+            if False:
+                # LHC Run I
+                lumisection = int(line[posLS])
+            if True:
+                # LHC Run II
+                lumisection, lumisection2 = [ int(x) for x in line[posLS].split(':')]
+                assert lumisection == lumisection2 or lumisection2 == 0
 
             # restrict the plot only to the lumisections
             # found in the root files
             if not lumisection in all_lumi_sections:
                 continue
             
-            delivered_lumi = float(line[2]) * utils.INV_MU_BARN
-            recorded_lumi = float(line[3]) * utils.INV_MU_BARN
+            delivered_lumi = float(line[posDelivered]) * utils.INV_MU_BARN
+            recorded_lumi = float(line[posRecorded]) * utils.INV_MU_BARN
 
             lumi_tuple.Fill(lumisection,
                             delivered_lumi / utils.INV_NANO_BARN,
