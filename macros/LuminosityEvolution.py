@@ -2,6 +2,8 @@
 
 import utils
 
+gcs = []
+
 #----------------------------------------------------------------------
 # make a plot of delivered lumi vs. lumi section
 #----------------------------------------------------------------------
@@ -105,7 +107,7 @@ class LuminosityEvolution:
                               1, htemp.GetXaxis().GetXmin(), htemp.GetXaxis().GetXmax(), # xaxis
                               1,                          0, htemp.GetYaxis().GetXmax() * 1.1  # yaxis
                               )
-            gc_saver.append(dummy)
+            gcs.append(dummy)
             dummy.Draw()
 
             # draw the tuple again
