@@ -633,7 +633,9 @@ all_tasks = [
     # the per vertex ntuples
     FedSizePerVertexLinearFit(),
 
-    FedSizePerBXlumiLinearFit(),
+    # per BX lumi is not available anymore
+    # in the event in LHC Run II
+    # FedSizePerBXlumiLinearFit(),
     
     NumEventsPerLumiSection(),
     NumVerticesPerLumiSection(),
