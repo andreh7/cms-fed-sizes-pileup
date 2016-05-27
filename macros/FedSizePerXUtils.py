@@ -225,6 +225,9 @@ class Plotter:
                 xpos_for_fit.append(x)
                 ypos_for_fit.append(y)
 
+        if len(xpos_for_fit) < 2:
+            raise Exception("must have at least two points for a linear fit (linear_fit_min_value=" + str(linear_fit_min_value) + " linear_fit_max_value=" + str(linear_fit_max_value) + ")")
+
         # alpha, beta = linearFit(xpos, avg_values)
         self.alpha, self.beta = utils.linearFit(xpos_for_fit, ypos_for_fit)
 
