@@ -109,7 +109,13 @@ def loadSmallTuple(fname):
 
     fin = ROOT.TFile.Open(fname); gc_saver.append(fin)
 
-    small_tuple = fin.Get("tupler/small_tuple")
+    assert fin.IsOpen(), "failed to open small tuple file " + fname
+
+    smallTupleName = "tupler/small_tuple"
+
+    small_tuple = fin.Get(smallTupleName)
+
+    assert small_tuple != None, "could not get " + smallTupleName + " in file " + fname
 
     # maybe this magically prevents crashes ?
     ROOT.gROOT.cd()
