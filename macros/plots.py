@@ -19,21 +19,6 @@ import utils
 parameters = utils.loadParameters()
 
 #----------------------------------------------------------------------
-# some constants
-
-MU_BARN = 1e-6
-INV_MU_BARN = 1 / MU_BARN
-
-NANO_BARN = 1e-9
-INV_NANO_BARN = 1 / NANO_BARN
-
-PICO_BARN = 1e-12
-INV_PICO_BARN = 1 / PICO_BARN
-
-# 1 cm^2 in barn
-CM2 = 1e24
-
-#----------------------------------------------------------------------
 # ROOT setup
 #----------------------------------------------------------------------
 import ROOT

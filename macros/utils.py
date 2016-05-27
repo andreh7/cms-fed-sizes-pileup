@@ -58,6 +58,24 @@ cscFeds   = range(750, 757 + 1)  # CSC
 gcs = []
 
 #----------------------------------------------------------------------
+# some constants
+#----------------------------------------------------------------------
+
+MU_BARN = 1e-6
+INV_MU_BARN = 1 / MU_BARN
+
+NANO_BARN = 1e-9
+INV_NANO_BARN = 1 / NANO_BARN
+
+PICO_BARN = 1e-12
+INV_PICO_BARN = 1 / PICO_BARN
+
+# 1 cm^2 in barn
+CM2 = 1e24
+
+#----------------------------------------------------------------------
+
+
 
 # from http://cmsdoc.cern.ch/cms/TRIDAS/horizontal/RUWG/DAQ_IF_guide/DAQ_IF_guide.html
 def getSubsystemFromFed(fed,

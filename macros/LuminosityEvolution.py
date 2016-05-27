@@ -62,12 +62,12 @@ class LuminosityEvolution:
             if not lumisection in all_lumi_sections:
                 continue
             
-            delivered_lumi = float(line[2]) * INV_MU_BARN
-            recorded_lumi = float(line[3]) * INV_MU_BARN
+            delivered_lumi = float(line[2]) * utils.INV_MU_BARN
+            recorded_lumi = float(line[3]) * utils.INV_MU_BARN
 
             lumi_tuple.Fill(lumisection,
-                            delivered_lumi / INV_NANO_BARN,
-                            recorded_lumi / INV_NANO_BARN,
+                            delivered_lumi / utils.INV_NANO_BARN,
+                            recorded_lumi / utils.INV_NANO_BARN,
                             )
 
 
@@ -84,7 +84,7 @@ class LuminosityEvolution:
             ROOT.gPad.SetLogy(0)
 
             if self.use_cm:
-                quantity = ("%s *" %name) +  str(INV_NANO_BARN * CM2 / utils.seconds_per_lumi_section)
+                quantity = ("%s *" %name) +  str(utils.INV_NANO_BARN * utils.CM2 / utils.seconds_per_lumi_section)
             else:
                 quantity = "%s" % name
 
@@ -124,7 +124,7 @@ class LuminosityEvolution:
 
             #--------------------
             # figure out an appropriate unit for the luminosity
-            lumiForPrinting = total / INV_PICO_BARN
+            lumiForPrinting = total / utils.INV_PICO_BARN
             if lumiForPrinting < 1:
                 # use inverse nanobarns instead
                 lumiForPrinting = "%.1f nb^{-1}" % (lumiForPrinting * 1000)
@@ -146,7 +146,7 @@ class LuminosityEvolution:
                 dict(fname = utils.parameters.plots_output_dir + "/lumi-evolution-%s.png" % name)
                 )
 
-            print "total %s lumi =" % name,total / INV_PICO_BARN,"/pb"
+            print "total %s lumi =" % name,total / utils.INV_PICO_BARN,"/pb"
 
 
 
