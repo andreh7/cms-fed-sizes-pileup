@@ -107,7 +107,7 @@ def loadSmallTuple(fname):
 
     global small_tuple
 
-    fin = ROOT.TFile.Open(fname)
+    fin = ROOT.TFile.Open(fname); gc_saver.append(fin)
 
     small_tuple = fin.Get("tupler/small_tuple")
 
