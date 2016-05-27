@@ -10,11 +10,12 @@ gcs = []
 class LuminosityEvolution:
 
     #----------------------------------------
-    def __init__(self):
+    def __init__(self, smallTuple):
 
         # use /cm^2 units instead of
         # inv nb/lumisection
         self.use_cm = True
+        self.smallTuple = smallTuple
 
     #----------------------------------------
 
@@ -28,7 +29,7 @@ class LuminosityEvolution:
         self.outputFiles = [ ]
 
         # get the processed lumi sections from the data tuples
-        all_lumi_sections = utils.getAllLumiSections()
+        all_lumi_sections = self.smallTuple.getAllLumiSections()
 
         fname = "lumi-by-ls-%d.csv" % utils.parameters.run
 

@@ -44,8 +44,9 @@ num_events = None
 
 # a simple tuple with the values used here
 # calculated from the original CMSSW tree
-global small_tuple
-small_tuple = None
+
+from SmallTuple import SmallTuple
+small_tuple = SmallTuple(parameters)
 
 #----------------------------------------
 
@@ -103,15 +104,13 @@ class NumVertices:
     #----------------------------------------
     def produce(self):
 
-        small_tuple = utils.getSmallTuple()
-
         draw_expr = "min(" + \
                     "num_vertices,%d" % parameters.max_num_vertices + \
                     ")>>histo_num_vertices(%d,-0.5,%.1f)" % (parameters.max_num_vertices + 1, parameters.max_num_vertices + 0.5)
 
                     # ")>>histo_num_vertices(8,-0.5,7.5)"
 
-        small_tuple.Draw(draw_expr)
+        small_tuple.tree.Draw(draw_expr)
 
         ROOT.histo_num_vertices.Sumw2()
 
@@ -296,8 +295,6 @@ class FedSizeDist:
 
         # produce histograms of the fed size distributions
 
-        small_tuple = utils.getSmallTuple()
-        
         for num_vertices in range(1,parameters.max_num_vertices + 1):
 
             histo_name = "fed_size_dist_" + str(num_vertices)
@@ -316,7 +313,7 @@ class FedSizeDist:
             print "cut_expr=",cut_expr
             
 
-            small_tuple.Draw(plot_expr,cut_expr)
+            small_tuple.tree.Draw(plot_expr,cut_expr)
 
             # do we need errors and histogram normalization ?
             # ROOT.histo_num_vertices.Sumw2()
@@ -455,22 +452,21 @@ class NumEventsPerLumiSection:
 
     #----------------------------------------
     def plot(self):
-        small_tuple = utils.getSmallTuple()
 
         #--------------------
         # determine the maximum luminosity section automatically
-        small_tuple.SetEstimate(small_tuple.GetEntries())
-        small_tuple.Draw("lumisection","","goff")
-        entries = small_tuple.GetSelectedRows()
+        small_tuple.tree.SetEstimate(small_tuple.tree.GetEntries())
+        small_tuple.tree.Draw("lumisection","","goff")
+        entries = small_tuple.tree.GetSelectedRows()
 
-        v1 = small_tuple.GetV1()
+        v1 = small_tuple.tree.GetV1()
         lumisections = [ v1[index] for index in xrange(entries) ]
 
         max_lumi_section = int(max(lumisections) * 1.1)
         #--------------------
 
         # let root fill the histogram
-        small_tuple.Draw("lumisection>>htemp(%d,-0.5,%f)" %
+        small_tuple.tree.Draw("lumisection>>htemp(%d,-0.5,%f)" %
                     (max_lumi_section, max_lumi_section - 0.5))
 
         ROOT.gPad.SetGrid()
@@ -511,15 +507,13 @@ class NumVerticesPerLumiSection:
 
     #----------------------------------------
     def plot(self):
-        small_tuple = utils.getSmallTuple()
-
         #--------------------
         # determine the maximum luminosity section automatically
-        small_tuple.SetEstimate(small_tuple.GetEntries())
-        small_tuple.Draw("lumisection","","goff")
-        entries = small_tuple.GetSelectedRows()
+        small_tuple.tree.SetEstimate(small_tuple.tree.GetEntries())
+        small_tuple.tree.Draw("lumisection","","goff")
+        entries = small_tuple.tree.GetSelectedRows()
 
-        v1 = small_tuple.GetV1()
+        v1 = small_tuple.tree.GetV1()
         lumisections = [ v1[index] for index in xrange(entries) ]
 
         max_lumi_section = int(max(lumisections) * 1.1)
@@ -528,7 +522,7 @@ class NumVerticesPerLumiSection:
         # let root fill the histogram
         # we call the histogram htemp2 to avoid problems
         # with the previous plotting step....
-        small_tuple.Draw("num_vertices:lumisection>>htemp2(%d,-0.5,%f)" % (max_lumi_section, max_lumi_section - 0.5),"",
+        small_tuple.tree.Draw("num_vertices:lumisection>>htemp2(%d,-0.5,%f)" % (max_lumi_section, max_lumi_section - 0.5),"",
                          "prof")
 
         ROOT.gPad.SetGrid()
@@ -624,7 +618,7 @@ all_tasks = [
     
     NumEventsPerLumiSection(),
     NumVerticesPerLumiSection(),
-    LuminosityEvolution(),
+    LuminosityEvolution(small_tuple),
 
     # this is not yet implemented (or not needed any more ?)
     # PerFedSize(),
