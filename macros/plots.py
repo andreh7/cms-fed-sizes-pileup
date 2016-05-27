@@ -59,6 +59,7 @@ num_events = None
 
 # a simple tuple with the values used here
 # calculated from the original CMSSW tree
+global small_tuple
 small_tuple = None
 
 #----------------------------------------
@@ -86,130 +87,6 @@ def getNumEvents():
 
     return num_events
 
-#----------------------------------------
-def newestFileDate(glob_pattern):
-    import glob, os    
-
-    newest_date = None
-
-    for fname in glob.glob(glob_pattern):
-
-        this_date = os.path.getmtime(fname)
-
-        if this_date > newest_date:
-            newest_date = this_date
-
-    return newest_date
-
-#----------------------------------------
-
-def loadSmallTuple(fname):
-
-    global small_tuple
-
-    fin = ROOT.TFile.Open(fname); gc_saver.append(fin)
-
-    assert fin.IsOpen(), "failed to open small tuple file " + fname
-
-    smallTupleName = "tupler/small_tuple"
-
-    small_tuple = fin.Get(smallTupleName)
-
-    assert small_tuple != None, "could not get " + smallTupleName + " in file " + fname
-
-    # maybe this magically prevents crashes ?
-    ROOT.gROOT.cd()
-
-    return small_tuple
-
-#----------------------------------------
-
-def getSmallTuple():
-
-    import os
-    global small_tuple
-
-    # the file name of the file
-    # containing the cached data
-    fname = parameters.input_data_dir + "/small-tuples.root"
-
-    if small_tuple != None:
-        return small_tuple
-
-    # try to find it on disk 
-
-    biggest_time = None
-
-    # also check whether this is newer than all
-    # of the original ntuples
-    if os.path.exists(fname) and \
-       os.path.getmtime(fname) >= newestFileDate(parameters.input_data_dir + "/*.root"):
-
-        return loadSmallTuple(fname)
-
-    raise Exception("small tuple " + fname + " is out of date (files in " + parameters.input_data_dir + " seem newer) or not existing, need to rerun cmsRun")
-
-
-    ## # not on disk or not recent enough, we must
-    ## # produce it
-    ## 
-    ## print >> sys.stderr,"getting the original data from the large number of files"
-    ## 
-    ## Events.SetEstimate(Events.GetEntries())
-    ## Events.Draw(":".join( [
-    ##     "fedSizeData.getNumPrimaryVertices()", # V1
-    ##     "fedSizeData.getSumAllFedSizes()",     # V2
-    ##     "EventAuxiliary.luminosityBlock()",    # V3
-    ##     "EventAuxiliary.event()",              # V4
-    ##     ]),
-    ##             "", # cut
-    ##             "goff"
-    ##             )
-    ## 
-    ## small_tuple = ROOT.TNtuple("small_tuple","small_tuple",":".join([
-    ##     "num_vertices",
-    ##     "total_event_size",
-    ##     "lumisection",
-    ##     "event"]))
-    ## 
-    ## entries = Events.GetSelectedRows()
-    ## 
-    ## vector = [ Events.GetV1(), Events.GetV2(), Events.GetV3(), Events.GetV4() ]
-    ## 
-    ## for index in xrange(entries):
-    ##     small_tuple.Fill(vector[0][index],
-    ##                 vector[1][index],
-    ##                 vector[2][index])
-    ## 
-    ## fout = ROOT.TFile.Open(fname,"RECREATE")
-    ## fout.cd()
-    ## small_tuple.Write()
-    ## ROOT.gROOT.cd()
-    ## fout.Close()
-    ## 
-    ## print >> sys.stderr,"wrote cached file"
-    ## 
-    ## # try loading the file again in order to avoid
-    ## # crashes
-    ## return loadSmallTuple(fname)
-
-#----------------------------------------------------------------------
-
-def getAllLumiSections():
-    """ returns a list of all luminosity sections found """
-
-    getSmallTuple()
-    small_tuple.SetEstimate(small_tuple.GetEntries())
-    small_tuple.Draw("lumisection","","goff")
-
-    num_entries = small_tuple.GetSelectedRows()
-    data = small_tuple.GetV1()
-
-    lumi_sections = set([ data[i] for i in xrange(num_entries) ])
-
-    return lumi_sections
-
-    
 #----------------------------------------------------------------------
 
 def weightedAverage(values, weights):
@@ -241,7 +118,7 @@ class NumVertices:
     #----------------------------------------
     def produce(self):
 
-        getSmallTuple()
+        small_tuple = utils.getSmallTuple()
 
         draw_expr = "min(" + \
                     "num_vertices,%d" % parameters.max_num_vertices + \
@@ -434,7 +311,7 @@ class FedSizeDist:
 
         # produce histograms of the fed size distributions
 
-        getSmallTuple()
+        small_tuple = utils.getSmallTuple()
         
         for num_vertices in range(1,parameters.max_num_vertices + 1):
 
@@ -593,7 +470,7 @@ class NumEventsPerLumiSection:
 
     #----------------------------------------
     def plot(self):
-        getSmallTuple()
+        small_tuple = utils.getSmallTuple()
 
         #--------------------
         # determine the maximum luminosity section automatically
@@ -649,7 +526,7 @@ class NumVerticesPerLumiSection:
 
     #----------------------------------------
     def plot(self):
-        getSmallTuple()
+        small_tuple = utils.getSmallTuple()
 
         #--------------------
         # determine the maximum luminosity section automatically
