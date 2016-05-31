@@ -139,13 +139,22 @@ fedBuilderGroups = [
 
 def makeGroupExpressions(fedsInRun = []):
 
+    import sys
+
     retval = []
 
     fedsInRun = set(fedsInRun)
 
     for line in fedBuilderGroups:
+
+        # exclude fedbuilders for which no single FED was in the run
+        feds = [ fed for fed in line['feds'] if fed in fedsInRun ]
+        if not feds:
+            print >> sys.stderr,"skipping fedbuilder",line['name'],", no feds included in run"
+            continue
+
         retval.append(dict(label = line['name'],
-                           expr = "+".join(["size%03d" % fed for fed in line['feds'] if fed in fedsInRun ]),
+                           expr = "+".join(["size%03d" % fed for fed in feds ]),
                            ))
 
     return retval
