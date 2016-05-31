@@ -137,15 +137,15 @@ fedBuilderGroups = [
 # utility functions
 #----------------------------------------------------------------------
 
-def makeGroupExpressions(fedsToExclude = []):
+def makeGroupExpressions(fedsInRun = []):
 
     retval = []
 
-    fedsToExclude = set(fedsToExclude)
+    fedsInRun = set(fedsInRun)
 
     for line in fedBuilderGroups:
-        retval.append(dict(label = line['name'] + " " + line['frlpc'],
-                           expr = "+".join(["size%03d" % fed for fed in line['feds'] if not fed in fedsToExclude ]),
+        retval.append(dict(label = line['name'],
+                           expr = "+".join(["size%03d" % fed for fed in line['feds'] if fed in fedsInRun ]),
                            ))
 
     return retval
