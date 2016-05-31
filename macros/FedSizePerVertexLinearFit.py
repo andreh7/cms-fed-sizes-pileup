@@ -2,6 +2,8 @@
 # FED size distribution: minimum, maximum, average and fit to average
 #----------------------------------------------------------------------
 
+import os
+
 import utils
 import FedSizePerXUtils
 
@@ -269,7 +271,7 @@ class FedSizePerVertexLinearFit:
 
             averageNumVertices = avg_num_vertices,
 
-            yaxis_unit_size = yaxis_unit_size,
+            yaxis_unit_size = self.yaxis_unit_size,
 
             # for drawing the extrapolation
             linear_fit_extrapolation_min_num_vertices = getattr(parameters, 'linear_fit_extrapolation_min_num_vertices', None),
