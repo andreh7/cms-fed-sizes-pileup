@@ -443,6 +443,19 @@ def getIndividualFedsFromSmallTupleFile():
     getSmallTuple()
 
     
+#----------------------------------------------------------------------
+
+def weightedAverage(values, weights):
+    """ calculates a weighted average.
+        numpy seems not to be available for the CMSSW python installation,
+    so we have to do it by hand..."""
+
+    sum_value_times_weight = 0
+
+    for val, weight in zip(values,weights):
+        sum_value_times_weight += val * weight
+
+    return sum_value_times_weight / sum(weights)
 
 
 #----------------------------------------------------------------------
