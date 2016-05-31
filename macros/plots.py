@@ -431,7 +431,7 @@ class FedSizeDist:
         
     #----------------------------------------
 
-execfile("FedSizePerVertexLinearFit.py")
+from FedSizePerVertexLinearFit import FedSizePerVertexLinearFit
 
 #----------------------------------------------------------------------
 # number of events per lumi section
