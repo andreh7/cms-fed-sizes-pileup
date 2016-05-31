@@ -604,7 +604,7 @@ if False:
             text = ", ".join( [ "%d*%s" % (x,y) for x,y in zip(counts,subsystems) ])
 
         if True:
-            text = "%s (%s)" % (FedBuilderData.fedBuilderGroups[label]['name'], FedBuilderData.fedBuilderGroups[label]['frlpc'])
+            text = "%s" % FedBuilderData.fedBuilderGroups[label]['name']
 
         #--------------------
 
