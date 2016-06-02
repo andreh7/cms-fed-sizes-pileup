@@ -370,7 +370,6 @@ def loadParameters():
     return mod
 
 
-parameters = loadParameters()
 
 #----------------------------------------------------------------------
 
