@@ -78,63 +78,8 @@ def getNumEvents():
 from NumVertices import NumVertices
 from FedSizeDist import FedSizeDist
 from FedSizePerVertexLinearFit import FedSizePerVertexLinearFit
-
-#----------------------------------------------------------------------
-# number of events per lumi section
-#----------------------------------------------------------------------
-class NumEventsPerLumiSection:
-
-    #----------------------------------------
-
-    def __init__(self):
-        pass
-
-    #----------------------------------------
-
-    def produce(self):
-        # looks like it's fast to produce this plot,
-        # no need to store an intermediate histogram for the moment
-        pass
-
-    #----------------------------------------
-    def plot(self):
-
-        #--------------------
-        # determine the maximum luminosity section automatically
-        small_tuple.tree.SetEstimate(small_tuple.tree.GetEntries())
-        small_tuple.tree.Draw("lumisection","","goff")
-        entries = small_tuple.tree.GetSelectedRows()
-
-        v1 = small_tuple.tree.GetV1()
-        lumisections = [ v1[index] for index in xrange(entries) ]
-
-        max_lumi_section = int(max(lumisections) * 1.1)
-        #--------------------
-
-        # let root fill the histogram
-        small_tuple.tree.Draw("lumisection>>htemp(%d,-0.5,%f)" %
-                    (max_lumi_section, max_lumi_section - 0.5))
-
-        ROOT.gPad.SetGrid()
-        ROOT.gPad.SetLogy(0)
-
-        ROOT.htemp.SetXTitle("Luminosity section")
-        ROOT.htemp.SetYTitle("# events per luminosity section")
-
-
-        
-        ROOT.gPad.SaveAs(parameters.plots_output_dir + "/events-per-lumi-section.png")
-
-        #--------------------
-        # set output files
-        #--------------------
-        self.outputFiles = [
-            dict(fname = parameters.plots_output_dir + "/events-per-lumi-section.png"),
-            ]
-
-    #----------------------------------------
-
 from NumVerticesPerLumiSection import NumVerticesPerLumiSection
+from NumEventsPerLumiSection import NumEventsPerLumiSection
 
 #----------------------------------------------------------------------
 # checking which lumisections appear in the file and
@@ -209,7 +154,7 @@ all_tasks = [
     # in the event in LHC Run II
     # FedSizePerBXlumiLinearFit(),
     
-    NumEventsPerLumiSection(),
+    NumEventsPerLumiSection(parameters, small_tuple),
     NumVerticesPerLumiSection(parameters, small_tuple),
     LuminosityEvolution(parameters, small_tuple),
 
