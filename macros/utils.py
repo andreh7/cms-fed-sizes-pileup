@@ -367,8 +367,18 @@ def loadParameters():
         mod = imp.load_module(
             "parameters", module_file, fname, (".py","U", imp.PY_SOURCE))
 
-    return mod
+    # return an object instead of a module (because the former can be pickled)
+    from Parameters import Parameters
+    retval = Parameters()
 
+    for key in dir(mod):
+        if key.startswith("__"):
+             continue
+
+        obj = getattr(mod, key)
+        setattr(retval, key, obj)
+
+    return retval
 
 
 #----------------------------------------------------------------------
