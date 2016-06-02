@@ -470,3 +470,15 @@ if XLSutils.xlsUtilExists():
 
     print >> sys.stderr,"created spreadsheet file",xlsFname
 
+#----------------------------------------
+# save task data for later reporting
+#----------------------------------------
+
+tasksOutputFile = os.path.join(parameters.plots_output_dir, "allTasks.pkl")
+print >> sys.stderr,"writing task data to",tasksOutputFile
+fout = open(tasksOutputFile, "w")
+import cPickle as pickle
+pickle.dump(all_tasks, fout)
+fout.close()
+
+
