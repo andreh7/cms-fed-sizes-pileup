@@ -148,11 +148,11 @@ all_tasks = [
     # global, not per subsystem
     # but for the moment still needs
     # the per vertex ntuples
-    FedSizePerVertexLinearFit(),
+    FedSizePerVertexLinearFit(parameters),
 
     # per BX lumi is not available anymore
     # in the event in LHC Run II
-    # FedSizePerBXlumiLinearFit(),
+    # FedSizePerBXlumiLinearFit(parameters),
     
     NumEventsPerLumiSection(parameters, small_tuple),
     NumVerticesPerLumiSection(parameters, small_tuple),
@@ -193,7 +193,7 @@ if True:
             yaxis_unit_size = 1e6
 
 
-        thisTask = FedSizePerVertexLinearFit(size_expr = size_expr,
+        thisTask = FedSizePerVertexLinearFit(parameters, size_expr = size_expr,
                                                    subsys_name = subsys,
                                                    yaxis_unit_label = yaxis_unit_label,
                                                    yaxis_unit_size = yaxis_unit_size,
@@ -205,8 +205,8 @@ if True:
 #----------------------------------------------------------------------
 
 # FOR TESTING 
-# all_tasks = [ FedSizePerVertexLinearFit(), ]
-# all_tasks = [ FedSizePerBXlumiLinearFit.FedSizePerBXlumiLinearFit(), ]
+# all_tasks = [ FedSizePerVertexLinearFit(parameters), ]
+# all_tasks = [ FedSizePerBXlumiLinearFit(parameters), ]
 
 # list of output files (needed to produce a zip file)
 outputFiles = []
@@ -280,7 +280,7 @@ import GrandUnificationPlot
 
 
 # standard 'Grand Unification Plot' for subsystem sizes
-GrandUnificationPlot.makeGrandUnificationPlot(outputFiles, subsystemEvolutionData,
+GrandUnificationPlot.makeGrandUnificationPlot(parameters, outputFiles, subsystemEvolutionData,
                                               printCSV = True,
                                               )
 
