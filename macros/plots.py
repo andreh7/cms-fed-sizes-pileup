@@ -182,7 +182,8 @@ if True:
             # expect a dict
             subsys = line['label']
             size_expr = line['expr']
-            
+            grouping = line.get('grouping', None)
+
 
         yaxis_unit_label = "kB"
         yaxis_unit_size = 1e3
@@ -195,6 +196,7 @@ if True:
 
         thisTask = FedSizePerVertexLinearFit(parameters, size_expr = size_expr,
                                                    subsys_name = subsys,
+                                                   grouping_name = grouping,
                                                    yaxis_unit_label = yaxis_unit_label,
                                                    yaxis_unit_size = yaxis_unit_size,
                                                    legendBottomLeft = parameters.fedSizePerVertexLinearFitLegendPositions(parameters.run, subsys)

@@ -154,6 +154,7 @@ def makeGroupExpressions(fedsInRun = []):
             continue
 
         retval.append(dict(label = line['name'],
+                           grouping = "by fedbuilder",
                            expr = "+".join(["size%03d" % fed for fed in feds ]),
                            ))
 

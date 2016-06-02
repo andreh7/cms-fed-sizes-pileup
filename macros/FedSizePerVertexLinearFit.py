@@ -38,6 +38,7 @@ class FedSizePerVertexLinearFit:
     def __init__(self, 
                  parameters,
                  size_expr = "size_total", subsys_name = None,
+                 grouping_name = None,
                  yaxis_unit_label = "MB", yaxis_unit_size = 1e6,
                  legendBottomLeft = None
                  ):
@@ -107,6 +108,7 @@ class FedSizePerVertexLinearFit:
         #--------------------
 
         self.subsys = subsys_name
+        self.grouping = grouping_name
 
         if subsys_name != 'total':
             # add a protection for custom plotting expressions
