@@ -93,6 +93,7 @@ class Plotter:
     #----------------------------------------
     
     def __init__(self,
+                 parameters,
                  xpos,   # the bin centers
                  min_values,
                  avg_values,  # average values
@@ -137,6 +138,8 @@ class Plotter:
 
                  linear_fit_extrapolation_max_num_vertices = None,
                  ):
+
+        self.parameters = parameters
 
         self.xpos = xpos
         self.min_values = min_values
@@ -212,8 +215,6 @@ class Plotter:
                    ):
         """ perform a linear fit to the average values """
         import utils
-        parameters = utils.loadParameters()
-
         global linear_fit_min_num_vertices, linear_fit_max_num_vertices
 
         # filter the values for the fit
@@ -386,10 +387,7 @@ class Plotter:
         #--------------------
         if True:
 
-            import utils
-            parameters = utils.loadParameters()
-
-            label = ROOT.TLatex(0.89,0.15,"run %d" % parameters.run)
+            label = ROOT.TLatex(0.89,0.15,"run %d" % self.parameters.run)
             label.SetNDC(True)
             label.SetTextSize(label.GetTextSize() * 0.5)
             label.SetTextAlign(31)
@@ -449,7 +447,7 @@ class Plotter:
         # (and also other user specified)
         #--------------------
 
-        linear_fit_arrows = getattr(parameters, "linear_fit_arrows", [ dict(vtx = "avg") ])
+        linear_fit_arrows = getattr(self.parameters, "linear_fit_arrows", [ dict(vtx = "avg") ])
 
         if hasattr(self, 'fittedFunc'):
             # left end for horizontal arrows

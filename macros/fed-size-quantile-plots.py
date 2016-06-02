@@ -13,7 +13,6 @@ import utils
 # execfile("parameters.py")
 
 import utils
-parameters = utils.loadParameters()
 #--------------------
 
 # quantiles = [ 0.50, 0.95, 0.999, "mean" ]
@@ -52,7 +51,10 @@ class MainClass:
 
     #----------------------------------------
 
-    def __init__(self, rootFile):
+    def __init__(self, parameters, rootFile):
+
+        self.parameters = parameters
+
         # get all tuples for all number
         # of reconstructed vertices
         self.numVerticesToTuple = {}
@@ -89,9 +91,9 @@ class MainClass:
         self.fed_ids = [ x for x in self.fed_ids if not x == 1023 ]
 
         # excluded feds given by the configuration parameters
-        if hasattr(parameters, 'fedSizeQuantilePlotsParams'):
+        if hasattr(self.parameters, 'fedSizeQuantilePlotsParams'):
 
-            for fed in parameters.fedSizeQuantilePlotsParams.get('excludeFeds',[]):
+            for fed in self.parameters.fedSizeQuantilePlotsParams.get('excludeFeds',[]):
                 if fed in self.fed_ids:
                     self.fed_ids.remove(fed)
     
@@ -375,7 +377,7 @@ def makePlot(quantile_values, fed_ids, min_fedid = None, max_fedid = None, canva
             det_mid_fed = (det_max_fed + det_min_fed) / 2.0
 
 
-            configParams = getattr(parameters, 'fedSizeQuantilePlotsParams',{})
+            configParams = getattr(self.parameters, 'fedSizeQuantilePlotsParams',{})
 
             plotParams = {}
 
@@ -452,7 +454,7 @@ def makePlot(quantile_values, fed_ids, min_fedid = None, max_fedid = None, canva
     #--------------------
     label = ROOT.TLatex(# 0.89,0.15,
                         0.89, 0.93,
-                        "run %d" % parameters.run)
+                        "run %d" % self.parameters.run)
     label.SetNDC(True)
     label.SetTextSize(label.GetTextSize() * 0.5)
 
@@ -467,7 +469,7 @@ def makePlot(quantile_values, fed_ids, min_fedid = None, max_fedid = None, canva
     #--------------------        
 
 
-    ROOT.gPad.SaveAs(parameters.plots_output_dir + "/quantiles-%d-%d%s.png" % (min_fedid, max_fedid, outputFnameSuffix))
+    ROOT.gPad.SaveAs(self.parameters.plots_output_dir + "/quantiles-%d-%d%s.png" % (min_fedid, max_fedid, outputFnameSuffix))
 
     return quantile_histos
 
@@ -477,12 +479,13 @@ def makePlot(quantile_values, fed_ids, min_fedid = None, max_fedid = None, canva
 
 gc_saver = []
 
+parameters = utils.loadParameters()
 fname = parameters.output_data_dir + "/small-tuples.root"
 
 print "opening ",fname
 fin = ROOT.TFile.Open(fname)
 
-mainClass = MainClass(fin)
+mainClass = MainClass(parameters, fin)
 print len(mainClass.fed_ids), "feds found"
 
 #----------------------------------------

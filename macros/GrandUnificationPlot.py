@@ -1,10 +1,9 @@
 import utils
-parameters = utils.loadParameters()
 
 import pylab
 
 #----------------------------------------------------------------------
-def makeGrandUnificationPlot(outputFiles, subsystemEvolutionData,
+def makeGrandUnificationPlot(parameters, outputFiles, subsystemEvolutionData,
                              triggerRate = None,
                              xmax = 200,
                              printCSV = False,

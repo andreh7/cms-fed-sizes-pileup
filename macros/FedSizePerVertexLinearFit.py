@@ -7,8 +7,6 @@ import os
 import utils
 import FedSizePerXUtils
 
-parameters = utils.loadParameters()
-
 import ROOT
 
 class FedSizePerVertexLinearFit:
@@ -28,9 +26,6 @@ class FedSizePerVertexLinearFit:
     plotMinMax = True
     plotAvg = True
 
-    ymaxScale = getattr(parameters,'size_evolution_rel_yscale',1.2)
-    # ymaxScale = None
-
     # default parameters for legend
     legendWidth = 0.25
     legendHeight = 0.2
@@ -40,7 +35,9 @@ class FedSizePerVertexLinearFit:
 
     #----------------------------------------
 
-    def __init__(self, size_expr = "size_total", subsys_name = None,
+    def __init__(self, 
+                 parameters,
+                 size_expr = "size_total", subsys_name = None,
                  yaxis_unit_label = "MB", yaxis_unit_size = 1e6,
                  legendBottomLeft = None
                  ):
@@ -49,6 +46,13 @@ class FedSizePerVertexLinearFit:
             summing individual FEDs
             
         """
+
+        self.parameters = parameters
+
+
+        self.ymaxScale = getattr(self.parameters,'size_evolution_rel_yscale',1.2)
+        self.ymaxScale = None
+
 
         # assert(size_expr.startswith("size_"))
         self.size_expr = size_expr
@@ -106,7 +110,7 @@ class FedSizePerVertexLinearFit:
 
         if subsys_name != 'total':
             # add a protection for custom plotting expressions
-            self.numFeds = utils.getNumFedsPerFedGroup(parameters.input_data_dir).get(subsys_name, None)
+            self.numFeds = utils.getNumFedsPerFedGroup(self.parameters.input_data_dir).get(subsys_name, None)
 
             # if not found, estimate from the number of occurrences of 'size'
             # in the plot expression (assuming it's basically a sum)
@@ -135,10 +139,10 @@ class FedSizePerVertexLinearFit:
 
         # produce histograms of the fed size distributions
 
-        ntuple = utils.openSizePerFedNtuples(parameters.input_data_dir, parameters.max_num_vertices)
+        ntuple = utils.openSizePerFedNtuples(self.parameters.input_data_dir, self.parameters.max_num_vertices)
 
-        for num_vertices in range(parameters.size_evolution_min_num_vertices,
-                                  parameters.size_evolution_max_num_vertices + 1):
+        for num_vertices in range(self.parameters.size_evolution_min_num_vertices,
+                                  self.parameters.size_evolution_max_num_vertices + 1):
 
             # make sure this subsystem is known
             tupleVariables = [ x.GetName() for x in ntuple[num_vertices].GetListOfLeaves() ]
@@ -155,7 +159,7 @@ class FedSizePerVertexLinearFit:
             nentries = ntuple[num_vertices].GetSelectedRows()
             data = ntuple[num_vertices].GetV1()
 
-            fout = open(parameters.output_data_dir + "/event-sizes-%d-vtx.txt" % num_vertices,"w")
+            fout = open(self.parameters.output_data_dir + "/event-sizes-%d-vtx.txt" % num_vertices,"w")
 
             for i in range(nentries):
                 print >> fout,data[i]
@@ -173,8 +177,8 @@ class FedSizePerVertexLinearFit:
     def plot(self):
 
         #----------
-        if os.path.exists(parameters.plots_output_dir + "/avg-num-vertices.txt"):
-            avg_num_vertices = float(open(parameters.plots_output_dir + "/avg-num-vertices.txt").read())
+        if os.path.exists(self.parameters.plots_output_dir + "/avg-num-vertices.txt"):
+            avg_num_vertices = float(open(self.parameters.plots_output_dir + "/avg-num-vertices.txt").read())
         else:
             avg_num_vertices = None
 
@@ -194,11 +198,11 @@ class FedSizePerVertexLinearFit:
         # we should support the case where there were no events
         # for a given number of vertices
 
-        for num_vertices in range(parameters.size_evolution_min_num_vertices,
-                                  parameters.size_evolution_max_num_vertices + 1):
+        for num_vertices in range(self.parameters.size_evolution_min_num_vertices,
+                                  self.parameters.size_evolution_max_num_vertices + 1):
 
             # reading them back:
-            event_sizes = [ float(x.split('\n')[0]) for x in open(parameters.output_data_dir + "/event-sizes-%d-vtx.txt" % num_vertices).readlines() ]
+            event_sizes = [ float(x.split('\n')[0]) for x in open(self.parameters.output_data_dir + "/event-sizes-%d-vtx.txt" % num_vertices).readlines() ]
             
             event_sizes.sort()
             if event_sizes:
@@ -233,6 +237,7 @@ class FedSizePerVertexLinearFit:
         # use the helper class to actually per form the fit
         #--------------------
         plotter = FedSizePerXUtils.Plotter(
+            self.parameters,
             xpos = self.xpos,
             min_values = self.min_values,
             avg_values = self.avg_values,
@@ -274,13 +279,13 @@ class FedSizePerVertexLinearFit:
             yaxis_unit_size = self.yaxis_unit_size,
 
             # for drawing the extrapolation
-            linear_fit_extrapolation_min_num_vertices = getattr(parameters, 'linear_fit_extrapolation_min_num_vertices', None),
-            linear_fit_extrapolation_max_num_vertices = getattr(parameters, 'linear_fit_extrapolation_max_num_vertices', None),
+            linear_fit_extrapolation_min_num_vertices = getattr(self.parameters, 'linear_fit_extrapolation_min_num_vertices', None),
+            linear_fit_extrapolation_max_num_vertices = getattr(self.parameters, 'linear_fit_extrapolation_max_num_vertices', None),
 
             )
 
-        plotter.fitAverage(linear_fit_min_value = parameters.linear_fit_min_num_vertices - 0.5,
-                           linear_fit_max_value = parameters.linear_fit_max_num_vertices + 0.5,
+        plotter.fitAverage(linear_fit_min_value = self.parameters.linear_fit_min_num_vertices - 0.5,
+                           linear_fit_max_value = self.parameters.linear_fit_max_num_vertices + 0.5,
                            # "size = (%.2f + # vtx * %.2f) %s" % (self.alpha,self.beta, self.yaxis_unit_label)
                            label_template = "size = (%(offset).3f + # vtx * %(slope).3f) %(unit)s",
                            )
@@ -292,15 +297,15 @@ class FedSizePerVertexLinearFit:
         
         #--------------------
 
-        ROOT.gPad.SaveAs(parameters.plots_output_dir + "/average-sizes-vs-vertex-" + self.subsys + ".png")
-        ROOT.gPad.SaveAs(parameters.plots_output_dir + "/average-sizes-vs-vertex-" + self.subsys + ".C")
+        ROOT.gPad.SaveAs(self.parameters.plots_output_dir + "/average-sizes-vs-vertex-" + self.subsys + ".png")
+        ROOT.gPad.SaveAs(self.parameters.plots_output_dir + "/average-sizes-vs-vertex-" + self.subsys + ".C")
         
         #--------------------
         # set output files
         #--------------------
         self.outputFiles = [
-            dict(fname = parameters.plots_output_dir + "/average-sizes-vs-vertex-" + self.subsys + ".png"),
-            dict(fname = parameters.plots_output_dir + "/average-sizes-vs-vertex-" + self.subsys + ".C"),
+            dict(fname = self.parameters.plots_output_dir + "/average-sizes-vs-vertex-" + self.subsys + ".png"),
+            dict(fname = self.parameters.plots_output_dir + "/average-sizes-vs-vertex-" + self.subsys + ".C"),
             ]
 
     

@@ -5,8 +5,6 @@
 import utils
 import FedSizePerXUtils
 
-parameters = utils.loadParameters()
-
 import ROOT
 
 class FedSizePerBXlumiLinearFit:
@@ -26,9 +24,6 @@ class FedSizePerBXlumiLinearFit:
     plotMinMax = True
     plotAvg = True
 
-    ymaxScale = getattr(parameters,'perLumiSize_relYmax',1.2)
-    # ymaxScale = None
-
     # default parameters for legend
     legendWidth = 0.25
     legendHeight = 0.2
@@ -39,6 +34,7 @@ class FedSizePerBXlumiLinearFit:
     #----------------------------------------
 
     def __init__(self,
+                 parameters,
                  size_expr = "size_total",
                  subsys_name = None,
                  yaxis_unit_label = "MB",
@@ -51,14 +47,19 @@ class FedSizePerBXlumiLinearFit:
             
         """
 
+        self.parameters = parameters
+
+        self.ymaxScale = getattr(parameters,'perLumiSize_relYmax',1.2)
+        self.ymaxScale = None
+
         # assert(size_expr.startswith("size_"))
         self.size_expr = size_expr
 
         import HistogramBinning
         self.lumiBinning = HistogramBinning.HistogramBinning(
-            parameters.lumiBinningNbins,
-            parameters.lumiBinningXlow,
-            parameters.lumiBinningXhigh)
+            self.parameters.lumiBinningNbins,
+            self.parameters.lumiBinningXlow,
+            self.parameters.lumiBinningXhigh)
 
         #--------------------
 
@@ -113,7 +114,7 @@ class FedSizePerBXlumiLinearFit:
 
         if subsys_name != 'total':
             # add a protection for custom plotting expressions
-            self.numFeds = utils.getNumFedsPerFedGroup(parameters.output_data_dir).get(subsys_name, None)
+            self.numFeds = utils.getNumFedsPerFedGroup(self.parameters.output_data_dir).get(subsys_name, None)
 
             # if not found, estimate from the number of occurrences of 'size'
             # in the plot expression (assuming it's basically a sum)
@@ -137,14 +138,14 @@ class FedSizePerBXlumiLinearFit:
         #     self.legendXLeft = legendXLeft
         #     self.legendYBottom = legendYBottom
 
-        self.textFileNameTemplate = parameters.output_data_dir + "/event-sizes-with-per-bx-lumi-bin-%d.txt"
+        self.textFileNameTemplate = self.parameters.output_data_dir + "/event-sizes-with-per-bx-lumi-bin-%d.txt"
 
     #----------------------------------------
     def produce(self):
 
         # produce histograms of the fed size distributions
 
-        ntuple = utils.openSizePerFedNtuples(parameters.input_data_dir, parameters.max_num_vertices)
+        ntuple = utils.openSizePerFedNtuples(self.parameters.input_data_dir, self.parameters.max_num_vertices)
 
         outputFiles = {}
 
@@ -155,8 +156,8 @@ class FedSizePerBXlumiLinearFit:
 
         # note that we loop over the per-vertex tuples
         # but we need to bin in per bunch crossing luminosity bins
-        for num_vertices in range(parameters.size_evolution_min_num_vertices,
-                                  parameters.size_evolution_max_num_vertices + 1):
+        for num_vertices in range(self.parameters.size_evolution_min_num_vertices,
+                                  self.parameters.size_evolution_max_num_vertices + 1):
 
             # make sure this subsystem is known
             tupleVariables = [ x.GetName() for x in ntuple[num_vertices].GetListOfLeaves() ]
@@ -266,6 +267,7 @@ class FedSizePerBXlumiLinearFit:
         #--------------------
 
         plotter = FedSizePerXUtils.Plotter(
+            self.parameters,
             xpos = self.xpos,
             min_values = self.min_values,
             avg_values = self.avg_values,
@@ -305,8 +307,8 @@ class FedSizePerBXlumiLinearFit:
 
             )
 
-        plotter.fitAverage(linear_fit_min_value = parameters.linear_fit_min_per_bx_lumi,
-                           linear_fit_max_value = parameters.linear_fit_max_per_bx_lumi,
+        plotter.fitAverage(linear_fit_min_value = self.parameters.linear_fit_min_per_bx_lumi,
+                           linear_fit_max_value = self.parameters.linear_fit_max_per_bx_lumi,
                            label_template = "size = (%(offset).2f + bxlumi * %(slope).2f) %(unit)s",
                            )
         plotter.plot()
@@ -314,15 +316,15 @@ class FedSizePerBXlumiLinearFit:
         
         #--------------------
 
-        ROOT.gPad.SaveAs(parameters.plots_output_dir + "/average-sizes-vs-bxlumi-" + self.subsys + ".png")
-        ROOT.gPad.SaveAs(parameters.plots_output_dir + "/average-sizes-vs-bxlumi-" + self.subsys + ".C")
+        ROOT.gPad.SaveAs(self.parameters.plots_output_dir + "/average-sizes-vs-bxlumi-" + self.subsys + ".png")
+        ROOT.gPad.SaveAs(self.parameters.plots_output_dir + "/average-sizes-vs-bxlumi-" + self.subsys + ".C")
         
         #--------------------
         # set output files
         #--------------------
         self.outputFiles = [
-            dict(fname = parameters.plots_output_dir + "/average-sizes-vs-bxlumi-" + self.subsys + ".png"),
-            dict(fname = parameters.plots_output_dir + "/average-sizes-vs-bxlumi-" + self.subsys + ".C"),
+            dict(fname = self.parameters.plots_output_dir + "/average-sizes-vs-bxlumi-" + self.subsys + ".png"),
+            dict(fname = self.parameters.plots_output_dir + "/average-sizes-vs-bxlumi-" + self.subsys + ".C"),
             ]
 
     
