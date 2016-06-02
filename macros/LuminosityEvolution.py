@@ -10,11 +10,13 @@ gcs = []
 class LuminosityEvolution:
 
     #----------------------------------------
-    def __init__(self, smallTuple):
+    def __init__(self, parameters, smallTuple):
 
         # use /cm^2 units instead of
         # inv nb/lumisection
         self.use_cm = True
+
+        self.parameters = parameters
         self.smallTuple = smallTuple
 
     #----------------------------------------
@@ -31,13 +33,13 @@ class LuminosityEvolution:
         # get the processed lumi sections from the data tuples
         all_lumi_sections = self.smallTuple.getAllLumiSections()
 
-        fname = "lumi-by-ls-%d.csv" % utils.parameters.run
+        fname = "lumi-by-ls-%d.csv" % self.parameters.run
 
         import os
         if not os.path.exists(fname):
             print "could not find file '%s'," % fname
             print "you should run"
-            print"     lumiCalc.py -r %d -o lumi-by-ls-%d.csv --nowarning lumibyls" % (utils.parameters.run, utils.parameters.run)
+            print"     lumiCalc.py -r %d -o lumi-by-ls-%d.csv --nowarning lumibyls" % (self.parameters.run, self.parameters.run)
             print "Skipping luminosity evolution plot. Press return."
             sys.stdin.readline()
             return
@@ -169,9 +171,9 @@ class LuminosityEvolution:
             ROOT.gPad.Modified()
             # ROOT.gPad.Update()
 
-            ROOT.gPad.SaveAs(utils.parameters.plots_output_dir + "/lumi-evolution-%s.png" % name)
+            ROOT.gPad.SaveAs(self.parameters.plots_output_dir + "/lumi-evolution-%s.png" % name)
             self.outputFiles.append(
-                dict(fname = utils.parameters.plots_output_dir + "/lumi-evolution-%s.png" % name)
+                dict(fname = self.parameters.plots_output_dir + "/lumi-evolution-%s.png" % name)
                 )
 
             print "total %s lumi =" % name,total / utils.INV_PICO_BARN,"/pb"
