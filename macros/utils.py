@@ -92,6 +92,8 @@ def getSubsystemFromFed(fed,
     else:
         if fed >= 0	        and fed <= 39	: return "Pixel"
 
+    if fed >= 40        and fed <= 40   : return "PixelPilot"
+
     if fed >= 50	and fed <= 489	: return "Tracker"
     if fed >= 520	and fed <= 575	: return "Preshower"
     if fed >= 600	and fed <= 670	: return "ECAL"
@@ -120,6 +122,11 @@ def getSubsystemFromFed(fed,
     if fed >= 890	and fed <= 901	: return "CSCTF"
     if fed >= 1023	and fed <= 1023	: return "DAQ"
 
+    # uTCA FEDs
+    if fed >= 1024	and fed <= 1024	: return "TCDS"
+    if fed >= 1100	and fed <= 1199	: return "uHCAL"
+    if fed >= 1200	and fed <= 1349	: return "uPixel"
+    if fed >= 1350	and fed <= 1409	: return "trigUP1"
     return "???"
 
 #----------------------------------------------------------------------
