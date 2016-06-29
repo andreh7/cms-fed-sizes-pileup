@@ -485,8 +485,8 @@ class Plotter:
                 arrow.Draw()
 
                 # add a label with the average number of vertices
-                xlabel = ROOT.TLatex(xpos, ybot + (ypos - ybot) * 0.5,"  %.1f vtx" % xpos)
-                xlabel.SetTextSize(xlabel.GetTextSize() * 0.5)
+                xlabel = ROOT.TLatex(xpos, ybot + (ypos - ybot) * 0.2,"  %.1f vtx" % xpos)
+                xlabel.SetTextSize(xlabel.GetTextSize() * 0.7)
                 gc_saver.append(xlabel)
 
                 xlabel.Draw()
@@ -513,7 +513,7 @@ class Plotter:
                     yval = ypos * 1000.0
 
                 ylabel = ROOT.TLatex(xleft, ypos * 1.1,"  %.1f kByte" % yval)
-                ylabel.SetTextSize(xlabel.GetTextSize() * 0.9)
+                ylabel.SetTextSize(xlabel.GetTextSize())
                 gc_saver.append(ylabel)
 
                 ylabel.Draw()
