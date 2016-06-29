@@ -452,12 +452,12 @@ class Plotter:
         if hasattr(self, 'fittedFunc'):
             # left end for horizontal arrows
             xmin, xmax = self.mg.GetXaxis().GetXmin(), self.mg.GetXaxis().GetXmax()
-            xleft = xmin + 0.05 * (xmax - xmin)
+            xleft = xmin
 
             # lower end for vertical arrows
             ymin, ymax = self.mg.GetYaxis().GetXmin(), self.mg.GetYaxis().GetXmax()
-            ymin = 0
-            ybot  = ymin + 0.08 * (ymax - ymin)
+
+            ybot = ymin
             print "ymin,ymax=",ymin,ymax
 
             for line in linear_fit_arrows:
