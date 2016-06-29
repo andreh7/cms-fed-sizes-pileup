@@ -22,9 +22,19 @@ parameters = utils.loadParameters()
 # ROOT setup
 #----------------------------------------------------------------------
 import ROOT
+
 ROOT.gROOT.ProcessLine(".x ~/rootlogon.C")
 ROOT.gROOT.ProcessLine("setTDRStyle();")
 ROOT.gStyle.SetErrorX(0.5)
+
+#----------
+# increase maximum number of operators (basically for plotting
+# the sum of all FED sizes), see https://root.cern.ch/phpBB3/viewtopic.php?t=8218
+# 
+# this does not work unfortunately, this leafs to a segmentation violation...
+# ROOT.v5.TFormula.SetMaxima(1100)
+#----------
+
 
 gc_saver = []
 
