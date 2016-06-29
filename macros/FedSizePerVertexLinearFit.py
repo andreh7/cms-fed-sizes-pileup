@@ -289,7 +289,7 @@ class FedSizePerVertexLinearFit:
         plotter.fitAverage(linear_fit_min_value = self.parameters.linear_fit_min_num_vertices - 0.5,
                            linear_fit_max_value = self.parameters.linear_fit_max_num_vertices + 0.5,
                            # "size = (%.2f + # vtx * %.2f) %s" % (self.alpha,self.beta, self.yaxis_unit_label)
-                           label_template = "size = (%(offset).3f + # vtx * %(slope).3f) %(unit)s",
+                           label_template = "size = (%(offset).3f + nvtx * %(slope).3f) %(unit)s",
                            )
 
         plotter.plot()
