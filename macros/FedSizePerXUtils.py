@@ -387,9 +387,12 @@ class Plotter:
         #--------------------
         if True:
 
-            label = ROOT.TLatex(0.89,0.15,"run %d" % self.parameters.run)
+            label = ROOT.TLatex(0.902,0.91,"run %d" % self.parameters.run)
             label.SetNDC(True)
-            label.SetTextSize(label.GetTextSize() * 0.5)
+            label.SetTextSize(label.GetTextSize() * 0.7)
+
+            # x1 = bottom alignment
+            # 3y = right alignment
             label.SetTextAlign(31)
             label.Draw()
             gc_saver.append(label)
