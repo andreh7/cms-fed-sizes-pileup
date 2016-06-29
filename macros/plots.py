@@ -213,7 +213,9 @@ if True:
 # list of output files (needed to produce a zip file)
 outputFiles = []
 
-for task in all_tasks:
+duplicateOutputFilesWarnings = []
+
+for taskIndex, task in enumerate(all_tasks):
 
     print "#----------------------------------------"
     print "# producing",task.__class__.__name__,
@@ -231,9 +233,27 @@ for task in all_tasks:
         print "(%s)" % task.instanceName
     print
     print "#----------------------------------------"
-    task.plot()
+    task.plot(outputFilePrefix = "%04d-" % taskIndex)
 
-    outputFiles.extend(task.outputFiles)
+    thisOutputFiles = task.outputFiles
+
+    # check that we do not have duplicate output files
+    for outputFile in thisOutputFiles:
+        outputFile = outputFile['fname']
+
+        if outputFile in outputFiles:
+            duplicateOutputFilesWarnings.append("task %d (%s) produces duplicate output file %s"  %
+                                                (taskIndex, task.__class__.__name__, outputFile))
+
+        if not os.path.exists(outputFile):
+            duplicateOutputFilesWarnings.append("task %d (%s) claims to produce file %s but it does not exist" % 
+                                                (taskIndex, task.__class__.__name__, outputFile))
+
+    outputFiles.extend(thisOutputFiles)
+
+if duplicateOutputFilesWarnings:
+    for line in duplicateOutputFilesWarnings:
+        print >> sys.stderr,"WARNING:",line
 
 #----------------------------------------------------------------------
 # collect information about the evolution of the fed sizes

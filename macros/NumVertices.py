@@ -46,7 +46,7 @@ class NumVertices:
 
     #----------------------------------------
         
-    def plot(self):
+    def plot(self, outputFilePrefix):
         import ROOT
 
         # load the histogram
@@ -149,14 +149,15 @@ class NumVertices:
         label.Draw()
 
                                      
-        ROOT.gPad.SaveAs(self.parameters.plots_output_dir + "/num-vertices-fitted.png")
-        ROOT.gPad.SaveAs(self.parameters.plots_output_dir + "/num-vertices-fitted.C")
+        ROOT.gPad.SaveAs(self.parameters.plots_output_dir + "/" + outputFilePrefix + "num-vertices-fitted.png")
+        ROOT.gPad.SaveAs(self.parameters.plots_output_dir + "/" + outputFilePrefix + "num-vertices-fitted.C")
         fin.Close()
 
         #--------------------
         # write the average number of vertices also to a file
         # for later use in other tasks
-        utils.writeStringToFile(self.parameters.plots_output_dir + "/avg-num-vertices.txt",str(avg_num_vertices) + "\n")
+        # do NOT use the output file prefix here because we need to read it from other modules
+        utils.writeStringToFile(self.parameters.plots_output_dir + "/" + "avg-num-vertices.txt",str(avg_num_vertices) + "\n")
 
         #--------------------
 
@@ -181,7 +182,7 @@ class NumVertices:
         label.SetNDC(1)
         label.Draw()
 
-        ROOT.gPad.SaveAs(self.parameters.plots_output_dir + "/num-vertices.png")
+        ROOT.gPad.SaveAs(self.parameters.plots_output_dir + "/" + outputFilePrefix + "num-vertices.png")
 
         fin.Close()
         ROOT.gROOT.cd()
@@ -190,7 +191,7 @@ class NumVertices:
         # set output files
         #--------------------
         self.outputFiles = [
-            dict(fname = self.parameters.plots_output_dir + "/num-vertices-fitted.png"),
-            dict(fname = self.parameters.plots_output_dir + "/num-vertices.png"),
-            dict(fname = self.parameters.plots_output_dir + "/avg-num-vertices.txt"),
+            dict(fname = self.parameters.plots_output_dir + "/" + outputFilePrefix + "num-vertices-fitted.png"),
+            dict(fname = self.parameters.plots_output_dir + "/" + outputFilePrefix + "num-vertices.png"),
+            dict(fname = self.parameters.plots_output_dir + "/" + "avg-num-vertices.txt"),
         ]

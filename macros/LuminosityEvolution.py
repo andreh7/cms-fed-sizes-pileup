@@ -25,7 +25,7 @@ class LuminosityEvolution:
         pass
 
     #----------------------------------------
-    def plot(self):
+    def plot(self, outputFilePrefix):
 
         # list of output files
         self.outputFiles = [ ]
@@ -171,9 +171,9 @@ class LuminosityEvolution:
             ROOT.gPad.Modified()
             # ROOT.gPad.Update()
 
-            ROOT.gPad.SaveAs(self.parameters.plots_output_dir + "/lumi-evolution-%s.png" % name)
+            ROOT.gPad.SaveAs(self.parameters.plots_output_dir + "/" + outputFilePrefix + "lumi-evolution-%s.png" % name)
             self.outputFiles.append(
-                dict(fname = self.parameters.plots_output_dir + "/lumi-evolution-%s.png" % name)
+                dict(fname = self.parameters.plots_output_dir + "/" + outputFilePrefix + "lumi-evolution-%s.png" % name)
                 )
 
             print "total %s lumi =" % name,total / utils.INV_PICO_BARN,"/pb"

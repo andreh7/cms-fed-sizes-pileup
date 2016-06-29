@@ -20,7 +20,7 @@ class NumVerticesPerLumiSection:
         pass
 
     #----------------------------------------
-    def plot(self):
+    def plot(self, outputFilePrefix):
 
         import ROOT
 
@@ -48,13 +48,13 @@ class NumVerticesPerLumiSection:
         ROOT.htemp2.SetXTitle("Luminosity section")
         ROOT.htemp2.SetYTitle("# vertices per event")
         
-        ROOT.gPad.SaveAs(self.parameters.plots_output_dir + "/vertices-per-lumi-section.png")
+        ROOT.gPad.SaveAs(self.parameters.plots_output_dir + "/" + outputFilePrefix + "vertices-per-lumi-section.png")
 
         #--------------------
         # set output files
         #--------------------
         self.outputFiles = [
-            dict(fname = self.parameters.plots_output_dir + "/vertices-per-lumi-section.png"),
+            dict(fname = self.parameters.plots_output_dir + "/" + outputFilePrefix + "vertices-per-lumi-section.png"),
             ]
 
     #----------------------------------------

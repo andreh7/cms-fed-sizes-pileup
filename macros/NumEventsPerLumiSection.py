@@ -19,7 +19,7 @@ class NumEventsPerLumiSection:
         pass
 
     #----------------------------------------
-    def plot(self):
+    def plot(self, outputFilePrefix):
 
         import ROOT
 
@@ -47,13 +47,13 @@ class NumEventsPerLumiSection:
 
 
         
-        ROOT.gPad.SaveAs(self.parameters.plots_output_dir + "/events-per-lumi-section.png")
+        ROOT.gPad.SaveAs(self.parameters.plots_output_dir + "/" + outputFilePrefix + "events-per-lumi-section.png")
 
         #--------------------
         # set output files
         #--------------------
         self.outputFiles = [
-            dict(fname = self.parameters.plots_output_dir + "/events-per-lumi-section.png"),
+            dict(fname = self.parameters.plots_output_dir + "/" + outputFilePrefix + "events-per-lumi-section.png"),
             ]
 
     #----------------------------------------

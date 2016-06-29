@@ -176,7 +176,7 @@ class FedSizePerVertexLinearFit:
             
     #----------------------------------------
 
-    def plot(self):
+    def plot(self, outputFilePrefix):
 
         #----------
         if os.path.exists(self.parameters.plots_output_dir + "/avg-num-vertices.txt"):
@@ -299,15 +299,15 @@ class FedSizePerVertexLinearFit:
         
         #--------------------
 
-        ROOT.gPad.SaveAs(self.parameters.plots_output_dir + "/average-sizes-vs-vertex-" + self.subsys + ".png")
-        ROOT.gPad.SaveAs(self.parameters.plots_output_dir + "/average-sizes-vs-vertex-" + self.subsys + ".C")
+        ROOT.gPad.SaveAs(self.parameters.plots_output_dir + "/" + outputFilePrefix + "average-sizes-vs-vertex-" + self.subsys + ".png")
+        ROOT.gPad.SaveAs(self.parameters.plots_output_dir + "/" + outputFilePrefix + "average-sizes-vs-vertex-" + self.subsys + ".C")
         
         #--------------------
         # set output files
         #--------------------
         self.outputFiles = [
-            dict(fname = self.parameters.plots_output_dir + "/average-sizes-vs-vertex-" + self.subsys + ".png"),
-            dict(fname = self.parameters.plots_output_dir + "/average-sizes-vs-vertex-" + self.subsys + ".C"),
+            dict(fname = self.parameters.plots_output_dir + "/" + outputFilePrefix + "average-sizes-vs-vertex-" + self.subsys + ".png"),
+            dict(fname = self.parameters.plots_output_dir + "/" + outputFilePrefix + "average-sizes-vs-vertex-" + self.subsys + ".C"),
             ]
 
     
