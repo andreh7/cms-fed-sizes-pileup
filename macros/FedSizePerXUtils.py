@@ -374,7 +374,7 @@ class Plotter:
             self.fittedFunc.SetLineWidth(3)
             self.fittedFunc.SetLineColor(ROOT.kBlue)
 
-            label = ROOT.TLatex(0.20,0.9,self.fitResultLabel)
+            label = ROOT.TLatex(0.1,0.92,self.fitResultLabel)
             label.SetNDC(1)
             label.Draw()
 
