@@ -4,6 +4,39 @@ import pylab
 
 #----------------------------------------------------------------------
 
+def makeSubsystemEvolutionData(tasks):
+    # extracts linear fits per vertex results and returns
+    # a dict of 
+    #   grouping description mapping to
+    #   list of dicts with the fit results
+    #
+    # a value item can be passed to a GrandUnificationPlot instance
+    
+    retval = {}
+
+    from FedSizePerVertexLinearFit import FedSizePerVertexLinearFit
+
+    for task in tasks:
+        if not isinstance(task, FedSizePerVertexLinearFit):
+            continue
+
+        if task.subsys == 'total':
+            continue
+
+
+        # sizes in kB (note that 'total' is in MB)
+        retval.setdefault(task.grouping, []).append({
+                "subsystem":  task.subsys, 
+                "offset":     task.alpha, 
+                "slope":      task.beta, 
+                "numFeds":    task.numFeds,
+                })
+
+    return retval
+
+
+#----------------------------------------------------------------------
+
 class GrandUnificationPlot:
     # produce a plot with e.g. per subsystem evolution to large number
     # of vertices

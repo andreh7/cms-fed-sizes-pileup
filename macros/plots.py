@@ -273,24 +273,14 @@ if duplicateOutputFilesWarnings:
 # per subsystem
 #----------------------------------------------------------------------
 
-subsystemEvolutionData = []
+import GrandUnificationPlot
+
+subsystemEvolutionData = GrandUnificationPlot.makeSubsystemEvolutionData(all_tasks)
 
 groupingForGrandUnificationPlot = "by subsystem"
+subsystemEvolutionData = subsystemEvolutionData.get(groupingForGrandUnificationPlot, None)
 
-for task in all_tasks:
-    if not isinstance(task, FedSizePerVertexLinearFit):
-        continue
 
-    if task.subsys == 'total':
-        continue
-
-    # only take per subsystem fits (i.e. not per FRL etc.) for the moment
-    if task.grouping != groupingForGrandUnificationPlot:
-        continue
-
-    # print sizes in kB (note that 'total' is in MB)
-    # print "subsystem %-20s: #FEDS=%3d offset=%8.3f kByte slope=%8.3f kByte/vtx" % (task.subsys, task.numFeds, task.alpha, task.beta)
-    subsystemEvolutionData.append({"subsystem":  task.subsys, "offset":   task.alpha, "slope":  task.beta, "numFeds": task.numFeds})
 
 #----------------------------------------
 # persistently store the subsystemEvolutionData
@@ -317,18 +307,17 @@ if False:
 # import pprint
 # pprint.pprint(subsystemEvolutionData)
 
-from GrandUnificationPlot import GrandUnificationPlot
-
 # standard 'Grand Unification Plot' for subsystem sizes
-grandUnificationPlot = GrandUnificationPlot(parameters, subsystemEvolutionData,
-                                            printCSV = True,
-                                            )
+if subsystemEvolutionData != None:
+    grandUnificationPlot = GrandUnificationPlot.GrandUnificationPlot(parameters, subsystemEvolutionData,
+                                                                     printCSV = True,
+                                                                     )
 
-grandUnificationPlot.produce()
-taskIndex = len(all_tasks)
+    grandUnificationPlot.produce()
+    taskIndex = len(all_tasks)
 
-all_tasks.append(grandUnificationPlot)
-outputFiles.extend(grandUnificationPlot.plot(outputFilePrefix = "%04d-" % taskIndex))
+    all_tasks.append(grandUnificationPlot)
+    outputFiles.extend(grandUnificationPlot.plot(outputFilePrefix = "%04d-" % taskIndex))
 
 
 # special version for fedbuilders at 30 vertices
