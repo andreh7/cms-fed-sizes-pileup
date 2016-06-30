@@ -159,3 +159,16 @@ def makeGroupExpressions(fedsInRun = []):
                            ))
 
     return retval
+
+#----------------------------------------------------------------------
+
+def fedbuilderFromFed(fed):
+    # find the fedbuilder the given fed belongs to
+    for line in fedBuilderGroups:
+        if fed in line['feds']:
+            return line['name']
+
+    # not found
+    return None
+
+#----------------------------------------------------------------------
