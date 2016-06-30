@@ -195,6 +195,8 @@ if True:
             grouping = line.get('grouping', None)
 
 
+        numFeds = line['numFeds']
+
         yaxis_unit_label = "kB"
         yaxis_unit_size = 1e3
 
@@ -209,7 +211,8 @@ if True:
                                                    grouping_name = grouping,
                                                    yaxis_unit_label = yaxis_unit_label,
                                                    yaxis_unit_size = yaxis_unit_size,
-                                                   legendBottomLeft = parameters.fedSizePerVertexLinearFitLegendPositions(parameters.run, subsys)
+                                                   legendBottomLeft = parameters.fedSizePerVertexLinearFitLegendPositions(parameters.run, subsys),
+                                                   numFeds = numFeds,
                                                    )
 
         thisTask.instanceName = subsys

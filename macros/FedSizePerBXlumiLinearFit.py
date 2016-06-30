@@ -40,6 +40,7 @@ class FedSizePerBXlumiLinearFit:
                  yaxis_unit_label = "MB",
                  yaxis_unit_size = 1e6,
                  legendBottomLeft = None,
+                 numFeds = None,
                  ):
         """ @param size_expr is the expression to plot, typically
             something like size_<subsys> but can also be an expression
@@ -112,20 +113,7 @@ class FedSizePerBXlumiLinearFit:
 
         self.subsys = subsys_name
 
-        if subsys_name != 'total':
-            # add a protection for custom plotting expressions
-            self.numFeds = utils.getNumFedsPerFedGroup(self.parameters.output_data_dir).get(subsys_name, None)
-
-            # if not found, estimate from the number of occurrences of 'size'
-            # in the plot expression (assuming it's basically a sum)
-
-            if self.numFeds == None:
-                self.numFeds = self.size_expr.count('size')
-            
-        else:
-            # note that some of the subsystems are overlapping,
-            # so we can't just sum them
-            self.numFeds = None
+        self.numFeds = numFeds
 
         self.yaxis_unit_label = yaxis_unit_label
         self.yaxis_unit_size = yaxis_unit_size
