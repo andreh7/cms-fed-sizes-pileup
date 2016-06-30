@@ -153,7 +153,7 @@ from FedSizePerBXlumiLinearFit import FedSizePerBXlumiLinearFit
 all_tasks = [
     # PrintLumiSectionsFound(),
     NumVertices(parameters, small_tuple),
-    FedSizeDist(parameters, small_tuple),
+    # FedSizeDist(parameters, small_tuple),
     
     # global, not per subsystem
     # but for the moment still needs
