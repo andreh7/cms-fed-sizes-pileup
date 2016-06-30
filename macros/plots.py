@@ -158,7 +158,7 @@ all_tasks = [
     # global, not per subsystem
     # but for the moment still needs
     # the per vertex ntuples
-    FedSizePerVertexLinearFit(parameters),
+    # FedSizePerVertexLinearFit(parameters),
 
     # per BX lumi is not available anymore
     # in the event in LHC Run II
