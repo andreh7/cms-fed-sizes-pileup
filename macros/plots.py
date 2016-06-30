@@ -314,13 +314,18 @@ if False:
 # import pprint
 # pprint.pprint(subsystemEvolutionData)
 
-import GrandUnificationPlot
-
+from GrandUnificationPlot import GrandUnificationPlot
 
 # standard 'Grand Unification Plot' for subsystem sizes
-GrandUnificationPlot.makeGrandUnificationPlot(parameters, outputFiles, subsystemEvolutionData,
-                                              printCSV = True,
-                                              )
+grandUnificationPlot = GrandUnificationPlot(parameters, subsystemEvolutionData,
+                                            printCSV = True,
+                                            )
+
+grandUnificationPlot.produce()
+taskIndex = len(all_tasks)
+
+all_tasks.append(grandUnificationPlot)
+outputFiles.extend(grandUnificationPlot.plot(outputFilePrefix = "%04d-" % taskIndex))
 
 
 # special version for fedbuilders at 30 vertices
