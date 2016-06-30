@@ -143,6 +143,8 @@ def makeGrandUnificationPlot(parameters, outputFiles, subsystemEvolutionData,
             mo = re.match('FED(\d+)$', data['subsystem'])
             if mo:
                 subsys = utils.getSubsystemFromFed(int(mo.group(1)))
+                if subsys == None:
+                    subsys = "???"
             else:
                 subsys = ""
 
