@@ -272,11 +272,17 @@ if duplicateOutputFilesWarnings:
 
 subsystemEvolutionData = []
 
+groupingForGrandUnificationPlot = "by subsystem"
+
 for task in all_tasks:
     if not isinstance(task, FedSizePerVertexLinearFit):
         continue
 
     if task.subsys == 'total':
+        continue
+
+    # only take per subsystem fits (i.e. not per FRL etc.) for the moment
+    if task.grouping != groupingForGrandUnificationPlot:
         continue
 
     # print sizes in kB (note that 'total' is in MB)
