@@ -298,6 +298,10 @@ class GrandUnificationPlot:
 
             outputFiles.append(dict(fname = name))
 
+
+        # needed when generating the HTML report
+        self.outputFiles = outputFiles
+
         return outputFiles
 
     #----------------------------------------
