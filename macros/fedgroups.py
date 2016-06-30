@@ -22,9 +22,10 @@ def makeFRLgroups(fedsInRun):
             allSubsysToPlot.append(dict(
                     label = "+".join(str(x) for x in thisFeds),
                     grouping = "by FRL",
-                    expr = "+".join([ "size%03d" % x for x in thisFeds])),
+                    expr = "+".join([ "size%03d" % x for x in thisFeds]),
                     numFeds = len(set(thisFeds)),
                                    )
+                    )
 
     return allSubsysToPlot
 
@@ -52,9 +53,10 @@ def makeSubSystemGroups(fedsInRun):
         groups.append(dict(
                 label = subdet,
                 grouping = "by subsystem",
-                expr = "+".join([ "size%03d" % x for x in thisFeds])),
+                expr = "+".join([ "size%03d" % x for x in thisFeds]),
                 numFeds = len(set(thisFeds)),
-                      )
+                     )
+                )
 
     # end of loop over subdetectors
     return groups
@@ -86,9 +88,10 @@ def makeTTCpartitionGroups(fedsInRun):
             groups.append(dict(
                     label = ttcpart,
                 grouping = "by TTC partition",
-                expr = "+".join([ "size%03d" % x for x in thisFeds])),
+                expr = "+".join([ "size%03d" % x for x in thisFeds]),
                 numFeds = len(set(thisFeds)),
                       )
+                )
 
     # end of loop over subdetectors
     return groups
