@@ -298,28 +298,6 @@ if duplicateOutputFilesWarnings:
         print >> sys.stderr,"WARNING:",line
 
 #----------------------------------------
-# persistently store the subsystemEvolutionData
-#----------------------------------------
-if True:
-    import cPickle as pickle
-    fout = open(parameters.output_data_dir + "/subsystemEvolutionData.pkl","w")
-    pickle.dump(subsystemEvolutionData, fout)
-    fout.close()
-
-#----------------------------------------
-# load subsystemEvolutionData from pickled file
-#----------------------------------------
-
-if False:
-    import cPickle as pickle
-    fin = open(parameters.output_data_dir + "/subsystemEvolutionData.pkl")
-    subsystemEvolutionData = pickle.load(fin)
-    fin.close()
-
-
-#----------------------------------------
-
-#----------------------------------------
 
 # print "output files"
 # pprint.pprint(outputFiles)
