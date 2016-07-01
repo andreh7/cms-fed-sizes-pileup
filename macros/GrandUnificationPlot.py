@@ -44,7 +44,7 @@ class GrandUnificationPlot:
     #----------------------------------------
 
     def __init__(self, 
-                 parameters, subsystemEvolutionData,
+                 parameters, tasks, groupingName,
                  triggerRate = None,
                  xmax = 200,
                  printCSV = False,
@@ -52,7 +52,15 @@ class GrandUnificationPlot:
                  labelTextFunc = None,
                  subsystemsTitle = 'Subsystem'):
         
-        """@param keyFunc: is the function determining the sorting of the lines.
+        """
+           @param tasks:   is the list of tasks to extract information from.
+                           By the time this task runs, these tasks must have calculated
+                           the fit result.
+                           
+           @param groupingName: the name of the grouping (e.g. 'by subsystem') for which the plot
+                           is made
+        
+           @param keyFunc: is the function determining the sorting of the lines.
                            If not given, entries are sorted by decreasing order of slope (and then offset).
                            Note that sorting always happens in reverse order.
 
@@ -69,6 +77,8 @@ class GrandUnificationPlot:
         self.keyFunc         = keyFunc
         self.labelTextFunc   = labelTextFunc
         self.subsystemsTitle = subsystemsTitle
+        self.tasks           = tasks
+        self.groupingName    = groupingName
 
         #--------------------
         # sort by slope first, then by offset
@@ -90,15 +100,26 @@ class GrandUnificationPlot:
                 self.labelTextFunc = lambda subsystem, offset, slope: "%s (%.3f kB/vertex)" % (subsystem, slope)
 
 
+
+    #----------------------------------------
+    def produce(self):
+        #--------------------
+        # extract fit results
         #--------------------
 
-        self.subsystemEvolutionData = subsystemEvolutionData
+        self.subsystemEvolutionData = makeSubsystemEvolutionData(self.tasks)
+        self.subsystemEvolutionData = self.subsystemEvolutionData.get(self.groupingName, None)
+
+        if self.subsystemEvolutionData == None:
+            print >> sys.stderr,"WARNING: grouping '%s' not found in GrandUnificationPlot" % groupingName
+            return
+
+        #--------------------
 
         if self.triggerRate != None:
             # plot per FED rate instead of subsystem size
-            self.subsystemEvolutionData = list(self.subsystemEvolutionData) # make a copy
 
-            for data in subsystemEvolutionData:
+            for data in self.subsystemEvolutionData:
                 if data['numFeds'] == None:
                     data['offset'] = None
                     data['slope'] = None
@@ -109,15 +130,13 @@ class GrandUnificationPlot:
 
 
     #----------------------------------------
-    def produce(self):
-        # for the moment everything is in plot(..)
-        pass
-
-    #----------------------------------------
     
     def plot(self, outputFilePrefix):
+        # we need to keep the output files as a class member for generating the HTML report
+        self.outputFiles = []
 
-        outputFiles = []
+        if self.subsystemEvolutionData == None:
+            return self.outputFiles
 
         if self.printCSV:
             csvLines = []
@@ -260,7 +279,7 @@ class GrandUnificationPlot:
                 print >> fout, ",".join([ x.strip() for x in line])
 
             fout.close()
-            outputFiles.append(dict(fname = fname))
+            self.outputFiles.append(dict(fname = fname))
 
         #--------------------
 
@@ -329,13 +348,10 @@ class GrandUnificationPlot:
             fig.savefig(name)
             print "wrote",name
 
-            outputFiles.append(dict(fname = name))
+            self.outputFiles.append(dict(fname = name))
 
 
-        # needed when generating the HTML report
-        self.outputFiles = outputFiles
-
-        return outputFiles
+        return self.outputFiles
 
     #----------------------------------------
 

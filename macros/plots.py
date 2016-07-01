@@ -217,6 +217,35 @@ if True:
 
         thisTask.instanceName = subsys
         all_tasks.append(thisTask)
+
+#----------------------------------------------------------------------
+# collect information about the evolution of the fed sizes
+# per subsystem ('grand unification plot')
+#----------------------------------------------------------------------
+from GrandUnificationPlot import GrandUnificationPlot
+
+for grouping in [
+    "by subsystem",
+    ]:
+    all_tasks.append(GrandUnificationPlot(parameters, all_tasks, grouping,
+                                          printCSV = True,
+                                          )
+                     )
+
+
+# special version for fedbuilders size at 30 vertices
+# GrandUnificationPlot.makeGrandUnificationPlot(outputFiles, subsystemEvolutionData, xmax = 50, printCSV = True,
+#                          # sort according to size at given number of vertices
+#                          keyFunc = lambda x: x['slope'] * 30 + x['offset'],
+#                          subsystemsTitle = 'FEDBuilder',
+# 
+#                          labelTextFunc = lambda subsystem, offset, slope: "%s (%.2f kB/ev @ 30 vertices)" % (subsystem, offset + 30 * slope),
+#                          )
+
+# 'Grand Unification Plot' for per fed rate
+# GrandUnificationPlot.makeGrandUnificationPlot(outputFiles, subsystemEvolutionData, triggerRate = 100, xmax = 50, printCSV = True)
+
+
 #----------------------------------------------------------------------
 
 # FOR TESTING 
@@ -268,20 +297,6 @@ if duplicateOutputFilesWarnings:
     for line in duplicateOutputFilesWarnings:
         print >> sys.stderr,"WARNING:",line
 
-#----------------------------------------------------------------------
-# collect information about the evolution of the fed sizes
-# per subsystem
-#----------------------------------------------------------------------
-
-import GrandUnificationPlot
-
-subsystemEvolutionData = GrandUnificationPlot.makeSubsystemEvolutionData(all_tasks)
-
-groupingForGrandUnificationPlot = "by subsystem"
-subsystemEvolutionData = subsystemEvolutionData.get(groupingForGrandUnificationPlot, None)
-
-
-
 #----------------------------------------
 # persistently store the subsystemEvolutionData
 #----------------------------------------
@@ -303,34 +318,6 @@ if False:
 
 
 #----------------------------------------
-
-# import pprint
-# pprint.pprint(subsystemEvolutionData)
-
-# standard 'Grand Unification Plot' for subsystem sizes
-if subsystemEvolutionData != None:
-    grandUnificationPlot = GrandUnificationPlot.GrandUnificationPlot(parameters, subsystemEvolutionData,
-                                                                     printCSV = True,
-                                                                     )
-
-    grandUnificationPlot.produce()
-    taskIndex = len(all_tasks)
-
-    all_tasks.append(grandUnificationPlot)
-    outputFiles.extend(grandUnificationPlot.plot(outputFilePrefix = "%04d-" % taskIndex))
-
-
-# special version for fedbuilders at 30 vertices
-# GrandUnificationPlot.makeGrandUnificationPlot(outputFiles, subsystemEvolutionData, xmax = 50, printCSV = True,
-#                          # sort according to size at given number of vertices
-#                          keyFunc = lambda x: x['slope'] * 30 + x['offset'],
-#                          subsystemsTitle = 'FEDBuilder',
-# 
-#                          labelTextFunc = lambda subsystem, offset, slope: "%s (%.2f kB/ev @ 30 vertices)" % (subsystem, offset + 30 * slope),
-#                          )
-
-# 'Grand Unification Plot' for per fed rate
-# GrandUnificationPlot.makeGrandUnificationPlot(outputFiles, subsystemEvolutionData, triggerRate = 100, xmax = 50, printCSV = True)
 
 #----------------------------------------
 
