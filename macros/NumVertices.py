@@ -139,12 +139,14 @@ class NumVertices:
             num_events_list.append(histo.GetBinContent(i))
             num_vertices_list.append(num_vertices)
 
-        avg_num_vertices = utils.weightedAverage(num_vertices_list, num_events_list)
+        # keep this in the object such that we also can use it 
+        # when using the pickled task objects
+        self.avg_num_vertices = utils.weightedAverage(num_vertices_list, num_events_list)
 
 
         # print "average number of vertices:",self.avg_num_vertices
 
-        label = ROOT.TLatex(0.2,0.2,"avg. # vertices: %.2f" % avg_num_vertices)
+        label = ROOT.TLatex(0.2,0.2,"avg. # vertices: %.2f" % self.avg_num_vertices)
         label.SetNDC(1)
         label.Draw()
 
@@ -157,7 +159,7 @@ class NumVertices:
         # write the average number of vertices also to a file
         # for later use in other tasks
         # do NOT use the output file prefix here because we need to read it from other modules
-        utils.writeStringToFile(self.parameters.plots_output_dir + "/" + "avg-num-vertices.txt",str(avg_num_vertices) + "\n")
+        utils.writeStringToFile(self.parameters.plots_output_dir + "/" + "avg-num-vertices.txt",str(self.avg_num_vertices) + "\n")
 
         #--------------------
 
