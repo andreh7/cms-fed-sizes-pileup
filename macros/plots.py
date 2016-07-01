@@ -390,32 +390,6 @@ if os.path.exists(plotReportMakerJar):
         print >> sys.stderr,"created powerpoint file " + pptFname
 
 #----------------------------------------
-import XLSutils
-
-if XLSutils.xlsUtilExists():
-
-    print >> sys.stderr,"creating spreadsheet..."
-
-    # read the number of vertices
-    avg_num_vertices = float(open(parameters.plots_output_dir + "/avg-num-vertices.txt").read())
-
-    xlsFname = summaryOutputFilesDir + "/evolution-summary-%d.xlsx" % parameters.run
-
-    # create a spread sheet with some formulas allowing
-    # to test different scenarios
-    XLSutils.makeXLS(
-        # the underlying csv file
-        parameters.plots_output_dir + "/subsystem-gut.csv", 
-
-        # the output file
-        xlsFname,
-        
-        avg_num_vertices
-        )
-
-    print >> sys.stderr,"created spreadsheet file",xlsFname
-
-#----------------------------------------
 # save task data for later reporting
 #----------------------------------------
 
