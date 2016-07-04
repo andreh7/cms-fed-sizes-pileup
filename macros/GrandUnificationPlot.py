@@ -22,11 +22,14 @@ def makeSubsystemEvolutionData(tasks):
             continue
 
         if task.subsys == 'total':
-            continue
-
+            # also add this, it gives a nice overview of the overall 
+            # event size and rate
+            grouping = 'total'
+        else:
+            grouping = task.grouping
 
         # sizes in kB (note that 'total' is in MB)
-        retval.setdefault(task.grouping, []).append({
+        retval.setdefault(grouping, []).append({
                 "subsystem":  task.subsys, 
                 "offset":     task.alpha, 
                 "slope":      task.beta, 
