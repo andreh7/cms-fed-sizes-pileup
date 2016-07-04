@@ -87,7 +87,7 @@ class SpreadsheetCreator:
         if self.avgNumVertices == None:
             ws['B1'] = "unknown"
         else:
-            ws['B1'] = str(self.avgNumVertices)
+            self.makeNumericCell(ws, 'B1', self.avgNumVertices, "0.0")
 
         #----------
         # title cells
@@ -118,8 +118,8 @@ class SpreadsheetCreator:
             thisRow = row + 6
             ws['A%d' % thisRow] = data['subsystem']
             ws['B%d' % thisRow] = data['numFeds']
-            self.makeNumericCell(ws, 'D%d' % thisRow, data['offset'], "0.000")
-            self.makeNumericCell(ws, 'E%d' % thisRow, data['slope'], "0.000")
+            self.makeNumericCell(ws, 'D%d' % thisRow, data['offset'], "#,##0.000")
+            self.makeNumericCell(ws, 'E%d' % thisRow, data['slope'], "#,##0.000")
 
         #----------
 
@@ -127,7 +127,7 @@ class SpreadsheetCreator:
         for i in range(numItems):
             row = 6+i
             # need absolute cell rows to allow sorting by the user
-            self.makeNumericCell(ws, 'G%d' % row, "=D%d+E%d*B$1" %(row,row), "0.000")
+            self.makeNumericCell(ws, 'G%d' % row, "=D%d+E%d*B$1" %(row,row), "#,##0.000")
 
         # add additional cells with formulas
 
@@ -144,8 +144,8 @@ class SpreadsheetCreator:
 
         for i in range(numItems):
             row = 6+i
-            self.makeNumericCell(ws, 'I%d' % row, "=D%d*I$1" %row, "0.000")
-            self.makeNumericCell(ws, 'J%d' % row, "=E%d*I$1" %row, "0.000")
+            self.makeNumericCell(ws, 'I%d' % row, "=D%d*I$1" %row, "#,##0.000")
+            self.makeNumericCell(ws, 'J%d' % row, "=E%d*I$1" %row, "#,##0.000")
 
         #----------
         ws['L3'] = "per FED data rate [MByte/s]"
@@ -155,8 +155,8 @@ class SpreadsheetCreator:
 
         for i in range(numItems):
             row = 6+i
-            self.makeNumericCell(ws, 'L%d' % row, "=I%d/B%d" %(row,row), "0.000")
-            self.makeNumericCell(ws, 'M%d' % row, "=J%d/B%d" %(row,row), "0.000")
+            self.makeNumericCell(ws, 'L%d' % row, "=I%d/B%d" %(row,row), "#,##0.000")
+            self.makeNumericCell(ws, 'M%d' % row, "=J%d/B%d" %(row,row), "#,##0.000")
 
         #----------
         # when do we reach 200 MByte/s per FED ?
