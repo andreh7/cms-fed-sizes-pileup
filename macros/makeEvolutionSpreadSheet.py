@@ -89,6 +89,8 @@ class SpreadsheetCreator:
         else:
             self.makeNumericCell(ws, 'B1', self.avgNumVertices, "0.0")
 
+        ws.column_dimensions['A'].width = 20
+
         #----------
         # title cells
         #----------
@@ -109,6 +111,8 @@ class SpreadsheetCreator:
         ws['C5'] = 'subsys' # do we still need this ?
         ws['D5'] = 'offset'
         ws['E5'] = 'slope'
+
+        ws.column_dimensions['B'].width = 14
 
         #----------
         # fill the evolution data
@@ -135,6 +139,7 @@ class SpreadsheetCreator:
         # data rate
         #--------------------
         ws['H1'] = 'trigger rate [kHz]:'
+        ws.column_dimensions['H'].width = 14
         ws['I1'] = str(self.triggerRateKHz)
 
         ws['I3'] = "data rate [MByte/s]"
@@ -149,6 +154,7 @@ class SpreadsheetCreator:
 
         #----------
         ws['L3'] = "per FED data rate [MByte/s]"
+        ws.column_dimensions['O'].width = 27
         ws['L4'] = "at trigger rate"
         ws['L5'] = "offset"
         ws['M5'] = "slope"
