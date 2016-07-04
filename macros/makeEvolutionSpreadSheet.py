@@ -66,7 +66,11 @@ class SpreadsheetCreator:
 
         # create a new worksheet
         ws = self.wb.create_sheet()
-        ws.title = groupingName
+        
+        if groupingName == "" or groupingName == None:
+            ws.title = "-"
+        else:
+            ws.title = groupingName
 
 
         #----------

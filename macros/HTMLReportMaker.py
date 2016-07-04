@@ -21,6 +21,20 @@ def encodeImage(imageFname):
 
 #----------------------------------------------------------------------
 
+def encodeDocument(data, linkText, mimeType):
+
+    # returns a data URI encoded document 
+
+    encodedData = data.encode("base64").replace("\n","")
+
+    return '<a href="data:' + mimeType + ';base64,' + encodedData + '">%s</a>' % linkText
+    
+
+#----------------------------------------------------------------------
+
+from makeEvolutionSpreadSheet import SpreadsheetCreator, getAverageNumVerticesFromTasks
+
+
 class HTMLReportMaker:
 
     #----------------------------------------
@@ -34,6 +48,14 @@ class HTMLReportMaker:
     def __printEvolutionOverviewTable(self, subsystemEvolutionData):
 
         print >> self.os, "<h2>Overview of FED size vs. number of reconstructed vertices evolution</h2><br/>"
+
+        print >> self.os, encodeDocument(self.spreadSheetCreator.makeString(),
+                                         "spreadsheet",
+                                         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+        print >> self.os, "<br/>"
+        print >> self.os, "<br/>"
+        
+        # table with overview
         print >> self.os, "<table>"
         print >> self.os, "<tbody>"
         
@@ -81,6 +103,8 @@ class HTMLReportMaker:
 
         subsystemEvolutionData = []
 
+        groupedSubsystemEvolutionData = {}
+
         # index is used for linking within the document
         index = 0
 
@@ -88,19 +112,29 @@ class HTMLReportMaker:
             if not isinstance(task, FedSizePerVertexLinearFit):
                 continue
 
-            subsystemEvolutionData.append({"subsystem":  task.subsys, 
+            thisData = {"subsystem":  task.subsys, 
                                            "grouping":   task.grouping,
                                            "offset":     task.alpha, 
                                            "slope":      task.beta, 
                                            "numFeds":    task.numFeds, 
-                                           "index":      index})
+                                           "index":      index}
 
             if task.subsys == 'total':
                 # convert from MB to kB
-                subsystemEvolutionData[-1]['offset'] *= 1000.0
-                subsystemEvolutionData[-1]['slope'] *= 1000.0
+                thisData['offset'] *= 1000.0
+                thisData['slope'] *= 1000.0
+
+            subsystemEvolutionData.append(thisData)
+
+            groupedSubsystemEvolutionData.setdefault(task.grouping, []).append(thisData)
 
             index += 1
+
+
+        self.spreadSheetCreator = SpreadsheetCreator(groupedSubsystemEvolutionData,
+                                                     getAverageNumVerticesFromTasks(self.tasks))
+
+
 
         #----------
         print >> self.os,"<html>"
