@@ -49,6 +49,13 @@ class SpreadsheetCreator:
 
     #----------------------------------------
 
+    def makeNumericCell(self, ws, cellName, value, format = None):
+        ws[cellName] = value
+        if format != None:
+            ws.cell(cellName).number_format = format
+
+    #----------------------------------------
+
     def makeString(self):
         # returns the binary notebook as a string
         # (which could be written to a file etc.)
@@ -111,8 +118,8 @@ class SpreadsheetCreator:
             thisRow = row + 6
             ws['A%d' % thisRow] = data['subsystem']
             ws['B%d' % thisRow] = data['numFeds']
-            ws['D%d' % thisRow] = data['offset']
-            ws['E%d' % thisRow] = data['slope']
+            self.makeNumericCell(ws, 'D%d' % thisRow, data['offset'], "0.000")
+            self.makeNumericCell(ws, 'E%d' % thisRow, data['slope'], "0.000")
 
         #----------
 
@@ -120,7 +127,7 @@ class SpreadsheetCreator:
         for i in range(numItems):
             row = 6+i
             # need absolute cell rows to allow sorting by the user
-            ws['G%d' % row] = "=D%d+E%d*B$1" %(row,row)
+            self.makeNumericCell(ws, 'G%d' % row, "=D%d+E%d*B$1" %(row,row), "0.000")
 
         # add additional cells with formulas
 
@@ -137,8 +144,8 @@ class SpreadsheetCreator:
 
         for i in range(numItems):
             row = 6+i
-            ws['I%d' % row ] = "=D%d*I$1" %row 
-            ws['J%d' % row ] = "=E%d*I$1" %row 
+            self.makeNumericCell(ws, 'I%d' % row, "=D%d*I$1" %row, "0.000")
+            self.makeNumericCell(ws, 'J%d' % row, "=E%d*I$1" %row, "0.000")
 
         #----------
         ws['L3'] = "per FED data rate [MByte/s]"
@@ -148,8 +155,8 @@ class SpreadsheetCreator:
 
         for i in range(numItems):
             row = 6+i
-            ws['L%d' % row] = "=I%d/B%d" %(row,row)
-            ws['M%d' % row] = "=J%d/B%d" %(row,row)
+            self.makeNumericCell(ws, 'L%d' % row, "=I%d/B%d" %(row,row), "0.000")
+            self.makeNumericCell(ws, 'M%d' % row, "=J%d/B%d" %(row,row), "0.000")
 
         #----------
         # when do we reach 200 MByte/s per FED ?
@@ -160,7 +167,7 @@ class SpreadsheetCreator:
 
         for i in range(numItems):
             row = 6+i
-            ws['O%d' % row] = "=(P$1-L%d)/M%d" %(row,row)
+            self.makeNumericCell(ws, 'O%d' % row, "=(P$1-L%d)/M%d" %(row,row), "0.0")
 
 #----------------------------------------------------------------------
 # main
