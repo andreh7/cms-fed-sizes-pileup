@@ -1,5 +1,6 @@
 import utils
 
+import sys
 import pylab
 
 #----------------------------------------------------------------------
@@ -111,7 +112,7 @@ class GrandUnificationPlot:
         self.subsystemEvolutionData = self.subsystemEvolutionData.get(self.groupingName, None)
 
         if self.subsystemEvolutionData == None:
-            print >> sys.stderr,"WARNING: grouping '%s' not found in GrandUnificationPlot" % groupingName
+            print >> sys.stderr,"WARNING: grouping '%s' not found in GrandUnificationPlot" % self.groupingName
             return
 
         #--------------------
