@@ -102,8 +102,8 @@ class SpreadsheetCreator:
         # does not work with POI
         # ws['F3'] = '="data size at "&A2&" vertices"'
 
-        ws['G2'] = 'data size [kByte/ev] at'
-        ws['G3'] = 'avg. #vertices'
+        ws['G3'] = 'data size [kByte/ev] at'
+        ws['G4'] = 'avg. #vertices'
 
         # column headers
         ws['A5'] = 'FED group'
