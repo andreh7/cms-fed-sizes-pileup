@@ -39,7 +39,7 @@ class FedSizePerVertexLinearFit:
                  parameters,
                  size_expr = "size_total", subsys_name = None,
                  grouping_name = None,
-                 yaxis_unit_label = "MB", yaxis_unit_size = 1e6,
+                 yaxis_unit_label = "MB", y_scale_factor = 0.001,
                  legendBottomLeft = None,
                  numFeds = None,
                  ):
@@ -114,7 +114,7 @@ class FedSizePerVertexLinearFit:
         self.numFeds = numFeds
 
         self.yaxis_unit_label = yaxis_unit_label
-        self.yaxis_unit_size = yaxis_unit_size
+        self.y_scale_factor = y_scale_factor
 
         if legendBottomLeft != None:
             self.legendXLeft = legendBottomLeft[0]
@@ -198,8 +198,8 @@ class FedSizePerVertexLinearFit:
             if event_sizes:
                 # there were events with this number of reconstructed vertices
 
-                # convert to desired unit
-                event_sizes = [ x / self.yaxis_unit_size for x in event_sizes ]
+                # convert to kBytes
+                event_sizes = [ x / 1000.0 for x in event_sizes ]
 
                 self.min_values.append(min(event_sizes))
                 self.max_values.append(max(event_sizes))
@@ -266,7 +266,7 @@ class FedSizePerVertexLinearFit:
 
             averageNumVertices = avg_num_vertices,
 
-            yaxis_unit_size = self.yaxis_unit_size,
+            y_scale_factor = self.y_scale_factor,
 
             # for drawing the extrapolation
             linear_fit_extrapolation_min_num_vertices = getattr(self.parameters, 'linear_fit_extrapolation_min_num_vertices', None),
@@ -276,7 +276,6 @@ class FedSizePerVertexLinearFit:
 
         plotter.fitAverage(linear_fit_min_value = self.parameters.linear_fit_min_num_vertices - 0.5,
                            linear_fit_max_value = self.parameters.linear_fit_max_num_vertices + 0.5,
-                           # "size = (%.2f + # vtx * %.2f) %s" % (self.alpha,self.beta, self.yaxis_unit_label)
                            label_template = "size = (%(offset).3f + nvtx * %(slope).3f) %(unit)s",
                            )
 

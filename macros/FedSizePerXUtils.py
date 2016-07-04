@@ -5,6 +5,7 @@
 # or per bunch crossing luminosity bins
 
 import array
+import numpy as np
 
 #----------------------------------------------------------------------
 
@@ -132,19 +133,21 @@ class Plotter:
 
                  averageNumVertices = None,
 
-                 yaxis_unit_size = None,
-
                  linear_fit_extrapolation_min_num_vertices = None,
 
                  linear_fit_extrapolation_max_num_vertices = None,
+
+                 # scaling factor for y axis for plotting only
+                 # (fitted values are still in kB)
+                 y_scale_factor = 1., 
                  ):
 
         self.parameters = parameters
 
         self.xpos = xpos
-        self.min_values = min_values
-        self.avg_values = avg_values
-        self.max_values = max_values
+        self.min_values = np.array(min_values)
+        self.avg_values = np.array(avg_values)
+        self.max_values = np.array(max_values)
 
         self.legendXLeft   = legendXLeft
         self.legendYBottom = legendYBottom
@@ -182,6 +185,7 @@ class Plotter:
 
         self.linear_fit_extrapolation_max_num_vertices = linear_fit_extrapolation_max_num_vertices
 
+        self.y_scale_factor = y_scale_factor
 
         print "UUU ymaxScale=",ymaxScale
 
@@ -190,7 +194,7 @@ class Plotter:
     def __makeAvgGraph(self):
         return makeGraph(
             self.xpos,
-            self.avg_values, self.avg_values, self.avg_values,
+            self.avg_values * self.y_scale_factor, self.avg_values * self.y_scale_factor, self.avg_values * self.y_scale_factor,
             self.minMaxBarColor,
             self.xbinWidth / 2.0)
     #----------------------------------------
@@ -198,7 +202,7 @@ class Plotter:
     def __makeMinMaxGraph(self):
         return makeGraph(
             self.xpos,
-            self.min_values, self.avg_values, self.max_values,
+            self.min_values * self.y_scale_factor, self.avg_values * self.y_scale_factor, self.max_values * self.y_scale_factor,
             self.minMaxBarColor,
             self.xbinWidth / 2.0)
 
@@ -245,13 +249,21 @@ class Plotter:
         self.fittedFunc.SetParameter(0,self.alpha)
         self.fittedFunc.SetParameter(1,self.beta)
 
+        # create a scaled version for drawing
+        self.scaledFittedFunc = ROOT.TF1("scaledFittedFunc","%f*([0]+x*[1])" % self.y_scale_factor,
+                                         linear_fit_min_value,
+                                         linear_fit_max_value,
+                                         )
+        self.scaledFittedFunc.SetParName(0,"const")
+        self.scaledFittedFunc.SetParName(1,"slope")
+        self.scaledFittedFunc.SetParameter(0,self.alpha)
+        self.scaledFittedFunc.SetParameter(1,self.beta)
 
         self.fitResultLabel = label_template % dict(
-            offset = self.alpha,
-            slope  = self.beta,
+            offset = self.alpha * self.y_scale_factor,
+            slope  = self.beta  * self.y_scale_factor,
             unit   = self.yaxis_unit_label)
         
-
     #----------------------------------------
     def plot(self):
         """ produces the graph from the data supplied """
@@ -283,9 +295,9 @@ class Plotter:
         for index, quantile_histo_def in enumerate(self.quantile_histo_defs):        
             gr = makeGraph(
                 self.xpos,
-                self.quantile_values_lower[index],
-                self.avg_values, # should not matter what we use here
-                self.quantile_values_upper[index],
+                np.array(self.quantile_values_lower[index]) * self.y_scale_factor,
+                self.avg_values * self.y_scale_factor, # should not matter what we use here
+                np.array(self.quantile_values_upper[index]) * self.y_scale_factor,
                 quantile_histo_def.get('FillColor',None),
                 self.xbinWidth / 2.0,
                 )
@@ -312,12 +324,12 @@ class Plotter:
         # draw an extrapolation line if requested
         # (draw before the fitted line so )
 
-        if hasattr(self,'fittedFunc') and \
+        if hasattr(self,'scaledFittedFunc') and \
                self.linear_fit_extrapolation_min_num_vertices != None and \
                self.linear_fit_extrapolation_max_num_vertices != None:
             # just draw a line through the two endpoints
             xvalues = [ self.linear_fit_extrapolation_min_num_vertices, self.linear_fit_extrapolation_max_num_vertices]
-            yvalues = [ self.fittedFunc.Eval(x) for x in xvalues ]
+            yvalues = [ self.scaledFittedFunc.Eval(x) for x in xvalues ]
 
             gr = ROOT.TGraph(2, array.array('f',xvalues), array.array('f',yvalues)); gc_saver.append(gr)
             gr.SetLineWidth(3)
@@ -365,14 +377,14 @@ class Plotter:
         #--------------------
         # global fittedFunc
 
-        if hasattr(self,'fittedFunc'):
+        if hasattr(self,'scaledFittedFunc'):
 
-            self.fittedFunc.Draw("same")
+            self.scaledFittedFunc.Draw("same")
 
             ROOT.gPad.SetLogy(0)
 
-            self.fittedFunc.SetLineWidth(3)
-            self.fittedFunc.SetLineColor(ROOT.kBlue)
+            self.scaledFittedFunc.SetLineWidth(3)
+            self.scaledFittedFunc.SetLineColor(ROOT.kBlue)
 
             label = ROOT.TLatex(0.1,0.92,self.fitResultLabel)
             label.SetNDC(1)
@@ -380,7 +392,7 @@ class Plotter:
 
 
             gc_saver.append(label)
-            gc_saver.append(self.fittedFunc)
+            gc_saver.append(self.scaledFittedFunc)
 
         #--------------------
         # add the run number to the plot
@@ -452,7 +464,7 @@ class Plotter:
 
         linear_fit_arrows = getattr(self.parameters, "linear_fit_arrows", [ dict(vtx = "avg") ])
 
-        if hasattr(self, 'fittedFunc'):
+        if hasattr(self, 'scaledFittedFunc'):
             # left end for horizontal arrows
             xmin, xmax = self.mg.GetXaxis().GetXmin(), self.mg.GetXaxis().GetXmax()
             xleft = xmin
@@ -473,7 +485,7 @@ class Plotter:
                         continue
                     xpos = self.averageNumVertices
 
-                ypos = self.fittedFunc(xpos)
+                ypos = self.scaledFittedFunc(xpos)
 
                 #----------
                 # vertical arrow
@@ -508,12 +520,9 @@ class Plotter:
                 arrow.SetLineWidth(2)
                 arrow.Draw()
 
-                # add a label with the average number of vertices
-
-                if self.yaxis_unit_label.lower() == 'kb':
-                    yval = ypos
-                elif self.yaxis_unit_label.lower() == 'mb':
-                    yval = ypos * 1000.0
+                # add a label with the event size at the average number of vertices
+                # we convert back to kByte (we were using the scaled function above)
+                yval = ypos / self.y_scale_factor
 
                 ylabel = ROOT.TLatex(xleft, ypos * 1.1,"  %.1f kByte" % yval)
                 ylabel.SetTextSize(xlabel.GetTextSize())

@@ -198,19 +198,18 @@ if True:
         numFeds = line['numFeds']
 
         yaxis_unit_label = "kB"
-        yaxis_unit_size = 1e3
-
+        y_scale_factor = 1.
 
         if subsys == "total":
             yaxis_unit_label = "MB"
-            yaxis_unit_size = 1e6
+            y_scale_factor = 0.001
 
 
         thisTask = FedSizePerVertexLinearFit(parameters, size_expr = size_expr,
                                                    subsys_name = subsys,
                                                    grouping_name = grouping,
                                                    yaxis_unit_label = yaxis_unit_label,
-                                                   yaxis_unit_size = yaxis_unit_size,
+                                                   y_scale_factor = y_scale_factor,
                                                    legendBottomLeft = parameters.fedSizePerVertexLinearFitLegendPositions(parameters.run, subsys),
                                                    numFeds = numFeds,
                                                    )
