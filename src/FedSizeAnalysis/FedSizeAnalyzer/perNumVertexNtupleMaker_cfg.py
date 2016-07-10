@@ -11,9 +11,15 @@ if not os.environ.has_key('RUN'):
     print >> sys.stderr,"environment variable RUN must be set"
     sys.exit(1)
 
-inputFiles = [ 'file:out-0001-99999.root' ]
+
+inputFiles = glob.glob("out-" + os.environ['RUN'] + "-*-*.root")
+
+assert inputFiles,"no input files found for run " + os.environ['RUN']
+
+inputFiles = [ 'file:' + fname for fname in inputFiles ]
 
 outputFile = "/tmp/ah/small-tuples.root"
+
 
 #--------------------
 # select events by HLT path
