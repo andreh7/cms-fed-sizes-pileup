@@ -59,6 +59,9 @@ class PerNumVertexNtupleMaker : public edm::EDAnalyzer
       virtual void analyze(const edm::Event&, const edm::EventSetup&);
       virtual void endJob();
 
+      virtual void beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const&);
+
+
   /** currently, running over more than one run is not really
       supported. In the future we could at least check that
       the set of FEDs of subsequent runs is the same as for the
@@ -76,7 +79,13 @@ class PerNumVertexNtupleMaker : public edm::EDAnalyzer
   //--------------------
 
   /** the input tag where the FedSizeAnalysisData objects should be taken from */
-  edm::InputTag source;
+  edm::EDGetTokenT<FedSizeAnalysisData> sourceToken;
+
+  edm::EDGetTokenT<LumiDetails> lumiDetailsToken;
+
+  // see https://twiki.cern.ch/twiki/bin/view/CMS/LumiCalc#LumiDetails
+  edm::Handle<LumiDetails> lumiDetails;
+
 
   /** all FedIDs to look at
       TODO: do we actually need this ? If we used a TTree instead, we could
@@ -222,7 +231,8 @@ PerNumVertexNtupleMaker::PerNumVertexNtupleMaker(const edm::ParameterSet& iConfi
   isFirstRun(true)
 {
   maxNumVertices = iConfig.getUntrackedParameter<unsigned>("maxNumVertices");
-  source = iConfig.getUntrackedParameter<edm::InputTag>("src");
+  sourceToken = consumes<FedSizeAnalysisData>(iConfig.getUntrackedParameter<edm::InputTag>("src"));
+  lumiDetailsToken = consumes<LumiDetails, edm::InLumi>(edm::InputTag("lumiProducer"));
 
   for (unsigned i = 0; i <= FEDNumbering::MAXFEDID; ++i)
   {
@@ -488,7 +498,7 @@ PerNumVertexNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup
 
   // get the input data
   Handle<FedSizeAnalysisData> sizeData;
-  iEvent.getByLabel(source,sizeData);
+  iEvent.getByToken(sourceToken,sizeData);
   
   // find out how many vertices there were
   int numVertices = sizeData->getNumPrimaryVertices();
@@ -703,17 +713,32 @@ PerNumVertexNtupleMaker::fillLumi(const edm::Event& iEvent, Float_t *outputBuffe
 double 
 PerNumVertexNtupleMaker::getLumi(const edm::Event& iEvent)
 {
-  // see https://twiki.cern.ch/twiki/bin/view/CMS/LumiCalc#LumiDetails
-  edm::Handle<LumiDetails> lumiDetails;
-  iEvent.getLuminosityBlock().getByLabel("lumiProducer",lumiDetails); 
+  iEvent.getLuminosityBlock().getByToken(lumiDetailsToken, lumiDetails); 
+  // lb.getByToken(lumiDetailsToken, lumiDetails); 
+
 
   // this luminosity should be in Hz/ubarn (i.e. 10^30 s^-1 cm^-2)
   if (! lumiDetails.isValid())  
     // object not available for some reason
     return -1;
   else
-    return lumiDetails->lumiValue(LumiDetails::kOCC1,iEvent.bunchCrossing()) * 6.37;
+    {
+      // this is what we used for LHC Run I
+      // double value = lumiDetails->lumiValue(LumiDetails::kOCC1,iEvent.bunchCrossing()) * 6.37;
 
+      // neither kOCC1, kOCC2 nor kPLT seem to work for LHC Run II (CMS run 273158)
+      // double value = lumiDetails->lumiValue(LumiDetails::kPLT,iEvent.bunchCrossing()) * 6.37;
+      // std::cout << "here2" << std::endl;
+      // return value;
+      return -1;
+    }
+}
+
+//----------------------------------------------------------------------
+
+void 
+PerNumVertexNtupleMaker::beginLuminosityBlock(edm::LuminosityBlock const&lb, edm::EventSetup const&)
+{
 }
 
 //----------------------------------------------------------------------
