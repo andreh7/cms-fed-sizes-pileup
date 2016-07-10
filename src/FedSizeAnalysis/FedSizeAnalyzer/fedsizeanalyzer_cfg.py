@@ -45,9 +45,14 @@ if os.path.basename(sys.argv[0]) == 'cmsRun':
 else:
     ARGV = sys.argv[1:]
 
+
+min_ls = int(ARGV.pop(0))
+max_ls = int(ARGV.pop(0))
 dataset = ARGV.pop(0)
 run = int(ARGV.pop(0))
 
+print "min_ls=",min_ls
+print "max_ls=",max_ls
 print "dataset=",dataset
 print "run=",run
 
@@ -121,7 +126,7 @@ process.out = cms.OutputModule("PoolOutputModule",
     # running interactively                           
     # fileName = cms.untracked.string('/tmp/myOutputFile.root'),
 
-    fileName = cms.untracked.string('out.root'),
+    fileName = cms.untracked.string('out-%04d-%04d.root' % (min_ls, max_ls)),
                                
     # dropMetaDataForDroppedData = cms.untracked.bool(True),
     outputCommands = cms.untracked.vstring([
@@ -229,9 +234,16 @@ if good_lumi_section_json_file != None:
 
     for ls_range in lumi_sections_from_json:
 
+        if ls_range[0] > max_ls:
+            continue
+        if ls_range[1] < min_ls:
+            continue
+
+        # there is some overlap
+
         selected_ls_ranges.append([
-            ls_range[0],
-            ls_range[1]
+            max(min_ls, ls_range[0]),
+            min(max_ls, ls_range[1])
             ])
 
     print "selected_ls_ranges=",
