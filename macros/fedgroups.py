@@ -98,16 +98,22 @@ def makeTTCpartitionGroups(fedsInRun):
 
 
 #----------------------------------------------------------------------
-def makeFEDbuilderGroups(fedsInRun):
+def makeFEDbuilderGroups(run, fedsInRun):
 
     import sys
+
+    import runToFbset
+    fbset = runToFbset.getFbsetFromRun(run)
 
     retval = []
 
     fedsInRun = set(fedsInRun)
 
     import FedBuilderData
-    for line in FedBuilderData.fedBuilderGroups:
+
+    assert FedBuilderData.fedBuilderGroups.has_key(fbset), "could not find data for fbset " + fbset
+
+    for line in FedBuilderData.fedBuilderGroups[fbset]:
 
         # exclude fedbuilders for which no single FED was in the run
         feds = [ fed for fed in line['feds'] if fed in fedsInRun ]

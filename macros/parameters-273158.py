@@ -232,7 +232,7 @@ if True:
 
     import FedBuilderData
 
-    allSubsysToPlot.extend(fedgroups.makeFEDbuilderGroups(fedsInRun = fedsInRun))
+    allSubsysToPlot.extend(fedgroups.makeFEDbuilderGroups(run, fedsInRun = fedsInRun))
 
     # DEBUG
     # allSubsysToPlot = [ allSubsysToPlot[1] ]
