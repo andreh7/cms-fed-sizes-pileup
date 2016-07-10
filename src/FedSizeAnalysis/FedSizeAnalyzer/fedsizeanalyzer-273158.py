@@ -7,7 +7,9 @@
 #--------------------
 
 # see https://hypernews.cern.ch/HyperNews/CMS/get/physics-validation/2648/1/1.html
-good_lumi_section_json_file = "/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/Cert_271036-273450_13TeV_PromptReco_Collisions16_JSON_NoL1T.txt"
+#good_lumi_section_json_file = "/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/Cert_271036-273450_13TeV_PromptReco_Collisions16_JSON_NoL1T.txt"
+
+good_lumi_section_json_file = "Cert_271036-273450_13TeV_PromptReco_Collisions16_JSON_NoL1T.txt"
 
 #--------------------
 
