@@ -242,7 +242,7 @@ if True:
 #--------------------
 if True:
 
-    items = fedgroups.makeFRLgroups(fedsInRun)
+    items = fedgroups.makeFRLgroups(run, fedsInRun)
 
     # DEBUG
     # items = [ items[0] ]

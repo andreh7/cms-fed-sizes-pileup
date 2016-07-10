@@ -3,11 +3,11 @@
 # utilities to make plotting tasks for different ways of grouping FEDs
 
 #----------------------------------------------------------------------
-def makeFRLgroups(fedsInRun):
+def makeFRLgroups(run, fedsInRun):
     """ summing by FRL/FEROL, i.e. many tracker FEDs are in pairs, most others are single FEDs """
     
     import FEDtoFRLMappingData
-    frlTuples = FEDtoFRLMappingData.makeFRLtuples(fedsInRun)
+    frlTuples = FEDtoFRLMappingData.makeFRLtuples(run, fedsInRun)
 
     allSubsysToPlot = []
 
