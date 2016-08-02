@@ -67,7 +67,9 @@ for dstier, dataset in (
 
     query = "file dataset=%s" % dataset + " " + run_spec
 
-    lines = commands.getoutput("dascli --limit 0 --query '" + query + "'").splitlines()
+    cmd = "dascli --limit 0 --query '" + query + "'"
+    print >> sys.stderr, "executing",cmd
+    lines = commands.getoutput(cmd).splitlines()
 
     output_data[dstier] = lines
 
