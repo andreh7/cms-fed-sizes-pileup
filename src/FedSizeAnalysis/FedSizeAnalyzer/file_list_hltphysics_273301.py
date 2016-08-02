@@ -1,5 +1,5 @@
 # output of 
-# ./makeFileList.py --run 273301 /HLTPhysics/Run2016B-v2/RAW /HLTPhysics/Run2016C-PromptReco-v2/RECO
+# ./makeFileList.py --run 273301 /HLTPhysics/Run2016B-v2/RAW /HLTPhysics/Run2016B-PromptReco-v2/AOD
 #
 files_list ={'raw': ['/store/data/Run2016B/HLTPhysics/RAW/v2/000/273/301/00000/264C2F38-B718-E611-8DAD-02163E014679.root',
          '/store/data/Run2016B/HLTPhysics/RAW/v2/000/273/301/00000/326E6948-B718-E611-BC85-02163E0142C5.root',
@@ -15,4 +15,10 @@ files_list ={'raw': ['/store/data/Run2016B/HLTPhysics/RAW/v2/000/273/301/00000/2
          '/store/data/Run2016B/HLTPhysics/RAW/v2/000/273/301/00000/B8D34D03-A518-E611-B51D-02163E0145D6.root',
          '/store/data/Run2016B/HLTPhysics/RAW/v2/000/273/301/00000/E23ED53E-F218-E611-81C1-02163E01440C.root',
          '/store/data/Run2016B/HLTPhysics/RAW/v2/000/273/301/00000/FC3C8E3B-F218-E611-AD1D-02163E0133BF.root'],
- 'reco': []}
+ 'reco': ['/store/data/Run2016B/HLTPhysics/AOD/PromptReco-v2/000/273/301/00000/A6F52F2B-8E1A-E611-BE30-02163E0139E0.root',
+          '/store/data/Run2016B/HLTPhysics/AOD/PromptReco-v2/000/273/301/00000/BE7C4EDF-A31A-E611-B567-02163E012791.root',
+          '/store/data/Run2016B/HLTPhysics/AOD/PromptReco-v2/000/273/301/00000/C2EB673F-8F1A-E611-B22F-02163E0122F4.root',
+          '/store/data/Run2016B/HLTPhysics/AOD/PromptReco-v2/000/273/301/00000/CC13FD3E-961A-E611-B5BB-02163E01431F.root',
+          '/store/data/Run2016B/HLTPhysics/AOD/PromptReco-v2/000/273/301/00000/D42FD37F-971A-E611-B9FF-02163E013601.root',
+          '/store/data/Run2016B/HLTPhysics/AOD/PromptReco-v2/000/273/301/00000/F439F00A-9D1A-E611-9F62-02163E0140F8.root',
+          '/store/data/Run2016B/HLTPhysics/AOD/PromptReco-v2/000/273/301/00000/FE571AEF-931A-E611-920B-02163E013921.root']}
