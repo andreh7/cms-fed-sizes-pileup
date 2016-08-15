@@ -31,6 +31,25 @@ def makeFRLgroups(run, fedsInRun):
 
 #----------------------------------------------------------------------
 
+def makeSingleFEDgroups(run, fedsInRun):
+    """ makes a list of groups consisting of a single FED only """
+    
+    allSubsysToPlot = []
+
+    for fed in fedsInRun:
+
+        allSubsysToPlot.append(dict(
+                label = "fed %d" % fed,
+                grouping = "by FED",
+                expr = "size%03d" % fed,
+                numFeds = 1,
+                )
+              )
+
+    return allSubsysToPlot
+
+#----------------------------------------------------------------------
+
 def makeSubSystemGroups(fedsInRun):
     import utils, operator
 
