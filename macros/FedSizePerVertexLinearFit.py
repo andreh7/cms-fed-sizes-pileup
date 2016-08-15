@@ -274,16 +274,24 @@ class FedSizePerVertexLinearFit:
 
             )
 
-        plotter.fitAverage(linear_fit_min_value = self.parameters.linear_fit_min_num_vertices - 0.5,
-                           linear_fit_max_value = self.parameters.linear_fit_max_num_vertices + 0.5,
-                           label_template = "size = (%(offset).3f + nvtx * %(slope).3f) %(unit)s",
-                           )
+        # perform lienar fit but only if the fitting range was specified
+        if self.parameters.linear_fit_min_num_vertices != None and \
+                self.parameters.linear_fit_max_num_vertices != None:
+
+            plotter.fitAverage(linear_fit_min_value = self.parameters.linear_fit_min_num_vertices - 0.5,
+                               linear_fit_max_value = self.parameters.linear_fit_max_num_vertices + 0.5,
+                               label_template = "size = (%(offset).3f + nvtx * %(slope).3f) %(unit)s",
+                               )
+
+            self.alpha = plotter.alpha
+            self.beta = plotter.beta
+
+        else:
+            self.alpha = None
+            self.beta = None
 
         plotter.plot()
 
-        self.alpha = plotter.alpha
-        self.beta = plotter.beta
-        
         #--------------------
 
         ROOT.gPad.SaveAs(self.parameters.plots_output_dir + "/" + outputFilePrefix + "average-sizes-vs-vertex-" + self.subsys + ".png")

@@ -72,12 +72,18 @@ class HTMLReportMaker:
             if grouping == None:
                 grouping = "&nbsp;"
 
+            def sizeToString(value):
+                if value == None:
+                    return "?"
+                else:
+                    return "%0.3f" % value
+
             # TODO: sort by what ? or print table multiple times with different sorting criteria ?
             print >> self.os,"<tr>"
             print >> self.os,"<td>" + grouping + "</td>"
             print >> self.os,"<td>" + '<a href="#subsys%04d">%s</a>' % (line['index'], line['subsystem']) + "</td>"
-            print >> self.os,"<td>" + "%0.3f" % line['offset'] + "</td>"
-            print >> self.os,"<td>" + "%0.3f" % line['slope'] + "</td>"
+            print >> self.os,"<td>" + sizeToString(line['offset']) + "</td>"
+            print >> self.os,"<td>" + sizeToString(line['slope']) + "</td>"
 
             if line['numFeds'] != None:
                 numFedsStr = str(line['numFeds'])
@@ -121,8 +127,11 @@ class HTMLReportMaker:
 
             if task.subsys == 'total':
                 # convert from MB to kB
-                thisData['offset'] *= 1000.0
-                thisData['slope'] *= 1000.0
+                if thisData['offset'] != None:
+                    thisData['offset'] *= 1000.0
+
+                if thisData['slope'] != None:
+                    thisData['slope'] *= 1000.0
 
             subsystemEvolutionData.append(thisData)
 
