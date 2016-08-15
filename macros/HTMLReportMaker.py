@@ -44,6 +44,49 @@ class HTMLReportMaker:
         self.tasks = list(tasks)
 
     #----------------------------------------
+        
+    def printSizeCalculatorJavascriptAndForm(self, numLines):
+        print >> self.os,"""
+<script language="javascript">
+//----------------------------------------------------------------------
+function updateTable()
+{
+  var numVertices = document.getElementById('customNumVertices').value;
+
+  // convert to integer
+  numVertices = parseFloat(numVertices);
+  if (isNaN(numVertices))
+  {
+    alert("malformed number of vertices");
+    return;
+  }
+
+  document.getElementById('customNumVerticesField').innerHTML = numVertices;
+
+  for (var subsys = 0; subsys < """ + str(numLines) + """; ++subsys)
+  {
+    var offset = parseFloat(document.getElementById('offset_subsys' + subsys).innerHTML);
+    var slope  = parseFloat(document.getElementById('slope_subsys' + subsys).innerHTML);
+
+    var value = offset + numVertices * slope;
+
+    document.getElementById('custom_size_subsys' + subsys).innerHTML = value.toFixed(3);
+
+  }
+
+
+}
+//----------------------------------------------------------------------
+
+</script>
+<form>
+Custom number of vertices:
+<input type='text' id='customNumVertices' />
+<button type="button" onclick="updateTable();">update table</button>
+</form>
+<br/>
+"""
+    #----------------------------------------
 
     def __printEvolutionOverviewTable(self, subsystemEvolutionData):
 
@@ -55,16 +98,23 @@ class HTMLReportMaker:
         print >> self.os, "<br/>"
         print >> self.os, "<br/>"
         
+        # print javascript for event size calculation
+        self.printSizeCalculatorJavascriptAndForm(len(subsystemEvolutionData))
+
+
         # table with overview
         print >> self.os, "<table>"
         print >> self.os, "<tbody>"
-        
+
+        # table header
         print >> self.os,"<tr>" + "".join([ "<th>" + x + "</th>" for x in [
                     'grouping',
                     'group',
                     'offset [kByte]',
                     'slope [kByte/vtx]',
-                    'number of feds']]) + "</tr>"
+                    'number of feds',
+                    'event size at <div id="customNumVerticesField">?</div> vertices [kByte]',
+                    ]]) + "</tr>"
 
         for line in subsystemEvolutionData:
 
@@ -82,8 +132,8 @@ class HTMLReportMaker:
             print >> self.os,"<tr>"
             print >> self.os,"<td>" + grouping + "</td>"
             print >> self.os,"<td>" + '<a href="#subsys%04d">%s</a>' % (line['index'], line['subsystem']) + "</td>"
-            print >> self.os,"<td>" + sizeToString(line['offset']) + "</td>"
-            print >> self.os,"<td>" + sizeToString(line['slope']) + "</td>"
+            print >> self.os,'<td id="offset_subsys%d">' % line['index'] + sizeToString(line['offset']) + "</td>"
+            print >> self.os,'<td id="slope_subsys%d">'  % line['index'] + sizeToString(line['slope']) + "</td>"
 
             if line['numFeds'] != None:
                 numFedsStr = str(line['numFeds'])
@@ -91,6 +141,9 @@ class HTMLReportMaker:
                 numFedsStr = "&nbsp;"
 
             print >> self.os,"<td>" + numFedsStr + "</td>"
+
+            print >> self.os, '<td id="custom_size_subsys%d" style="text-align: right;">-</td>' % line['index']
+
             print >> self.os,"</tr>"
 
         print >> self.os, "</tbody>"
