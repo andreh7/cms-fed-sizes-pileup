@@ -131,6 +131,9 @@ class FedSizePerVertexLinearFit:
 
         ntuple = utils.openSizePerFedNtuples(self.parameters.input_data_dir, self.parameters.max_num_vertices)
 
+        # maps from number of vertices to list of sum of fragment sizes
+        self.fragmentSizes = {}
+
         for num_vertices in range(self.parameters.size_evolution_min_num_vertices,
                                   self.parameters.size_evolution_max_num_vertices + 1):
 
@@ -147,13 +150,10 @@ class FedSizePerVertexLinearFit:
             nentries = ntuple[num_vertices].GetSelectedRows()
             data = ntuple[num_vertices].GetV1()
 
-            fout = open(self.parameters.output_data_dir + "/event-sizes-%d-vtx.txt" % num_vertices,"w")
-
-            for i in range(nentries):
-                print >> fout,data[i]
-
-            fout.close()
-            print "wrote data for %d vertices to %s" % (num_vertices, fout.name)
+            #----------
+            # keep event sizes data
+            #----------            
+            self.fragmentSizes[num_vertices] = [ data[i] for i in range(nentries) ]
 
         # close the input file again (otherwise we'll run out of
         # file descriptors when running for all FEDs)
@@ -190,7 +190,7 @@ class FedSizePerVertexLinearFit:
                                   self.parameters.size_evolution_max_num_vertices + 1):
 
             # reading them back:
-            event_sizes = [ float(x.split('\n')[0]) for x in open(self.parameters.output_data_dir + "/event-sizes-%d-vtx.txt" % num_vertices).readlines() ]
+            event_sizes = self.fragmentSizes[num_vertices]
             
             event_sizes.sort()
             if event_sizes:
@@ -303,5 +303,7 @@ class FedSizePerVertexLinearFit:
             dict(fname = self.parameters.plots_output_dir + "/" + outputFilePrefix + "average-sizes-vs-vertex-" + self.subsys + ".C"),
             ]
 
+        # free memory
+        del self.fragmentSizes
     
     #----------------------------------------
