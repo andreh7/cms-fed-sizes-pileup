@@ -139,8 +139,6 @@ class FedSizePerVertexLinearFit:
             ## if not self.size_variable in  tupleVariables:
             ##     raise Exception("no variable %s found in the per fed size tuple (is this a well known subsystem ?)" % self.size_variable)
 
-            print "size_expr=",self.size_expr
-
             # get all the values in the ntuple
             ntuple[num_vertices].SetEstimate(ntuple[num_vertices].GetEntries())
             ntuple[num_vertices].Draw(self.size_expr,"","goff")
