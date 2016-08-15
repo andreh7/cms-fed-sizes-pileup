@@ -8,6 +8,8 @@ runToFbset = {
 
     273301 : "fb_all_withuTCA_consolidated3_no1240_TOTEM",
 
+    276870 : "fb_all",
+
     }
 
 def getFbsetFromRun(run):
