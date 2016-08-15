@@ -58,7 +58,7 @@ class LuminosityEvolution:
             # LHC RUN II brilcalc
             line = csv_reader.next()
             line = csv_reader.next()
-            print "line=",line
+
             assert(line == ['#run:fill', 'ls', 'time' , 'beamstatus' , 'E(GeV)', 'delivered(/ub)', 'recorded(/ub)', 'avgpu', 'source'])
             posLS = 1
             posDelivered = 5
