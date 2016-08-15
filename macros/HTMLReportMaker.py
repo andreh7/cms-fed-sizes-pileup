@@ -178,14 +178,6 @@ Custom number of vertices:
                                            "numFeds":    task.numFeds, 
                                            "index":      index}
 
-            if task.subsys == 'total':
-                # convert from MB to kB
-                if thisData['offset'] != None:
-                    thisData['offset'] *= 1000.0
-
-                if thisData['slope'] != None:
-                    thisData['slope'] *= 1000.0
-
             subsystemEvolutionData.append(thisData)
 
             groupedSubsystemEvolutionData.setdefault(task.grouping, []).append(thisData)
