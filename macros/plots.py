@@ -262,7 +262,7 @@ for taskIndex, task in enumerate(all_tasks):
     print "# producing",task.__class__.__name__,
 
     if hasattr(task,'instanceName'):
-        print "(%s)" % task.instanceName
+        print "(%s)" % task.instanceName,
 
     print
     print "#----------------------------------------"
@@ -271,7 +271,7 @@ for taskIndex, task in enumerate(all_tasks):
     print "#----------------------------------------"
     print "# plotting",task.__class__.__name__,
     if hasattr(task,'instanceName'):
-        print "(%s)" % task.instanceName
+        print "(%s)" % task.instanceName,
     print
     print "#----------------------------------------"
     task.plot(outputFilePrefix = "%04d-" % taskIndex)
