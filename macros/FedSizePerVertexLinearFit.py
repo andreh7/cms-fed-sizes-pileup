@@ -311,3 +311,45 @@ class FedSizePerVertexLinearFit:
         del self.fragmentSizes
     
     #----------------------------------------
+
+    def writeQuantilesCSV(self, os, writeHeader = False):
+        # writes quantiles per number of vertex to a CSV format file
+
+        if writeHeader:
+            header = [ "subsys", 
+                       "num vertices",
+                       "mean",
+                       ]
+
+            for quantileDef in self.quantile_histo_defs:
+                header.append("minus " + quantileDef['title'])
+
+            header.append("median")
+
+            for quantileDef in reversed(self.quantile_histo_defs):
+                header.append("plus " + quantileDef['title'])
+
+            print >> os, ",".join(header)
+
+        #----------
+        assert len(self.avg_values) == len(self.xpos)
+
+        for index, num_vertices in enumerate(self.xpos):
+
+            parts = [ self.subsys, num_vertices ]
+
+            # add mean
+            parts.append(self.avg_values[index])
+
+            for quantileIndex in range(len(self.quantile_values_lower)):
+                parts.append(self.quantile_values_lower[quantileIndex][index])
+
+            # add median
+            parts.append(self.median_values[index])
+
+            for quantileIndex in reversed(range(len(self.quantile_values_lower))):
+                parts.append(self.quantile_values_upper[quantileIndex][index])
+        
+            print >> os, ",".join([ str(x) for x in parts ])
+
+    #----------------------------------------
