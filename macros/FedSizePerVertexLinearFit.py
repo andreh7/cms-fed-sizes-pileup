@@ -220,12 +220,13 @@ class FedSizePerVertexLinearFit:
                     # calculate the quantile
                     quantile = quantile_histo_def['quantile']
                     assert(quantile <= 0.5)
-
+                    
+                    # first index is quantile type, second index is number of vertices
                     self.quantile_values_lower.setdefault(index,[]).append(utils.getQuantile(event_sizes, quantile))
                     self.quantile_values_upper.setdefault(index,[]).append(utils.getQuantile(event_sizes, 1.0 - quantile))
 
         #--------------------
-        # use the helper class to actually per form the fit
+        # use the helper class to actually perform the fit
         #--------------------
         plotter = FedSizePerXUtils.Plotter(
             self.parameters,
