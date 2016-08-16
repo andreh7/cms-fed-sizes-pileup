@@ -37,13 +37,13 @@ standardQuantileHistoDefs = [
     # { "quantile": 0.05, "FillColor": ROOT.kBlue },
 
     # +/- 3 sigma
-    { "quantile": (1 - sigmaToArea(3)) / 2, "FillColor": ROOT.kRed },
+    { "quantile": (1 - sigmaToArea(3)) / 2, "FillColor": ROOT.kRed,   "title": "3 sigma", },
 
-    # +/- 3 sigma
-    { "quantile": (1 - sigmaToArea(2)) / 2, "FillColor": ROOT.kBlue },
+    # +/- 2 sigma
+    { "quantile": (1 - sigmaToArea(2)) / 2, "FillColor": ROOT.kBlue,  "title": "2 sigma", },
 
     # +/- 1 sigma
-    { "quantile": (1 - sigmaToArea(1)) / 2, "FillColor": ROOT.kGreen },
+    { "quantile": (1 - sigmaToArea(1)) / 2, "FillColor": ROOT.kGreen, "title": "1 sigma", },
     
     ]
 
