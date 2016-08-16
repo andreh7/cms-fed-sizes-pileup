@@ -8,6 +8,7 @@ import utils
 import FedSizePerXUtils
 
 import ROOT
+import numpy as np
 
 class FedSizePerVertexLinearFit:
 
@@ -177,6 +178,7 @@ class FedSizePerVertexLinearFit:
         self.min_values = []
         self.max_values = []
         self.avg_values = []
+        self.median_values = []
 
         # first index is the number of the quantile
         # second index is the index corresponding to the number of vertices
@@ -203,6 +205,7 @@ class FedSizePerVertexLinearFit:
                 self.max_values.append(max(event_sizes))
 
                 self.avg_values.append(sum(event_sizes) / float(len(event_sizes)))
+                self.median_values.append(np.median(event_sizes))
 
                 # only append the current number of vertices
                 # if there were actually some events
