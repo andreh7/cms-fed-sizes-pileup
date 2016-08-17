@@ -187,8 +187,6 @@ class Plotter:
 
         self.y_scale_factor = y_scale_factor
 
-        print "UUU ymaxScale=",ymaxScale
-
     #----------------------------------------
 
     def __makeAvgGraph(self):
@@ -237,8 +235,6 @@ class Plotter:
         self.alpha, self.beta = utils.linearFit(xpos_for_fit, ypos_for_fit)
 
         #--------------------
-
-        print "subsys,alpha,beta=",self.subsys, self.alpha, self.beta
 
         self.fittedFunc = ROOT.TF1("linearfunc","[0]+x*[1]",
                                    linear_fit_min_value,
