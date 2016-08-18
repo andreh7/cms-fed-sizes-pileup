@@ -187,6 +187,41 @@ class Plotter:
 
         self.y_scale_factor = y_scale_factor
 
+        # fit result for the mean
+        self.meanFitResult = {}
+
+        # fit result for the (absolute) size of the averaged one sigma band
+        self.uncertFitResult = {}
+
+    #----------------------------------------
+
+    def addFitResult(self, prefix, linear_fit_min_value, linear_fit_max_value, fitResultDict, alpha, beta):
+
+        fitResultDict['alpha'] = alpha
+        fitResultDict['beta'] = beta
+
+        func = ROOT.TF1(prefix + "linearfunc","[0]+x*[1]",
+                        linear_fit_min_value,
+                        linear_fit_max_value,
+                        )
+        func.SetParName(0,"const")
+        func.SetParName(1,"slope")
+        func.SetParameter(0,alpha)
+        func.SetParameter(1,beta)
+        fitResultDict['fittedFunc'] = func
+
+        # create a scaled version for drawing
+        func = ROOT.TF1(prefix + "scaledFittedFunc","%f*([0]+x*[1])" % self.y_scale_factor,
+                                         linear_fit_min_value,
+                                         linear_fit_max_value,
+                                         )
+        func.SetParName(0,"const")
+        func.SetParName(1,"slope")
+        func.SetParameter(0,alpha)
+        func.SetParameter(1,beta)
+
+        fitResultDict['scaledFittedFunc'] = func
+
     #----------------------------------------
 
     def __makeAvgGraph(self):
@@ -222,44 +257,39 @@ class Plotter:
         # filter the values for the fit
         xpos_for_fit = []
         ypos_for_fit = []
-        for x,y in zip(self.xpos, self.avg_values):
+        uncert_for_fit = []
+
+        oneSigmaIndex = 2
+        assert standardQuantileHistoDefs[oneSigmaIndex]['title'] == '1 sigma'
+
+        for x,y, sigmaUp, sigmaDown in zip(self.xpos, self.avg_values, self.quantile_values_upper[oneSigmaIndex], self.quantile_values_lower[oneSigmaIndex]):
             if x >= linear_fit_min_value and \
                x <= linear_fit_max_value:
+
                 xpos_for_fit.append(x)
+
+                # mean
                 ypos_for_fit.append(y)
+                
+                # 1 sigma 
+                uncert_for_fit.append(0.5 * (sigmaUp - sigmaDown))
 
         if len(xpos_for_fit) < 2:
             raise Exception("must have at least two points for a linear fit (linear_fit_min_value=" + str(linear_fit_min_value) + " linear_fit_max_value=" + str(linear_fit_max_value) + ")")
 
-        # alpha, beta = linearFit(xpos, avg_values)
-        self.alpha, self.beta = utils.linearFit(xpos_for_fit, ypos_for_fit)
-
-        #--------------------
-
-        self.fittedFunc = ROOT.TF1("linearfunc","[0]+x*[1]",
-                                   linear_fit_min_value,
-                                   linear_fit_max_value,
-                                   )
-        self.fittedFunc.SetParName(0,"const")
-        self.fittedFunc.SetParName(1,"slope")
-        self.fittedFunc.SetParameter(0,self.alpha)
-        self.fittedFunc.SetParameter(1,self.beta)
-
-        # create a scaled version for drawing
-        self.scaledFittedFunc = ROOT.TF1("scaledFittedFunc","%f*([0]+x*[1])" % self.y_scale_factor,
-                                         linear_fit_min_value,
-                                         linear_fit_max_value,
-                                         )
-        self.scaledFittedFunc.SetParName(0,"const")
-        self.scaledFittedFunc.SetParName(1,"slope")
-        self.scaledFittedFunc.SetParameter(0,self.alpha)
-        self.scaledFittedFunc.SetParameter(1,self.beta)
+        # perform fit to means
+        alpha, beta = utils.linearFit(xpos_for_fit, ypos_for_fit)
+        self.addFitResult('mean', linear_fit_min_value, linear_fit_max_value, self.meanFitResult, alpha, beta)
 
         self.fitResultLabel = label_template % dict(
-            offset = self.alpha * self.y_scale_factor,
-            slope  = self.beta  * self.y_scale_factor,
+            offset = alpha * self.y_scale_factor,
+            slope  = beta  * self.y_scale_factor,
             unit   = self.yaxis_unit_label)
         
+        # perform fit to symmetrized 1 sigma bands
+        alpha, beta = utils.linearFit(xpos_for_fit, uncert_for_fit)
+        self.addFitResult('uncert', linear_fit_min_value, linear_fit_max_value, self.uncertFitResult, alpha, beta)
+
     #----------------------------------------
     def plot(self):
         """ produces the graph from the data supplied """
