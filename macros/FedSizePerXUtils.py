@@ -379,8 +379,6 @@ class Plotter:
 
             overallMax *= self.ymaxScale
 
-            print "VVV applying ymaxscale",self.ymaxScale,overallMax
-
             self.mg.SetMaximum(overallMax)
             self.mg.SetMinimum(0)
 
