@@ -31,8 +31,8 @@ def makeSubsystemEvolutionData(tasks):
         # sizes in kB (note that 'total' is in MB)
         retval.setdefault(grouping, []).append({
                 "subsystem":  task.subsys, 
-                "offset":     task.alpha, 
-                "slope":      task.beta, 
+                "offset":     task.meanFitResult['alpha'], 
+                "slope":      task.meanFitResult['beta'], 
                 "numFeds":    task.numFeds,
                 })
 

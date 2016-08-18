@@ -173,8 +173,8 @@ Custom number of vertices:
 
             thisData = {"subsystem":  task.subsys, 
                                            "grouping":   task.grouping,
-                                           "offset":     task.alpha, 
-                                           "slope":      task.beta, 
+                                           "offset":     task.meanFitResult['alpha'], 
+                                           "slope":      task.meanFitResult['beta'], 
                                            "numFeds":    task.numFeds, 
                                            "index":      index}
 
