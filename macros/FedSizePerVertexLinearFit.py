@@ -277,6 +277,10 @@ class FedSizePerVertexLinearFit:
             )
 
         # perform lienar fit but only if the fitting range was specified
+
+        self.meanFitResult = {}
+        self.uncertFitResult = {}
+
         if self.parameters.linear_fit_min_num_vertices != None and \
                 self.parameters.linear_fit_max_num_vertices != None:
 
@@ -285,12 +289,11 @@ class FedSizePerVertexLinearFit:
                                label_template = "size = (%(offset).3f + nvtx * %(slope).3f) %(unit)s",
                                )
 
-            self.alpha = plotter.alpha
-            self.beta = plotter.beta
-
+            self.meanFitResult = dict(alpha = plotter.meanFitResult['alpha'], beta = plotter.meanFitResult['beta'])
+            self.uncertFitResult = dict(alpha = plotter.uncertFitResult['alpha'], beta = plotter.uncertFitResult['beta'])
         else:
-            self.alpha = None
-            self.beta = None
+            self.meanFitResult = dict(alpha = None, beta = None)
+            self.uncertFitResult = dict(alpha = None, beta = None)
 
         plotter.plot()
 
