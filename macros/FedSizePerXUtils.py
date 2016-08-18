@@ -399,8 +399,6 @@ class Plotter:
         #--------------------
         # plot the linear fit to the average values
         #--------------------
-        # global fittedFunc
-
         if self.meanFitResult.has_key('scaledFittedFunc'):
 
             self.meanFitResult['scaledFittedFunc'].Draw("same")
@@ -417,6 +415,52 @@ class Plotter:
 
             gc_saver.append(label)
             gc_saver.append(self.meanFitResult['scaledFittedFunc'])
+
+        #--------------------
+        # plot the linear fit to the +/- 1 sigma values
+        #--------------------
+        if self.uncertFitResult.has_key('scaledFittedFunc') and self.meanFitResult.has_key('scaledFittedFunc'):
+
+            # add the fitted uncertainties to the mean
+            # (which is not entirely correct because the
+            # boxes are dawn for sigmas around the meadian)
+            #
+            # produce a sum function
+            
+            for sign, name in (
+                ('+', 'plus'),
+                ('-', 'minus'),
+                ):
+
+                # this seems not to work for some unknown reason (from https://root.cern.ch/phpBB3/viewtopic.php?t=10862 it looks like
+                # it should...)
+                # sumFunc = ROOT.TF1("oneSigma" + name + "func","meanscaledFittedFunc" + sign + "uncertscaledFittedFunc",
+                #                    self.meanFitResult['scaledFittedFunc'].GetXmin(),
+                #                    self.meanFitResult['scaledFittedFunc'].GetXmax()
+                #                    )
+
+                # compose the formulas ourselves
+                # note the option "P": this will return the values of the actual parameters
+                # (which have the same name but different values for the two functions)
+                sumFormula = "(%s) %s (%s)" % (
+                                      self.meanFitResult['scaledFittedFunc'].GetExpFormula("P"),
+                                      sign,
+                                      self.uncertFitResult['scaledFittedFunc'].GetExpFormula("P"),
+                                      )
+
+                sumFunc = ROOT.TF1("oneSigma" + name + "func",
+                                   sumFormula,
+                                   self.meanFitResult['scaledFittedFunc'].GetXmin(),
+                                   self.meanFitResult['scaledFittedFunc'].GetXmax()
+                                   )
+
+                sumFunc.Draw("same")
+
+                sumFunc.SetLineWidth(3)
+                sumFunc.SetLineColor(ROOT.kRed)
+                sumFunc.SetLineStyle(ROOT.kDashed)
+
+                gc_saver.append(sumFunc)
 
         #--------------------
         # add the run number to the plot
