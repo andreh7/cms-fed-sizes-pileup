@@ -437,7 +437,13 @@ class Plotter:
         if self.numFeds != None:
             #--------------------
             # add a small label with number of FEDs
-            label = ROOT.TLatex(0.9,0.96,"%d FEDS" % self.numFeds)
+            if self.numFeds == 1:
+                text = "one FED"
+            else:
+                text = "%d FEDs" % self.numFeds
+
+            label = ROOT.TLatex(0.9,0.96,text)
+
             label.SetNDC(True)
             label.SetTextSize(label.GetTextSize() * 0.5)
             label.SetTextAlign(31)
