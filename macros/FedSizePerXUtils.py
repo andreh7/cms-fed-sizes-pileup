@@ -350,12 +350,12 @@ class Plotter:
         # draw an extrapolation line if requested
         # (draw before the fitted line so )
 
-        if hasattr(self,'scaledFittedFunc') and \
+        if self.meanFitResult.has_key('scaledFittedFunc') and \
                self.linear_fit_extrapolation_min_num_vertices != None and \
                self.linear_fit_extrapolation_max_num_vertices != None:
             # just draw a line through the two endpoints
             xvalues = [ self.linear_fit_extrapolation_min_num_vertices, self.linear_fit_extrapolation_max_num_vertices]
-            yvalues = [ self.scaledFittedFunc.Eval(x) for x in xvalues ]
+            yvalues = [ self.meanFitResult['scaledFittedFunc'].Eval(x) for x in xvalues ]
 
             gr = ROOT.TGraph(2, array.array('f',xvalues), array.array('f',yvalues)); gc_saver.append(gr)
             gr.SetLineWidth(3)
@@ -403,14 +403,14 @@ class Plotter:
         #--------------------
         # global fittedFunc
 
-        if hasattr(self,'scaledFittedFunc'):
+        if self.meanFitResult.has_key('scaledFittedFunc'):
 
-            self.scaledFittedFunc.Draw("same")
+            self.meanFitResult['scaledFittedFunc'].Draw("same")
 
             ROOT.gPad.SetLogy(0)
 
-            self.scaledFittedFunc.SetLineWidth(3)
-            self.scaledFittedFunc.SetLineColor(ROOT.kBlue)
+            self.meanFitResult['scaledFittedFunc'].SetLineWidth(3)
+            self.meanFitResult['scaledFittedFunc'].SetLineColor(ROOT.kBlue)
 
             label = ROOT.TLatex(0.1,0.92,self.fitResultLabel)
             label.SetNDC(1)
@@ -418,7 +418,7 @@ class Plotter:
 
 
             gc_saver.append(label)
-            gc_saver.append(self.scaledFittedFunc)
+            gc_saver.append(self.meanFitResult['scaledFittedFunc'])
 
         #--------------------
         # add the run number to the plot
@@ -490,7 +490,7 @@ class Plotter:
 
         linear_fit_arrows = getattr(self.parameters, "linear_fit_arrows", [ dict(vtx = "avg") ])
 
-        if hasattr(self, 'scaledFittedFunc'):
+        if self.meanFitResult.has_key('scaledFittedFunc'):
             # left end for horizontal arrows
             xmin, xmax = self.mg.GetXaxis().GetXmin(), self.mg.GetXaxis().GetXmax()
             xleft = xmin
@@ -511,7 +511,7 @@ class Plotter:
                         continue
                     xpos = self.averageNumVertices
 
-                ypos = self.scaledFittedFunc(xpos)
+                ypos = self.meanFitResult['scaledFittedFunc'](xpos)
 
                 #----------
                 # vertical arrow
