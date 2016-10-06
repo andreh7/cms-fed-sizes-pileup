@@ -175,6 +175,10 @@ Custom number of vertices:
                                            "grouping":   task.grouping,
                                            "offset":     task.meanFitResult['alpha'], 
                                            "slope":      task.meanFitResult['beta'], 
+
+                                           "uncertOffset":     task.uncertFitResult['alpha'], 
+                                           "uncertSlope":      task.uncertFitResult['beta'], 
+
                                            "numFeds":    task.numFeds, 
                                            "index":      index}
 

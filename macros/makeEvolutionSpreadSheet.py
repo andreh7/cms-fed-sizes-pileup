@@ -115,6 +115,13 @@ class SpreadsheetCreator:
         ws.column_dimensions['B'].width = 14
 
         #----------
+        # uncertainties fit
+        #----------
+        ws['Q3'] = 'one sigma spread on data sizes [kByte/ev]'
+        ws['Q5'] = 'offset'
+        ws['R5'] = 'slope'
+
+        #----------
         # fill the evolution data
         #----------
         
@@ -175,6 +182,15 @@ class SpreadsheetCreator:
             row = 6+i
             self.makeNumericCell(ws, 'O%d' % row, "=(P$1-L%d)/M%d" %(row,row), "0.0")
 
+        #----------
+        # offset and slope of uncertanties
+        #----------
+        for row, data in enumerate(evolutionData):
+            thisRow = row + 6
+            self.makeNumericCell(ws, 'Q%d' % thisRow, data['uncertOffset'], "#,##0.000")
+            self.makeNumericCell(ws, 'R%d' % thisRow, data['uncertSlope'], "#,##0.000")
+
+            
 #----------------------------------------------------------------------
 # main
 #----------------------------------------------------------------------
