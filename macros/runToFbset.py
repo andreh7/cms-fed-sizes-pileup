@@ -10,6 +10,8 @@ runToFbset = {
 
     276870 : "fb_all",
 
+    282092 : "fb_all_with1240_withCASTOR",
+
     }
 
 def getFbsetFromRun(run):
