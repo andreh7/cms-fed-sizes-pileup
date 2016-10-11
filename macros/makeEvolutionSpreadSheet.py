@@ -185,6 +185,11 @@ class SingleGroupSheet:
     #----------------------------------------
 
     def makeNumericCell(self, cellName, value, format = None):
+        # cellName can either be a string or a pair (row, col)
+        if not isinstance(cellName, str):
+            # convert from tuple to string
+            cellName = coordToName(*cellName)
+
         self.ws[cellName] = value
         if format != None:
             self.ws.cell(cellName).number_format = format
