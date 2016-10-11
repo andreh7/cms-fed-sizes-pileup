@@ -58,6 +58,11 @@ class SingleGroupSheet:
 
     #----------------------------------------
 
+    # helper function to assign to the current sheet
+    # by row and column number
+    def __setitem__(self, key, value):
+        self.ws._get_cell(*key).value = value
+
     #----------------------------------------
 
     def fillSheet(self):
