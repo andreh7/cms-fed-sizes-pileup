@@ -132,8 +132,8 @@ class SingleGroupSheet:
         # title cells
         #----------
 
-        self[(firstRow,     firstCol)] = 'data size [kByte/ev] at' # G3
-        self[(firstRow + 1, firstCol)] = 'avg. #vertices'          # G4
+        self[(firstRow,     firstCol)] = 'data size [kByte/ev]'                                            # G3
+        self[(firstRow + 1, firstCol)] = '=CONCATENATE("at ",TEXT(%s,"0.0")," vertices")' % numVtxCellName # G4
 
         #----------
         # fill the formulas
