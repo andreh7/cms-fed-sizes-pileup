@@ -46,15 +46,18 @@ class SingleGroupSheet:
     def __makeHeaderCells(self):
         # write average number of vertices
         # and trigger rate
+        #
+        # @return the next row index to be used
 
-
-        self.ws['A1'] = 'avg. number of vertices'
+        self[(1,1)] = 'avg. number of vertices'
         if self.avgNumVertices == None:
-            self.ws['B1'] = "unknown"
+            self[(1,2)] = "unknown"
         else:
-            self.makeNumericCell('B1', self.avgNumVertices, "0.0")
+            self.makeNumericCell((1,2), self.avgNumVertices, "0.0")
 
         self.ws.column_dimensions[_get_column_letter(1)].width = 20
+
+        return 3
 
     #----------------------------------------
 
