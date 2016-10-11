@@ -21,10 +21,10 @@ def getAverageNumVerticesFromTasks(tasks):
 
 from openpyxl.utils import _get_column_letter
 
-def coordToName(row, col):
+def coordToName(row, col, rowPrefix = "", colPrefix = ""):
     # row and col are one-based
 
-    return _get_column_letter(col) + str(row)
+    return colPrefix + _get_column_letter(col) + rowPrefix + str(row)
 
 #----------------------------------------------------------------------
 
