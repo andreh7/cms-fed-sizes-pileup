@@ -166,7 +166,7 @@ class SingleGroupSheet:
         #----------
 
         self[(firstRow,    firstCol)]     = "data rate [MByte/s]" # I3
-        self[(firstRow + 1,firstCol)]     = "at trigger rate"     # I4
+        self[(firstRow + 1,firstCol)]     = '=CONCATENATE("at ", TEXT(%s,"0.0")," kHz trigger rate")' % triggerRateCellName # I4
         self[(firstRow + 2,firstCol)]     = "offset"              # I5
         self[(firstRow + 2,firstCol + 1)] = "slope"               # J5
 
