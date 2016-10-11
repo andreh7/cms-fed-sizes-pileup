@@ -81,6 +81,41 @@ class SingleGroupSheet:
 
     #----------------------------------------
 
+    def __fillInputData(self, firstRow):
+        # fills the fitted data per FED group on which almost
+        # any other numbers are based on
+
+        #----------
+        # column headers
+        #----------
+        self[(firstRow, 4)] = 'sum data sizes [kByte/ev]' # D3
+        # self.ws['F3'] = '=CONCATENATE("data size at ";CELL("contents";A2);" vertices") '
+        # self.ws['F3'] = '=\"data size at \"\&A2\&\" vertices\"'
+
+        # does not work with POI
+        # self.ws['F3'] = '="data size at "&A2&" vertices"'
+
+        self[(firstRow + 2, 1)] = 'FED group'               # A5                  
+        self[(firstRow + 2, 2)] = 'number of feds'          # B5
+        self[(firstRow + 2, 3)] = 'subsys' # do we still need this ? # C5
+        self[(firstRow + 2, 4)] = 'offset'                  # D5
+        self[(firstRow + 2, 5)] = 'slope'                   # E5
+
+        self.ws.column_dimensions[_get_column_letter(2)].width = 14
+
+        #----------
+        # fill the evolution data
+        #----------
+        
+        for rowOffset, data in enumerate(self.evolutionData):
+            thisRow = rowOffset + firstRow + 3
+            self[(thisRow, 1)] = data['subsystem']                          # A%d
+            self[(thisRow, 2)] = data['numFeds']                            # B%d
+            self.makeNumericCell((thisRow, 4), data['offset'], "#,##0.000") # D%d
+            self.makeNumericCell((thisRow, 5), data['slope'], "#,##0.000")  # E%d
+
+    #----------------------------------------
+
     def fillSheet(self):
         
         numItems = len(self.evolutionData)
@@ -99,28 +134,15 @@ class SingleGroupSheet:
         #----------
         row = self.__makeHeaderCells()
 
+        # fill input data (fit results)
+        self.__fillInputData(row)
+
         #----------
         # title cells
         #----------
 
-        self[(row, 4)] = 'sum data sizes [kByte/ev]' # D3
-        # self.ws['F3'] = '=CONCATENATE("data size at ";CELL("contents";A2);" vertices") '
-        # self.ws['F3'] = '=\"data size at \"\&A2\&\" vertices\"'
-
-        # does not work with POI
-        # self.ws['F3'] = '="data size at "&A2&" vertices"'
-
         self[(row,     7)] = 'data size [kByte/ev] at' # G3
         self[(row + 1, 7)] = 'avg. #vertices'          # G4
-
-        # column headers
-        self[(row + 2, 1)] = 'FED group'               # A5                  
-        self[(row + 2, 2)] = 'number of feds'          # B5
-        self[(row + 2, 3)] = 'subsys' # do we still need this ? # C5
-        self[(row + 2, 4)] = 'offset'                  # D5
-        self[(row + 2, 5)] = 'slope'                   # E5
-
-        self.ws.column_dimensions['B'].width = 14
 
         #----------
         # uncertainties fit
@@ -128,17 +150,6 @@ class SingleGroupSheet:
         self[(row,     17)] = 'one sigma spread on data sizes [kByte/ev]' # Q3 
         self[(row + 2, 17)] = 'offset'                                    # Q5
         self[(row + 2, 18)] = 'slope'                                     # R5
-
-        #----------
-        # fill the evolution data
-        #----------
-        
-        for rowOffset, data in enumerate(self.evolutionData):
-            thisRow = rowOffset + row + 3
-            self[(thisRow, 1)] = data['subsystem']                          # A%d
-            self[(thisRow, 2)] = data['numFeds']                            # B%d
-            self.makeNumericCell((thisRow, 4), data['offset'], "#,##0.000") # D%d
-            self.makeNumericCell((thisRow, 5), data['slope'], "#,##0.000")  # E%d
 
         #----------
         # data size at given number of vertices
