@@ -19,66 +19,33 @@ def getAverageNumVerticesFromTasks(tasks):
 
 #----------------------------------------------------------------------
 
-class SpreadsheetCreator:
 
+class SingleGroupSheet:
+    # fills a single spreadsheet for a given group
 
     #----------------------------------------
-
-    def __init__(self, subsystemEvolutionData, avgNumVertices = None,
-                 triggerRateKHz = 100):
-        import openpyxl
-
-        self.subsystemEvolutionData = subsystemEvolutionData
-        self.triggerRateKHz = triggerRateKHz
+    
+    def __init__(self, workbook, groupingName, evolutionData, avgNumVertices, 
+                 triggerRateKHz):
+        self.wb = workbook
+        self.groupingName = groupingName
+        self.evolutionData = evolutionData
         self.avgNumVertices = avgNumVertices
-
-        # create a workbook
-        self.wb = openpyxl.Workbook()
-
-        # fill the workbook
-        for groupingName, groupingData in self.subsystemEvolutionData.items():
-            # make one sheet per grouping
-            self.makeSheet(groupingName, groupingData)
-
-    #----------------------------------------
-    def writeToFile(self, outputFname):
-
-        fout = open(outputFname, "w")
-        fout.write(self.makeString())
-        fout.close()
+        self.triggerRateKHz = triggerRateKHz
 
     #----------------------------------------
 
-    def makeNumericCell(self, ws, cellName, value, format = None):
-        ws[cellName] = value
-        if format != None:
-            ws.cell(cellName).number_format = format
-
-    #----------------------------------------
-
-    def makeString(self):
-        # returns the binary notebook as a string
-        # (which could be written to a file etc.)
-
-        import openpyxl
-
-        # see http://stackoverflow.com/a/8714342/288875
-        return openpyxl.writer.excel.save_virtual_workbook(self.wb)
-
-    #----------------------------------------
-
-    def makeSheet(self, groupingName, evolutionData):
+    def fillSheet(self):
         
-        numItems = len(evolutionData)
+        numItems = len(self.evolutionData)
 
         # create a new worksheet
         ws = self.wb.create_sheet()
         
-        if groupingName == "" or groupingName == None:
+        if self.groupingName == "" or self.groupingName == None:
             ws.title = "-"
         else:
-            ws.title = groupingName
-
+            ws.title = self.groupingName
 
         #----------
         # make titles
@@ -125,7 +92,7 @@ class SpreadsheetCreator:
         # fill the evolution data
         #----------
         
-        for row, data in enumerate(evolutionData):
+        for row, data in enumerate(self.evolutionData):
             thisRow = row + 6
             ws['A%d' % thisRow] = data['subsystem']
             ws['B%d' % thisRow] = data['numFeds']
@@ -185,10 +152,64 @@ class SpreadsheetCreator:
         #----------
         # offset and slope of uncertanties
         #----------
-        for row, data in enumerate(evolutionData):
+        for row, data in enumerate(self.evolutionData):
             thisRow = row + 6
             self.makeNumericCell(ws, 'Q%d' % thisRow, data['uncertOffset'], "#,##0.000")
             self.makeNumericCell(ws, 'R%d' % thisRow, data['uncertSlope'], "#,##0.000")
+
+    def makeNumericCell(self, ws, cellName, value, format = None):
+        ws[cellName] = value
+        if format != None:
+            ws.cell(cellName).number_format = format
+
+    #----------------------------------------
+
+
+#----------------------------------------------------------------------
+
+class SpreadsheetCreator:
+
+
+    #----------------------------------------
+
+    def __init__(self, subsystemEvolutionData, avgNumVertices = None,
+                 triggerRateKHz = 100, pileups = None):
+        import openpyxl
+
+        self.subsystemEvolutionData = subsystemEvolutionData
+        self.triggerRateKHz = triggerRateKHz
+        self.avgNumVertices = avgNumVertices
+
+        # create a workbook
+        self.wb = openpyxl.Workbook()
+
+        # fill the workbook
+        for groupingName, groupingData in self.subsystemEvolutionData.items():
+            # make one sheet per grouping
+            sheetFiller = SingleGroupSheet(self.wb, groupingName, groupingData, avgNumVertices, triggerRateKHz)
+            sheetFiller.fillSheet()
+
+    #----------------------------------------
+    def writeToFile(self, outputFname):
+
+        fout = open(outputFname, "w")
+        fout.write(self.makeString())
+        fout.close()
+
+
+    #----------------------------------------
+
+    def makeString(self):
+        # returns the binary notebook as a string
+        # (which could be written to a file etc.)
+
+        import openpyxl
+
+        # see http://stackoverflow.com/a/8714342/288875
+        return openpyxl.writer.excel.save_virtual_workbook(self.wb)
+
+    #----------------------------------------
+
 
             
 #----------------------------------------------------------------------
