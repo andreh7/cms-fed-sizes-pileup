@@ -19,9 +19,10 @@ def getAverageNumVerticesFromTasks(tasks):
 
 #----------------------------------------------------------------------
 
+from openpyxl.utils import _get_column_letter
+
 def coordToName(row, col):
     # row and col are one-based
-    from openpyxl.utils import _get_column_letter
 
     return _get_column_letter(col) + str(row)
 
@@ -53,7 +54,9 @@ class SingleGroupSheet:
         else:
             self.makeNumericCell('B1', self.avgNumVertices, "0.0")
 
-        self.ws.column_dimensions['A'].width = 20
+        self.ws.column_dimensions[_get_column_letter(1)].width = 20
+
+    #----------------------------------------
 
     #----------------------------------------
 
