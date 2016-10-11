@@ -19,6 +19,14 @@ def getAverageNumVerticesFromTasks(tasks):
 
 #----------------------------------------------------------------------
 
+def coordToName(row, col):
+    # row and col are one-based
+    from openpyxl.utils import _get_column_letter
+
+    return _get_column_letter(col) + str(row)
+
+#----------------------------------------------------------------------
+
 
 class SingleGroupSheet:
     # fills a single spreadsheet for a given group
