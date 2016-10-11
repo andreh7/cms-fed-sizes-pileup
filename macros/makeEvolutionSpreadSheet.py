@@ -57,6 +57,11 @@ class SingleGroupSheet:
 
         self.ws.column_dimensions[_get_column_letter(1)].width = 20
 
+        # trigger rate
+        self[(1,8)] = 'trigger rate [kHz]:' # H1
+        self.ws.column_dimensions[_get_column_letter(8)].width = 14
+        self[(1,9)] = str(self.triggerRateKHz) # 'I1'
+
         return 3
 
     #----------------------------------------
@@ -140,10 +145,6 @@ class SingleGroupSheet:
         #--------------------
         # data rate
         #--------------------
-        self.ws['H1'] = 'trigger rate [kHz]:'
-        self.ws.column_dimensions['H'].width = 14
-        self.ws['I1'] = str(self.triggerRateKHz)
-
         self.ws['I3'] = "data rate [MByte/s]"
         self.ws['I4'] = "at trigger rate"
         self.ws['I5'] = "offset"
