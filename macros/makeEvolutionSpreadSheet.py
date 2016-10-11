@@ -57,10 +57,15 @@ class SingleGroupSheet:
 
         self.ws.column_dimensions[_get_column_letter(1)].width = 20
 
+        #----------
         # trigger rate
-        self[(1,8)] = 'trigger rate [kHz]:' # H1
-        self.ws.column_dimensions[_get_column_letter(8)].width = 14
-        self[(1,9)] = str(self.triggerRateKHz) # 'I1'
+        #----------
+        self.triggerRateCell = (1,9)
+        self.triggerRateCellName = coordToName(*self.triggerRateCell, rowPrefix = "$")
+
+        self[(self.triggerRateCell[0], self.triggerRateCell[1] - 1)] = 'trigger rate [kHz]:' # H1
+        self.ws.column_dimensions[_get_column_letter(self.triggerRateCell[1] - 1)].width = 14
+        self[self.triggerRateCell] = str(self.triggerRateKHz) # 'I1'
 
         return 3
 
