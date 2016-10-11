@@ -40,6 +40,20 @@ class SingleGroupSheet:
         self.evolutionData = evolutionData
         self.avgNumVertices = avgNumVertices
         self.triggerRateKHz = triggerRateKHz
+    #----------------------------------------
+
+    def __makeHeaderCells(self):
+        # write average number of vertices
+        # and trigger rate
+
+
+        self.ws['A1'] = 'avg. number of vertices'
+        if self.avgNumVertices == None:
+            self.ws['B1'] = "unknown"
+        else:
+            self.makeNumericCell('B1', self.avgNumVertices, "0.0")
+
+        self.ws.column_dimensions['A'].width = 20
 
     #----------------------------------------
 
@@ -59,13 +73,7 @@ class SingleGroupSheet:
         # average number of vertices and
         # nominal trigger rate
         #----------
-        ws['A1'] = 'avg. number of vertices'
-        if self.avgNumVertices == None:
-            self.ws['B1'] = "unknown"
-        else:
-            self.makeNumericCell('B1', self.avgNumVertices, "0.0")
-
-        self.ws.column_dimensions['A'].width = 20
+        self.__makeHeaderCells()
 
         #----------
         # title cells
