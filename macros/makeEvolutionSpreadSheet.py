@@ -114,6 +114,44 @@ class SingleGroupSheet:
             self.makeNumericCell((thisRow, 4), data['offset'], "#,##0.000") # D%d
             self.makeNumericCell((thisRow, 5), data['slope'], "#,##0.000")  # E%d
 
+
+    #----------------------------------------
+
+    def __fillDataSizeAtNumVertices(self, topLeft, topLeftInputData, numVtxCellName):
+        # produces cells calculating the data size at a given number
+        # of vertices
+        #
+        # @param topLeftInputData is (row,col) of the first data cell
+        # (offset) of the input data
+
+        firstRow, firstCol = topLeft
+
+        firstRowInputData, inputCol = topLeftInputData
+
+        #----------
+        # title cells
+        #----------
+
+        self[(firstRow,     firstCol)] = 'data size [kByte/ev] at' # G3
+        self[(firstRow + 1, firstCol)] = 'avg. #vertices'          # G4
+
+        #----------
+        # fill the formulas
+        #----------
+
+        for i in range(len(self.evolutionData)):
+            thisRow = firstRow + 3 + i
+            # need absolute cell rows to allow sorting by the user
+
+            inputRow = firstRowInputData + i 
+
+            self.makeNumericCell((thisRow, firstCol), "=%s+%s*%s" %( # G%d =D%d+E%d*B$1
+                    coordToName(inputRow, inputCol), # D%d
+                    coordToName(inputRow, inputCol + 1), # E%d
+                    numVtxCellName # B$1
+                    ), "#,##0.000")
+
+
     #----------------------------------------
 
     def fillSheet(self):
@@ -138,13 +176,6 @@ class SingleGroupSheet:
         self.__fillInputData(row)
 
         #----------
-        # title cells
-        #----------
-
-        self[(row,     7)] = 'data size [kByte/ev] at' # G3
-        self[(row + 1, 7)] = 'avg. #vertices'          # G4
-
-        #----------
         # uncertainties fit
         #----------
         self[(row,     17)] = 'one sigma spread on data sizes [kByte/ev]' # Q3 
@@ -154,14 +185,9 @@ class SingleGroupSheet:
         #----------
         # data size at given number of vertices
         #----------
-        for i in range(numItems):
-            thisRow = row + 3 + i
-            # need absolute cell rows to allow sorting by the user
-            self.makeNumericCell((thisRow, 7), "=%s+%s*%s" %( # G%d =D%d+E%d*B$1
-                    coordToName(thisRow, 4), # D%d
-                    coordToName(thisRow, 5), # E%d
-                    self.avgNumVtxCellName # B$1
-                    ), "#,##0.000")
+        self.__fillDataSizeAtNumVertices(topLeft = (row, 7), 
+                                         topLeftInputData = (row + 3, 4),
+                                         numVtxCellName = self.avgNumVtxCellName)
 
         # add additional cells with formulas
 
