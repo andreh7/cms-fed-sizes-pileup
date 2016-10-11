@@ -154,6 +154,41 @@ class SingleGroupSheet:
 
     #----------------------------------------
 
+    def __fillDataRateOffsetSlope(self, topLeft, topLeftInputData, triggerRateCellName):
+        # produces columns with data rate offset and slope
+
+        firstRow, firstCol = topLeft
+
+        firstRowInputData, firstColInputData = topLeftInputData
+
+        #----------
+        # titles
+        #----------
+
+        self[(firstRow,    firstCol)]     = "data rate [MByte/s]" # I3
+        self[(firstRow + 1,firstCol)]     = "at trigger rate"     # I4
+        self[(firstRow + 2,firstCol)]     = "offset"              # I5
+        self[(firstRow + 2,firstCol + 1)] = "slope"               # J5
+
+        #----------
+        # equations
+        #----------
+
+        for i in range(len(self.evolutionData)):
+            thisRow = firstRow + 3 + i
+
+            inputRow = firstRowInputData + i
+            self.makeNumericCell((thisRow, firstCol),  "=%s*%s" % ( # I%d =D%d*I$1
+                    coordToName(inputRow, firstColInputData), # D%d
+                    triggerRateCellName),    # I$1
+                                 "#,##0.000") 
+            self.makeNumericCell((thisRow, firstCol + 1), "=%s*%s" %( # J%d =E%d*I$1
+                    coordToName(thisRow, firstColInputData + 1), # D%d
+                    triggerRateCellName),    # I$1
+                                 "#,##0.000") 
+
+    #----------------------------------------
+
     def fillSheet(self):
         
         numItems = len(self.evolutionData)
@@ -175,6 +210,8 @@ class SingleGroupSheet:
         # fill input data (fit results)
         self.__fillInputData(row)
 
+        topLeftInputData = (row + 3, 4)
+
         #----------
         # uncertainties fit
         #----------
@@ -186,29 +223,17 @@ class SingleGroupSheet:
         # data size at given number of vertices
         #----------
         self.__fillDataSizeAtNumVertices(topLeft = (row, 7), 
-                                         topLeftInputData = (row + 3, 4),
+                                         topLeftInputData = topLeftInputData,
                                          numVtxCellName = self.avgNumVtxCellName)
-
-        # add additional cells with formulas
 
         #--------------------
         # data rate
         #--------------------
-        self[(row,     9)] = "data rate [MByte/s]" # I3
-        self[(row + 1, 9)] = "at trigger rate"     # I4
-        self[(row + 2, 9)] = "offset"              # I5
-        self[(row + 2,10)] = "slope"               # J5
+        self.__fillDataRateOffsetSlope(topLeft = (row, 9),
+                                       topLeftInputData = topLeftInputData,
+                                       triggerRateCellName = self.triggerRateCellName)
 
-        for i in range(numItems):
-            thisRow = row + 3 + i
-            self.makeNumericCell((thisRow, 9),  "=%s*%s" % ( # I%d =D%d*I$1
-                    coordToName(thisRow, 4), # D%d
-                    self.triggerRateCellName),    # I$1
-                                 "#,##0.000") 
-            self.makeNumericCell((thisRow, 10), "=%s*%s" %( # J%d =E%d*I$1
-                    coordToName(thisRow, 5), # D%d
-                    self.triggerRateCellName),    # I$1
-                                 "#,##0.000") 
+
 
         #----------
         # per FED data rate
