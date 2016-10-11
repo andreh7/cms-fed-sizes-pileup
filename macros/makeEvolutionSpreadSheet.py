@@ -97,102 +97,136 @@ class SingleGroupSheet:
         # average number of vertices and
         # nominal trigger rate
         #----------
-        self.__makeHeaderCells()
+        row = self.__makeHeaderCells()
 
         #----------
         # title cells
         #----------
 
-        self.ws['D3'] = 'sum data sizes [kByte/ev]'
+        self[(row, 4)] = 'sum data sizes [kByte/ev]' # D3
         # self.ws['F3'] = '=CONCATENATE("data size at ";CELL("contents";A2);" vertices") '
         # self.ws['F3'] = '=\"data size at \"\&A2\&\" vertices\"'
 
         # does not work with POI
         # self.ws['F3'] = '="data size at "&A2&" vertices"'
 
-        self.ws['G3'] = 'data size [kByte/ev] at'
-        self.ws['G4'] = 'avg. #vertices'
+        self[(row,     7)] = 'data size [kByte/ev] at' # G3
+        self[(row + 1, 7)] = 'avg. #vertices'          # G4
 
         # column headers
-        self.ws['A5'] = 'FED group'
-        self.ws['B5'] = 'number of feds'
-        self.ws['C5'] = 'subsys' # do we still need this ?
-        self.ws['D5'] = 'offset'
-        self.ws['E5'] = 'slope'
+        self[(row + 2, 1)] = 'FED group'               # A5                  
+        self[(row + 2, 2)] = 'number of feds'          # B5
+        self[(row + 2, 3)] = 'subsys' # do we still need this ? # C5
+        self[(row + 2, 4)] = 'offset'                  # D5
+        self[(row + 2, 5)] = 'slope'                   # E5
 
         self.ws.column_dimensions['B'].width = 14
 
         #----------
         # uncertainties fit
         #----------
-        self.ws['Q3'] = 'one sigma spread on data sizes [kByte/ev]'
-        self.ws['Q5'] = 'offset'
-        self.ws['R5'] = 'slope'
+        self[(row,     17)] = 'one sigma spread on data sizes [kByte/ev]' # Q3 
+        self[(row + 2, 17)] = 'offset'                                    # Q5
+        self[(row + 2, 18)] = 'slope'                                     # R5
 
         #----------
         # fill the evolution data
         #----------
         
-        for row, data in enumerate(self.evolutionData):
-            thisRow = row + 6
-            self.ws['A%d' % thisRow] = data['subsystem']
-            self.ws['B%d' % thisRow] = data['numFeds']
-            self.makeNumericCell('D%d' % thisRow, data['offset'], "#,##0.000")
-            self.makeNumericCell('E%d' % thisRow, data['slope'], "#,##0.000")
+        for rowOffset, data in enumerate(self.evolutionData):
+            thisRow = rowOffset + row + 3
+            self[(thisRow, 1)] = data['subsystem']                          # A%d
+            self[(thisRow, 2)] = data['numFeds']                            # B%d
+            self.makeNumericCell((thisRow, 4), data['offset'], "#,##0.000") # D%d
+            self.makeNumericCell((thisRow, 5), data['slope'], "#,##0.000")  # E%d
 
         #----------
-
         # data size at given number of vertices
+        #----------
         for i in range(numItems):
-            row = 6+i
+            thisRow = row + 3 + i
             # need absolute cell rows to allow sorting by the user
-            self.makeNumericCell('G%d' % row, "=D%d+E%d*B$1" %(row,row), "#,##0.000")
+            self.makeNumericCell((thisRow, 7), "=%s+%s*%s" %( # G%d =D%d+E%d*B$1
+                    coordToName(thisRow, 4), # D%d
+                    coordToName(thisRow, 5), # E%d
+                    self.avgNumVtxCellName # B$1
+                    ), "#,##0.000")
 
         # add additional cells with formulas
 
         #--------------------
         # data rate
         #--------------------
-        self.ws['I3'] = "data rate [MByte/s]"
-        self.ws['I4'] = "at trigger rate"
-        self.ws['I5'] = "offset"
-        self.ws['J5'] = "slope"
+        self[(row,     9)] = "data rate [MByte/s]" # I3
+        self[(row + 1, 9)] = "at trigger rate"     # I4
+        self[(row + 2, 9)] = "offset"              # I5
+        self[(row + 2,10)] = "slope"               # J5
 
         for i in range(numItems):
-            row = 6+i
-            self.makeNumericCell('I%d' % row, "=D%d*I$1" %row, "#,##0.000")
-            self.makeNumericCell('J%d' % row, "=E%d*I$1" %row, "#,##0.000")
+            thisRow = row + 3 + i
+            self.makeNumericCell((thisRow, 9),  "=%s*%s" % ( # I%d =D%d*I$1
+                    coordToName(thisRow, 4), # D%d
+                    self.triggerRateCellName),    # I$1
+                                 "#,##0.000") 
+            self.makeNumericCell((thisRow, 10), "=%s*%s" %( # J%d =E%d*I$1
+                    coordToName(thisRow, 5), # D%d
+                    self.triggerRateCellName),    # I$1
+                                 "#,##0.000") 
 
         #----------
-        self.ws['L3'] = "per FED data rate [MByte/s]"
-        self.ws.column_dimensions['O'].width = 27
-        self.ws['L4'] = "at trigger rate"
-        self.ws['L5'] = "offset"
-        self.ws['M5'] = "slope"
+        # per FED data rate
+        #----------
+        self[(row,     12)] = "per FED data rate [MByte/s]" # L3
+        self[(row + 1, 12)] = "at trigger rate"             # L4
+        self[(row + 2, 12)] = "offset"                      # L5
+        self[(row + 2, 13)] = "slope"                       # M5
 
         for i in range(numItems):
-            row = 6+i
-            self.makeNumericCell('L%d' % row, "=I%d/B%d" %(row,row), "#,##0.000")
-            self.makeNumericCell('M%d' % row, "=J%d/B%d" %(row,row), "#,##0.000")
+            thisRow = row + 3 + i
+            self.makeNumericCell((thisRow, 12),  # L%d =I%d/B%d
+                                 "=%s/%s" %(
+                    coordToName(thisRow, 9),# I%d
+                    coordToName(thisRow, 2) # B%d (number of FEDs in this group)
+                    ), "#,##0.000")
+
+            self.makeNumericCell((thisRow, 13),  # M%d =J%d/B%d
+                                 "=%s/%s" %(
+                    coordToName(thisRow, 10), # J%d
+                    coordToName(thisRow, 2)  # B%d (number of FEDs in this group)
+                    ), "#,##0.000")
 
         #----------
         # when do we reach 200 MByte/s per FED ?
         #----------
-        self.ws['O1'] = "per FED data rate limit [MByte/s]"
-        self.ws['P1'] = "200"
-        self.ws['O3'] = "# vertices for FED rate limit"
+        limitColumn = 15  # column O
+
+
+        self[(1, limitColumn)] = "per FED data rate limit [MByte/s]"
+        self.ws.column_dimensions[_get_column_letter(limitColumn)].width = 27
+
+        # maximum data rate per FED
+        maxDataRateCell = (1, limitColumn + 1)
+        maxDataRateCellName = coordToName(*maxDataRateCell, rowPrefix = "$")
+
+        self[maxDataRateCell]  = "200" # P1
+        self[(3, limitColumn)] = "# vertices for FED rate limit" # O3
 
         for i in range(numItems):
-            row = 6+i
-            self.makeNumericCell('O%d' % row, "=(P$1-L%d)/M%d" %(row,row), "0.0")
-
+            thisRow = row + 3 + i
+            self.makeNumericCell((thisRow, limitColumn), # O%d
+                                 "=(%s-%s)/%s" %(  # =(P$1-L%d)/M%d
+                                 maxDataRateCellName,      # P$1
+                                 coordToName(thisRow, 12), # L%d
+                                 coordToName(thisRow, 13), # M%d
+                                 ),
+                                 "0.0")
         #----------
         # offset and slope of uncertanties
         #----------
-        for row, data in enumerate(self.evolutionData):
-            thisRow = row + 6
-            self.makeNumericCell('Q%d' % thisRow, data['uncertOffset'], "#,##0.000")
-            self.makeNumericCell('R%d' % thisRow, data['uncertSlope'], "#,##0.000")
+        for i, data in enumerate(self.evolutionData):
+            thisRow = row + 3 + i 
+            self.makeNumericCell((thisRow, 17), data['uncertOffset'], "#,##0.000") # Q%d
+            self.makeNumericCell((thisRow, 18), data['uncertSlope'], "#,##0.000")  # R%d
 
     #----------------------------------------
 
