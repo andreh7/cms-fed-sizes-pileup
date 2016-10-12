@@ -207,6 +207,66 @@ class SingleGroupSheet:
 
     #----------------------------------------
 
+    def __fillLimit(self, topLeft, topLeftInputData,
+                    maxDataRate,
+                    maxDataRateCell,
+                    triggerRateCellName,
+                    divideByNumFeds, topLeftNumFeds = None
+                    ):
+        
+        assert divideByNumFeds
+
+        if divideByNumFeds:
+            assert topLeftNumFeds != None
+
+
+        limitColumn = topLeft[1]
+
+        maxDataRateCellName = coordToName(*maxDataRateCell, rowPrefix = "$")
+
+        self[(maxDataRateCell[0], maxDataRateCell[1] - 1)] = "per FED data rate limit [MByte/s]"
+        self.ws.column_dimensions[_get_column_letter(maxDataRateCell[1])].width = 27
+
+        self[maxDataRateCell]  = str(maxDataRate) # P1
+        self[topLeft] = "# vertices for FED rate limit" # O3
+
+        # number of vertices where we cross the limit is
+        # (data rate limit - data rate offset) / data rate slope
+        #
+        # where data rates are (fed size) * (trigger rate)
+
+        # e.g. =(P$1-D7*I$1/B7)/(E7*I$1/B7)
+        # 
+        # where I$1 is the trigger rate cell
+        # and   P$1 is the maximum data rate cell
+        #       D7  is the fragment/group size offset
+        #       E7  is the fragment/group size slope
+        #       B7  is the number of feds in this group
+
+        for i in range(len(self.evolutionData)):
+            thisRow = topLeft[0] + 3 + i
+
+            expr = "=({maxDataRate} - {groupSizeOffset} * {triggerRate} / {numFeds}) / ({groupSizeSlope} * {triggerRate} / {numFeds})"
+
+            inputRow = topLeftInputData[0] + i
+
+            self.makeNumericCell((thisRow, limitColumn), # O%d
+                                 expr.format(
+                    maxDataRate = maxDataRateCellName,      # P$1
+                    triggerRate = triggerRateCellName,      # I$1
+                    
+                    groupSizeOffset = coordToName(inputRow, topLeftInputData[1]), # D%d
+                    groupSizeSlope = coordToName(inputRow, topLeftInputData[1] + 1), # E%d
+                    
+                    numFeds = coordToName(topLeftNumFeds[0] + i, topLeftNumFeds[1]), # B%d 
+                    ),
+                                 "0.0")
+        # end of loop over rows
+                               
+
+
+    #----------------------------------------
+
     def fillSheet(self):
         
         numItems = len(self.evolutionData)
@@ -267,28 +327,22 @@ class SingleGroupSheet:
         #----------
         # when do we reach 200 MByte/s per FED ?
         #----------
-        limitColumn = 15  # column O
 
-
-        self[(1, limitColumn)] = "per FED data rate limit [MByte/s]"
-        self.ws.column_dimensions[_get_column_letter(limitColumn)].width = 27
+        maxDataRateCell = (1, 15)
 
         # maximum data rate per FED
-        maxDataRateCell = (1, limitColumn + 1)
-        maxDataRateCellName = coordToName(*maxDataRateCell, rowPrefix = "$")
+        maxDataRate = 200 # in MByte/s
 
-        self[maxDataRateCell]  = "200" # P1
-        self[(3, limitColumn)] = "# vertices for FED rate limit" # O3
+        # now this is independent on any precalculations
+        self.__fillLimit(topLeft = (row, 15),  # column O
+                         topLeftInputData = topLeftInputData,
+                         maxDataRate = maxDataRate,
+                         maxDataRateCell = maxDataRateCell,
+                         triggerRateCellName = self.triggerRateCellName,
+                         divideByNumFeds = True,
+                         topLeftNumFeds = topLeftNumFeds
+                         )
 
-        for i in range(numItems):
-            thisRow = row + 3 + i
-            self.makeNumericCell((thisRow, limitColumn), # O%d
-                                 "=(%s-%s)/%s" %(  # =(P$1-L%d)/M%d
-                                 maxDataRateCellName,      # P$1
-                                 coordToName(thisRow, 12), # L%d
-                                 coordToName(thisRow, 13), # M%d
-                                 ),
-                                 "0.0")
         #----------
         # offset and slope of uncertanties
         #----------
