@@ -154,8 +154,12 @@ class SingleGroupSheet:
 
     #----------------------------------------
 
-    def __fillDataRateOffsetSlope(self, topLeft, topLeftInputData, triggerRateCellName):
+    def __fillDataRateOffsetSlope(self, topLeft, topLeftInputData, triggerRateCellName,
+                                  divideByNumFeds, topLeftNumFeds = None):
         # produces columns with data rate offset and slope
+
+        if divideByNumFeds:
+            assert topLeftNumFeds != None
 
         firstRow, firstCol = topLeft
 
@@ -165,7 +169,11 @@ class SingleGroupSheet:
         # titles
         #----------
 
-        self[(firstRow,    firstCol)]     = "data rate [MByte/s]" # I3
+        if divideByNumFeds:
+            self[(firstRow,    firstCol)] = "per FED data rate [MByte/s]" # L3
+        else:
+            self[(firstRow,    firstCol)] = "data rate [MByte/s]" # I3
+
         self[(firstRow + 1,firstCol)]     = '=CONCATENATE("at ", TEXT(%s,"0.0")," kHz trigger rate")' % triggerRateCellName # I4
         self[(firstRow + 2,firstCol)]     = "offset"              # I5
         self[(firstRow + 2,firstCol + 1)] = "slope"               # J5
@@ -178,14 +186,24 @@ class SingleGroupSheet:
             thisRow = firstRow + 3 + i
 
             inputRow = firstRowInputData + i
-            self.makeNumericCell((thisRow, firstCol),  "=%s*%s" % ( # I%d =D%d*I$1
-                    coordToName(inputRow, firstColInputData), # D%d
-                    triggerRateCellName),    # I$1
+
+            # loop over offset and slope
+            for colOffs in (0,1):
+
+                if divideByNumFeds:
+                    self.makeNumericCell((thisRow, firstCol + colOffs),  "=%s*%s/%s" % ( # I%d =D%d*I$1/B%d
+                            coordToName(inputRow, firstColInputData + colOffs), # D%d
+                            triggerRateCellName,                                # I$1
+                            coordToName(topLeftNumFeds[0] + i, topLeftNumFeds[1]), # B%d (number of FEDs in this group)
+                            ),  
                                  "#,##0.000") 
-            self.makeNumericCell((thisRow, firstCol + 1), "=%s*%s" %( # J%d =E%d*I$1
-                    coordToName(thisRow, firstColInputData + 1), # D%d
-                    triggerRateCellName),    # I$1
+
+                else:
+                    self.makeNumericCell((thisRow, firstCol + colOffs),  "=%s*%s" % ( # I%d =D%d*I$1
+                            coordToName(inputRow, firstColInputData + colOffs), # D%d
+                            triggerRateCellName),    # I$1
                                  "#,##0.000") 
+            # loop over offset/slope
 
     #----------------------------------------
 
@@ -211,6 +229,7 @@ class SingleGroupSheet:
         self.__fillInputData(row)
 
         topLeftInputData = (row + 3, 4)
+        topLeftNumFeds   = (row + 3, 2)
 
         #----------
         # uncertainties fit
@@ -231,32 +250,20 @@ class SingleGroupSheet:
         #--------------------
         self.__fillDataRateOffsetSlope(topLeft = (row, 9),
                                        topLeftInputData = topLeftInputData,
-                                       triggerRateCellName = self.triggerRateCellName)
+                                       triggerRateCellName = self.triggerRateCellName,
+                                       divideByNumFeds = False)
 
 
 
         #----------
         # per FED data rate
         #----------
-        self[(row,     12)] = "per FED data rate [MByte/s]" # L3
-        self[(row + 1, 12)] = "at trigger rate"             # L4
-        self[(row + 2, 12)] = "offset"                      # L5
-        self[(row + 2, 13)] = "slope"                       # M5
 
-        for i in range(numItems):
-            thisRow = row + 3 + i
-            self.makeNumericCell((thisRow, 12),  # L%d =I%d/B%d
-                                 "=%s/%s" %(
-                    coordToName(thisRow, 9),# I%d
-                    coordToName(thisRow, 2) # B%d (number of FEDs in this group)
-                    ), "#,##0.000")
-
-            self.makeNumericCell((thisRow, 13),  # M%d =J%d/B%d
-                                 "=%s/%s" %(
-                    coordToName(thisRow, 10), # J%d
-                    coordToName(thisRow, 2)  # B%d (number of FEDs in this group)
-                    ), "#,##0.000")
-
+        self.__fillDataRateOffsetSlope(topLeft = (row, 12),
+                                       topLeftInputData = topLeftInputData,
+                                       triggerRateCellName = self.triggerRateCellName,
+                                       divideByNumFeds = True,
+                                       topLeftNumFeds = topLeftNumFeds)
         #----------
         # when do we reach 200 MByte/s per FED ?
         #----------
