@@ -2,7 +2,7 @@
 
 # given a plot output directory, produces a spreadsheet with the fit parameters
 
-import sys, os
+import sys, os, re
 import GrandUnificationPlot
 
 #----------------------------------------------------------------------
@@ -214,21 +214,29 @@ class SingleGroupSheet:
                     divideByNumFeds, topLeftNumFeds = None
                     ):
         
-        assert divideByNumFeds
-
         if divideByNumFeds:
             assert topLeftNumFeds != None
-
 
         limitColumn = topLeft[1]
 
         maxDataRateCellName = coordToName(*maxDataRateCell, rowPrefix = "$")
 
-        self[(maxDataRateCell[0], maxDataRateCell[1] - 1)] = "per FED data rate limit [MByte/s]"
+        if divideByNumFeds:
+            title = "per FED data rate limit"
+        else:
+            title = "group"
+            if self.groupingName != None:
+                mo = re.match("by (.*)$", self.groupingName)
+                if mo:
+                    title = mo.group(1)
+
+            title = title + " data rate limit"
+
+        self[(maxDataRateCell[0], maxDataRateCell[1] - 1)] = "per " + title + " [MByte/s]"
         self.ws.column_dimensions[_get_column_letter(maxDataRateCell[1])].width = 27
 
         self[maxDataRateCell]  = str(maxDataRate) # P1
-        self[topLeft] = "# vertices for FED rate limit" # O3
+        self[topLeft] = "# vertices for " + title # O3
 
         # number of vertices where we cross the limit is
         # (data rate limit - data rate offset) / data rate slope
@@ -246,20 +254,26 @@ class SingleGroupSheet:
         for i in range(len(self.evolutionData)):
             thisRow = topLeft[0] + 3 + i
 
-            expr = "=({maxDataRate} - {groupSizeOffset} * {triggerRate} / {numFeds}) / ({groupSizeSlope} * {triggerRate} / {numFeds})"
-
             inputRow = topLeftInputData[0] + i
 
+            replacements = dict(
+                maxDataRate = maxDataRateCellName,      # P$1
+                triggerRate = triggerRateCellName,      # I$1
+                    
+                groupSizeOffset = coordToName(inputRow, topLeftInputData[1]), # D%d
+                groupSizeSlope = coordToName(inputRow, topLeftInputData[1] + 1), # E%d
+                    
+                )
+
+            if divideByNumFeds:
+                expr = "=({maxDataRate} - {groupSizeOffset} * {triggerRate} / {numFeds}) / ({groupSizeSlope} * {triggerRate} / {numFeds})"
+                replacements['numFeds'] = coordToName(topLeftNumFeds[0] + i, topLeftNumFeds[1]) # B%d 
+            else:
+                # do not divide by number of feds in the group
+                expr = "=({maxDataRate} - {groupSizeOffset} * {triggerRate}) / ({groupSizeSlope} * {triggerRate})"
+
             self.makeNumericCell((thisRow, limitColumn), # O%d
-                                 expr.format(
-                    maxDataRate = maxDataRateCellName,      # P$1
-                    triggerRate = triggerRateCellName,      # I$1
-                    
-                    groupSizeOffset = coordToName(inputRow, topLeftInputData[1]), # D%d
-                    groupSizeSlope = coordToName(inputRow, topLeftInputData[1] + 1), # E%d
-                    
-                    numFeds = coordToName(topLeftNumFeds[0] + i, topLeftNumFeds[1]), # B%d 
-                    ),
+                                 expr.format(**replacements),
                                  "0.0")
         # end of loop over rows
                                
