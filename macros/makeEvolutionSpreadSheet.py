@@ -345,7 +345,12 @@ class SingleGroupSheet:
         maxDataRateCell = (1, 15)
 
         # maximum data rate per FED
-        maxDataRate = 200 # in MByte/s
+        if self.groupingName == 'by fedbuilder':
+            maxDataRate = 4000 # in MByte/s
+            divideByNumFeds = False
+        else:
+            maxDataRate = 200 # in MByte/s
+            divideByNumFeds = True
 
         # now this is independent on any precalculations
         self.__fillLimit(topLeft = (row, 15),  # column O
@@ -353,7 +358,7 @@ class SingleGroupSheet:
                          maxDataRate = maxDataRate,
                          maxDataRateCell = maxDataRateCell,
                          triggerRateCellName = self.triggerRateCellName,
-                         divideByNumFeds = True,
+                         divideByNumFeds = divideByNumFeds,
                          topLeftNumFeds = topLeftNumFeds
                          )
 
