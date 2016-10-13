@@ -358,7 +358,7 @@ def getNumFedsPerFedGroup(input_data_dir):
 def getQuantile(sortedValues, quantile):
     """ takes care of underflow/overflow effects """
 
-    if not sortedValues:
+    if sortedValues == None or len(sortedValues) == 0:
         # no value, no quantile
         return None
 
