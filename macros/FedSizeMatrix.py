@@ -67,6 +67,7 @@ class FedSizeMatrix:
 
         # end of loop over number of vertices
 
+        fin.Close()
         ROOT.gROOT.cd()
 
     #----------------------------------------
