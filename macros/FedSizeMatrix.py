@@ -90,6 +90,18 @@ class FedSizeMatrix:
 
     #----------------------------------------
 
+    def setFixedFedSize(self, fedId, size):
+        # sets the size of the given fed to the given size
+        # for all number of vertices and all events
+        #
+        # this can be used to fix certain FEDs whose
+        # size is much larger in the RAW data files
+        # than it is online
+        for numVertices, tmp in self.data.items():
+            tmp[fedId][:] = size
+
+    #----------------------------------------
+
 #----------------------------------------------------------------------
 
 # test 

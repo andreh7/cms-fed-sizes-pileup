@@ -189,6 +189,20 @@ if True:
     fedSizeMatrix.read(inputTupleName, parameters.max_num_vertices,
                        parameters.fedsInRun)
 
+    #----------
+    # check if we should override some fed sizes
+    #----------
+    
+    fname = "fedsize-overrides-%d.py" % parameters.run
+    if os.path.exists(fname):
+        execfile(fname)
+
+        for fedId, size in fedSizeOverrides.items():
+            print "overriding size of fed %d to %d" % (fedId, size)
+            fedSizeMatrix.setFixedFedSize(fedId, size)
+
+    #----------
+
     for line in parameters.allSubsysToPlot:
 
         # expect a dict
