@@ -420,6 +420,52 @@ class SingleGroupSheet:
 
     #----------------------------------------
 
+    def __fillDataRateAtPileup(self,
+                               topLeft,
+                               topLeftInputData,
+                               triggerRateCellName,
+                               pileupCellName,
+                               ):
+        # fills cells (single column, not offset and slope like __fillDataRateOffsetSlope(..)) 
+        # with extrapolated data rates for a given pileup value
+
+        firstRow, firstCol = topLeft
+
+        firstRowInputData, firstColInputData = topLeftInputData
+
+        #----------
+        # titles
+        #----------
+
+        self[(firstRow,    firstCol)] = "data rate [MByte/s]" 
+        self[(firstRow + 1,firstCol)]     = '=CONCATENATE("at ", TEXT(%s,"0.0")," pileup")' % pileupCellName 
+        self[(firstRow + 2,firstCol)]     = '=CONCATENATE("and ", TEXT(%s,"0.0")," kHz trigger rate")' % triggerRateCellName 
+
+        #----------
+        # equations
+        #----------
+
+        for i in range(len(self.evolutionData)):
+            thisRow = firstRow + 3 + i
+
+            inputRow = firstRowInputData + i
+
+            expr = "({groupSizeOffset} + {groupSizeSlope} * {pileup} * 0.7) * {triggerRate}"
+
+            replacements = dict(
+                triggerRate = triggerRateCellName,  # I$1
+                pileup = pileupCellName, 
+                    
+                groupSizeOffset = coordToName(inputRow, topLeftInputData[1]), # D%d
+                groupSizeSlope = coordToName(inputRow, topLeftInputData[1] + 1), # E%d
+                )
+
+
+            self.makeNumericCell((thisRow, firstCol),  "=" + expr.format(**replacements),
+                                 "#,##0.0") 
+
+    #----------------------------------------
+
     def fillMultiPileupProjectionSheet(self, pileups):
 
         # create a new worksheet
