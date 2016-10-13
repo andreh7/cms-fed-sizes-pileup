@@ -71,7 +71,25 @@ class FedSizeMatrix:
         ROOT.gROOT.cd()
 
     #----------------------------------------
+
+    def getFedSums(self, numVertices, fedIds):
+        # @return a vector with the sum of the fragment sizes
+        #         of the given fedIds for each event
+        #         for the events with numVertices vertices
+
+        retval = None
         
+        for fedId in fedIds:
+            if retval == None:
+                retval = self.data[numVertices][fedId]
+            else:
+                # note: do NOT use +=
+                retval = retval + self.data[numVertices][fedId]
+    
+        return retval
+
+    #----------------------------------------
+
 #----------------------------------------------------------------------
 
 # test 
