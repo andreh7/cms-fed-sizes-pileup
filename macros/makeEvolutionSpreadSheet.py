@@ -531,6 +531,9 @@ class SpreadsheetCreator:
         self.triggerRateKHz = triggerRateKHz
         self.avgNumVertices = avgNumVertices
 
+        if pileups != None:
+            assert self.subsystemEvolutionData.has_key('by fedbuilder')
+
         # create a workbook
         self.wb = openpyxl.Workbook()
 
@@ -539,6 +542,15 @@ class SpreadsheetCreator:
             # make one sheet per grouping
             sheetFiller = SingleGroupSheet(self.wb, groupingName, groupingData, avgNumVertices, triggerRateKHz)
             sheetFiller.fillSheet()
+
+        if pileups != None:
+            # add multi-pileup projection sheet for fedbuilder
+
+            groupingName = 'by fedbuilder'
+            groupingData = self.subsystemEvolutionData[groupingName]
+
+            sheetFiller = SingleGroupSheet(self.wb, groupingName, groupingData, avgNumVertices, triggerRateKHz, sheetName = "multi pileup " + groupingName)
+            sheetFiller.fillMultiPileupProjectionSheet(pileups)
 
     #----------------------------------------
     def writeToFile(self, outputFname):
@@ -568,10 +580,29 @@ class SpreadsheetCreator:
 #----------------------------------------------------------------------
 if __name__ == "__main__":
 
+    from optparse import OptionParser
+    parser = OptionParser("""
 
-    ARGV = sys.argv[1:]
+      usage: %prog [options] input_file.pkl
+
+      runs on the given input file(s) and keeps/drops products.
+    """
+    )
+
+    parser.add_option("--pileups",
+                      default = None,
+                      type="str",
+                      help="comma separated list of pileup values to make projections for",
+                      metavar="NP1,NP2")
+
+    (options, ARGV) = parser.parse_args()
 
     assert len(ARGV) == 1
+
+    if options.pileups != None:
+        options.pileups = [ float(x) for x in options.pileups.split(',') ]
+
+    #----------
 
     tasksFile = ARGV.pop(0)
 
@@ -583,7 +614,8 @@ if __name__ == "__main__":
 
     subsystemEvolutionData = GrandUnificationPlot.makeSubsystemEvolutionData(tasks)
     sc = SpreadsheetCreator(subsystemEvolutionData,
-                            getAverageNumVerticesFromTasks(tasks))
+                            getAverageNumVerticesFromTasks(tasks),
+                            pileups = options.pileups)
 
     outputFname = os.path.join(plotDir, "evolution.xlsx")
 
