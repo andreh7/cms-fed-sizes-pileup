@@ -420,6 +420,89 @@ class SingleGroupSheet:
 
     #----------------------------------------
 
+    def fillMultiPileupProjectionSheet(self, pileups):
+
+        # create a new worksheet
+        self.__createWorkSheet()
+
+        #----------
+        # average number of vertices and
+        # nominal trigger rate
+        #----------
+        row = self.__makeHeaderCells()
+
+        #----------
+        # fill number of pileup lines
+        #----------
+        
+        sumWeightsCell = (row + len(pileups), 8)
+        sumWeightsCellName = coordToName(*sumWeightsCell)
+
+        # add the sum of weights cell
+        self[(sumWeightsCell[0], sumWeightsCell[1] - 1)] = 'sum of weights'
+        self.makeNumericCell(sumWeightsCell, 
+                             '=SUM(%s:%s)' % (coordToName(row, sumWeightsCell[1]),
+                                              coordToName(row + len(pileups) - 1, sumWeightsCell[1]),
+                                              ),
+                             "#,##0.000")
+
+        for i, pileup in enumerate(pileups):
+            self[(row + i, 1)] = 'number of interactions/bx #%d:' % (i+1)
+            self.makeNumericCell((row + i, 2), pileup,  "0.0")
+
+            self[(row + i, 4)] = 'number of vertices #%d:' % (i+1)
+            self[(row + i, 5)] = '=%s*0.7' % coordToName(row + i, 2)
+            
+            self[(row + i, 7)] = 'weight (arb. units) #%d:' % (i+1)
+            self.makeNumericCell((row + i, 8), 1.0 / len(pileups), "#,##0.000")
+            
+            self[(row + i, 10)] = 'weight (norm.) #%d:' % (i+1)
+            self.makeNumericCell((row + i, 11), 
+                                 '=%s / %s' % (
+                    coordToName(row + i, 8), 
+                    sumWeightsCellName), 
+                                 "0.00%")
+
+
+        # advance base row
+        row += 2 + len(pileups)
+
+        #----------
+        # fill input data (fit results)
+        #----------
+        self.__fillInputData(row)
+
+        topLeftInputData = (row + 3, 4)
+        topLeftNumFeds   = (row + 3, 2)
+
+
+        #----------
+        # when do we reach 4000 GByte/s per fedbuilder ?
+        #----------
+
+        maxDataRateCell = (1, 7)
+
+        # maximum data rate per FED
+        if self.groupingName == 'by fedbuilder':
+            maxDataRate = 4000 # in MByte/s
+            divideByNumFeds = False
+        else:
+            maxDataRate = 200 # in MByte/s
+            divideByNumFeds = True
+
+        # now this is independent on any precalculations
+        self.__fillLimit(topLeft = (row, 7), 
+                         topLeftInputData = topLeftInputData,
+                         maxDataRate = maxDataRate,
+                         maxDataRateCell = maxDataRateCell,
+                         triggerRateCellName = self.triggerRateCellName,
+                         divideByNumFeds = divideByNumFeds,
+                         topLeftNumFeds = topLeftNumFeds,
+                         usePileup = True
+                         )
+
+    #----------------------------------------
+
     def makeNumericCell(self, cellName, value, format = None):
         # cellName can either be a string or a pair (row, col)
         if not isinstance(cellName, str):
