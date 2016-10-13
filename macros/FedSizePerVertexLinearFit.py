@@ -61,54 +61,6 @@ class FedSizePerVertexLinearFit:
 
         assert subsys_name != None
 
-        # if subsys_name == None or 'size' in subsys_name:
-        if False:
-            import re
-
-            # build an automatic name
-            # by replacing 'size_' either
-            # by 'FED' if a number follows
-            # or by the empty string if
-            # a non-number (subsystem name)
-            # follows
-
-            tmp = str(self.size_expr)
-            subsys_name = ""
-
-            while tmp:
-                # the matching of the overall will be
-                # the first group,
-                # the inner expression will be the second group
-                mo = re.search("(size([0-9]+|_[0-9a-zA-Z]+))",tmp)
-
-                if not mo:
-                    # no match, just add the rest
-                    subsys_name += tmp
-                    tmp = ""
-                    break
-
-                # add everything before the matching
-                subsys_name += tmp[:mo.start(1)]
-
-                # keep only things after the match for
-                # the next iteration
-                tmp = tmp[mo.end(1):]
-
-                groupName = mo.group(2)
-                if groupName.startswith('_'):
-                    groupName = groupName[1:]
-
-                if utils.isIntString(groupName):
-                    # seems to be a FED
-                    subsys_name += "FED%s" % groupName
-                else:
-                    # seems to be a subsystem
-                    subsys_name += groupName
-
-            # while there is something left of the plot expression to convert
-
-        #--------------------
-
         self.subsys = subsys_name
         self.grouping = grouping_name
 
