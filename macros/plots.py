@@ -23,6 +23,9 @@ parameters = utils.loadParameters()
 #----------------------------------------------------------------------
 import ROOT
 
+# speed up plotting by not talking to an X server
+ROOT.gROOT.SetBatch(1)
+
 ROOT.gROOT.ProcessLine(".x ~/rootlogon.C")
 ROOT.gROOT.ProcessLine("setTDRStyle();")
 ROOT.gStyle.SetErrorX(0.5)
