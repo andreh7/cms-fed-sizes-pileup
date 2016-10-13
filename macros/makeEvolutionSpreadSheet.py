@@ -420,6 +420,51 @@ class SingleGroupSheet:
 
     #----------------------------------------
 
+    def __conditionalFormattingForDataRate(self, topLeft, maxDataRateCell):
+
+        # applies conditional formatting to absolute data rate cells
+        # for cells exceeding the data rate limit
+
+        firstRow, firstCol = topLeft
+
+        from openpyxl.formatting.rule import FormulaRule
+        from openpyxl.styles.fonts import Font
+        from openpyxl.styles.colors import Color
+        from openpyxl.styles.fills import PatternFill
+
+        # red font and fill
+        font = Font(color = Color(rgb='FF9C0006'))
+        fill = PatternFill(bgColor = Color(rgb='FFFFC7CE'))
+
+        # range where this formatting should be applied to
+        theRange = '%s:%s' % (coordToName(firstRow + 3, firstCol),
+                              coordToName(firstRow + 3 + len(self.evolutionData) - 1, firstCol)
+                              )
+
+
+        # see e.g. http://stackoverflow.com/a/31326228/288875
+        # 
+        # it looks like conditional formatting on multiple columns does not work
+        # properly, the formatting for the first column was taken from the last column etc.
+        for i in range(len(self.evolutionData)):
+
+            thisCell = coordToName(firstRow + 3 + i, firstCol)
+
+            self.ws.conditional_formatting.add(
+                thisCell
+                ,
+                FormulaRule(formula = ['%s - %s > 0' % (thisCell, coordToName(*maxDataRateCell))],
+
+                        font = font,
+                        fill = fill,
+                        )
+            )
+
+
+
+
+    #----------------------------------------
+
     def __fillDataRateAtPileup(self,
                                topLeft,
                                topLeftInputData,
@@ -610,6 +655,10 @@ class SingleGroupSheet:
                                         triggerRateCellName = self.triggerRateCellName,
                                         pileupCellName = coordToName(*pileupCell, rowPrefix = '$', colPrefix = '$')
                                         )
+
+            self.__conditionalFormattingForDataRate(topLeftsUnweightedRates[-1],
+                                                    maxDataRateCell)
+
 
         #--------------------
         # weighted sum of data rates at different pileups
