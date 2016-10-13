@@ -600,13 +600,28 @@ class SingleGroupSheet:
         # data rate at given trigger rate and given number of pileup
         #--------------------
 
+        topLeftsUnweightedRates = []
+
         for j, pileupCell in enumerate(pileupCells):
-            self.__fillDataRateAtPileup(topLeft = (row, 9 + 2 * j),
+
+            topLeftsUnweightedRates.append((row, 9 + 2 * j))
+
+            self.__fillDataRateAtPileup(topLeft = topLeftsUnweightedRates[-1],
                                         topLeftInputData = topLeftInputData,
                                         triggerRateCellName = self.triggerRateCellName,
                                         pileupCellName = coordToName(*pileupCell, rowPrefix = '$', colPrefix = '$')
                                         )
 
+        #--------------------
+        # weighted sum of data rates at different pileups
+        #--------------------
+
+        if len(pileups) > 1:
+            self.__fillDataRateAtAveragePileup(topLeft = (row, 9 + 2 * len(pileups)),
+                                               triggerRateCellName = self.triggerRateCellName,
+                                               topLeftsUnweightedRates = topLeftsUnweightedRates,
+                                               weightCells = weightCells,
+                                               )
 
     #----------------------------------------
 
