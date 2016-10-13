@@ -281,6 +281,29 @@ class SingleGroupSheet:
 
     #----------------------------------------
 
+    def __fillUncertainties(self, topLeftUncertainties):
+
+        firstRow, firstCol = topLeftUncertainties
+
+        #----------
+        # titles
+        #----------
+
+        self[(firstRow,     firstCol)]     = 'one sigma spread on data sizes [kByte/ev]' # Q3 
+        self[(firstRow + 2, firstCol)]     = 'offset'                                    # Q5
+        self[(firstRow + 2, firstCol + 1)] = 'slope'                                     # R5
+
+        #----------
+        # data
+        #----------
+
+        for i, data in enumerate(self.evolutionData):
+            thisRow = firstRow + 3 + i 
+            self.makeNumericCell((thisRow, firstCol    ), data['uncertOffset'], "#,##0.000") # Q%d
+            self.makeNumericCell((thisRow, firstCol + 1), data['uncertSlope'],  "#,##0.000") # R%d
+
+    #----------------------------------------
+
     def fillSheet(self):
         
         numItems = len(self.evolutionData)
@@ -304,13 +327,6 @@ class SingleGroupSheet:
 
         topLeftInputData = (row + 3, 4)
         topLeftNumFeds   = (row + 3, 2)
-
-        #----------
-        # uncertainties fit
-        #----------
-        self[(row,     17)] = 'one sigma spread on data sizes [kByte/ev]' # Q3 
-        self[(row + 2, 17)] = 'offset'                                    # Q5
-        self[(row + 2, 18)] = 'slope'                                     # R5
 
         #----------
         # data size at given number of vertices
@@ -363,12 +379,11 @@ class SingleGroupSheet:
                          )
 
         #----------
-        # offset and slope of uncertanties
+        # offset and slope of uncertainties fit
         #----------
-        for i, data in enumerate(self.evolutionData):
-            thisRow = row + 3 + i 
-            self.makeNumericCell((thisRow, 17), data['uncertOffset'], "#,##0.000") # Q%d
-            self.makeNumericCell((thisRow, 18), data['uncertSlope'], "#,##0.000")  # R%d
+
+        topLeftUncertainties = (row, 17)
+        self.__fillUncertainties(topLeftUncertainties)
 
     #----------------------------------------
 
