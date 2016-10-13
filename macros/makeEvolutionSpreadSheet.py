@@ -328,15 +328,26 @@ class SingleGroupSheet:
 
     #----------------------------------------
 
+    def __createWorkSheet(self):
+        self.ws = self.wb.create_sheet()
+
+        if self.sheetName != None:
+            self.ws.title = self.sheetName
+        else:
+            # determine from groupingName (which is also used 
+            # to determine other quantities)
+        
+            if self.groupingName == "" or self.groupingName == None:
+                self.ws.title = "-"
+            else:
+                self.ws.title = self.groupingName
+
+    #----------------------------------------
+
     def fillSheet(self):
         
         # create a new worksheet
-        self.ws = self.wb.create_sheet()
-        
-        if self.groupingName == "" or self.groupingName == None:
-            self.ws.title = "-"
-        else:
-            self.ws.title = self.groupingName
+        self.__createWorkSheet()
 
         #----------
         # average number of vertices and
