@@ -665,11 +665,15 @@ class SingleGroupSheet:
         #--------------------
 
         if len(pileups) > 1:
-            self.__fillDataRateAtAveragePileup(topLeft = (row, 9 + 2 * len(pileups)),
+            topLeft = (row, 9 + 2 * len(pileups))
+            self.__fillDataRateAtAveragePileup(topLeft = topLeft,
                                                triggerRateCellName = self.triggerRateCellName,
                                                topLeftsUnweightedRates = topLeftsUnweightedRates,
                                                weightCells = weightCells,
                                                )
+
+            self.__conditionalFormattingForDataRate(topLeft,
+                                                    maxDataRateCell)
 
     #----------------------------------------
 
