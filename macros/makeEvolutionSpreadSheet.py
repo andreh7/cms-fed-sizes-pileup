@@ -69,7 +69,7 @@ class SingleGroupSheet:
         # trigger rate
         #----------
         self.triggerRateCell = (1,9)
-        self.triggerRateCellName = coordToName(*self.triggerRateCell, rowPrefix = "$")
+        self.triggerRateCellName = coordToName(*self.triggerRateCell, rowPrefix = "$", colPrefix = "$")
 
         self[(self.triggerRateCell[0], self.triggerRateCell[1] - 1)] = 'trigger rate [kHz]:' # H1
         self.ws.column_dimensions[_get_column_letter(self.triggerRateCell[1] - 1)].width = 14
@@ -492,9 +492,14 @@ class SingleGroupSheet:
                                               ),
                              "#,##0.000")
 
+        pileupCells = []
+        weightCells = []
+
         for i, pileup in enumerate(pileups):
             self[(row + i, 1)] = 'number of interactions/bx #%d:' % (i+1)
             self.makeNumericCell((row + i, 2), pileup,  "0.0")
+
+            pileupCells.append((row + i, 2))
 
             self[(row + i, 4)] = 'number of vertices #%d:' % (i+1)
             self[(row + i, 5)] = '=%s*0.7' % coordToName(row + i, 2)
@@ -503,12 +508,15 @@ class SingleGroupSheet:
             self.makeNumericCell((row + i, 8), 1.0 / len(pileups), "#,##0.000")
             
             self[(row + i, 10)] = 'weight (norm.) #%d:' % (i+1)
-            self.makeNumericCell((row + i, 11), 
+
+            weightCells.append((row + i, 11))
+
+            # cell with the normalized weight value
+            self.makeNumericCell(weightCells[-1], 
                                  '=%s / %s' % (
                     coordToName(row + i, 8), 
                     sumWeightsCellName), 
                                  "0.00%")
-
 
         # advance base row
         row += 2 + len(pileups)
@@ -546,6 +554,18 @@ class SingleGroupSheet:
                          topLeftNumFeds = topLeftNumFeds,
                          usePileup = True
                          )
+
+        #--------------------
+        # data rate at given trigger rate and given number of pileup
+        #--------------------
+
+        for j, pileupCell in enumerate(pileupCells):
+            self.__fillDataRateAtPileup(topLeft = (row, 9 + 2 * j),
+                                        topLeftInputData = topLeftInputData,
+                                        triggerRateCellName = self.triggerRateCellName,
+                                        pileupCellName = coordToName(*pileupCell, rowPrefix = '$', colPrefix = '$')
+                                        )
+
 
     #----------------------------------------
 
