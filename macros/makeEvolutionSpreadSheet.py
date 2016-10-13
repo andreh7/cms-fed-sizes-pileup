@@ -211,9 +211,14 @@ class SingleGroupSheet:
                     maxDataRate,
                     maxDataRateCell,
                     triggerRateCellName,
-                    divideByNumFeds, topLeftNumFeds = None
+                    divideByNumFeds, topLeftNumFeds = None,
+                    usePileup = False,
                     ):
         
+        # @param usePileup: if this is True, the limit is shown in terms of pileup (number of interactions
+        #                   per bunch crossing) rather than number of vertices, assuming
+        #                   one interaction leads to 0.7 vertices on average
+
         if divideByNumFeds:
             assert topLeftNumFeds != None
 
@@ -221,6 +226,9 @@ class SingleGroupSheet:
 
         maxDataRateCellName = coordToName(*maxDataRateCell, rowPrefix = "$")
 
+        #----------
+        # determine group title
+        #----------
         if divideByNumFeds:
             title = "per FED data rate limit"
         else:
@@ -236,7 +244,13 @@ class SingleGroupSheet:
         self.ws.column_dimensions[_get_column_letter(maxDataRateCell[1])].width = 27
 
         self[maxDataRateCell]  = str(maxDataRate) # P1
-        self[topLeft] = "# vertices for " + title # O3
+        
+        #----------
+
+        if usePileup:
+            self[topLeft] = "pileup for " + title # O3
+        else:
+            self[topLeft] = "# vertices for " + title # O3
 
         # number of vertices where we cross the limit is
         # (data rate limit - data rate offset) / data rate slope
@@ -250,6 +264,8 @@ class SingleGroupSheet:
         #       D7  is the fragment/group size offset
         #       E7  is the fragment/group size slope
         #       B7  is the number of feds in this group
+            
+        # if we should display the pileup instead, we divide this by 0.7
 
         for i in range(len(self.evolutionData)):
             thisRow = topLeft[0] + 3 + i
@@ -266,14 +282,17 @@ class SingleGroupSheet:
                 )
 
             if divideByNumFeds:
-                expr = "=({maxDataRate} - {groupSizeOffset} * {triggerRate} / {numFeds}) / ({groupSizeSlope} * {triggerRate} / {numFeds})"
+                expr = "({maxDataRate} - {groupSizeOffset} * {triggerRate} / {numFeds}) / ({groupSizeSlope} * {triggerRate} / {numFeds})"
                 replacements['numFeds'] = coordToName(topLeftNumFeds[0] + i, topLeftNumFeds[1]) # B%d 
             else:
                 # do not divide by number of feds in the group
-                expr = "=({maxDataRate} - {groupSizeOffset} * {triggerRate}) / ({groupSizeSlope} * {triggerRate})"
+                expr = "({maxDataRate} - {groupSizeOffset} * {triggerRate}) / ({groupSizeSlope} * {triggerRate})"
+
+            if usePileup:
+                expr = "(%s) / 0.7" % expr
 
             self.makeNumericCell((thisRow, limitColumn), # O%d
-                                 expr.format(**replacements),
+                                 "=" + expr.format(**replacements),
                                  "0.0")
         # end of loop over rows
                                
