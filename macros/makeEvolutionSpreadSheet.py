@@ -466,6 +466,47 @@ class SingleGroupSheet:
 
     #----------------------------------------
 
+    def __fillDataRateAtAveragePileup(self,
+                                      topLeft,
+                                      triggerRateCellName,
+                                      topLeftsUnweightedRates,
+                                      weightCells,
+                                      ):
+        # TODO: could be merged with __fillDataRateAtPileup(..) ?
+        assert len(weightCells) == len(topLeftsUnweightedRates)
+
+        firstRow, firstCol = topLeft
+
+        #----------
+        # titles
+        #----------
+
+        self[(firstRow,    firstCol)] = "data rate [MByte/s]" 
+        self[(firstRow + 1,firstCol)] = 'at average pileup'
+        self[(firstRow + 2,firstCol)] = '=CONCATENATE("and ", TEXT(%s,"0.0")," kHz trigger rate")' % triggerRateCellName 
+
+        #----------
+        # equations
+        #----------
+
+        for i in range(len(self.evolutionData)):
+            thisRow = firstRow + 3 + i
+
+            parts = []
+
+            for inputRateCell, weightCell in zip(topLeftsUnweightedRates, weightCells):
+                parts.append("%s*%s" % (
+                        coordToName(inputRateCell[0] + 3 + i, inputRateCell[1]),
+                        coordToName(*weightCell)))
+
+            expr = " + ".join(parts)
+
+            print "expr=",expr
+            self.makeNumericCell((thisRow, firstCol),  "=" + expr, "#,##0.0") 
+
+        
+    #----------------------------------------
+
     def fillMultiPileupProjectionSheet(self, pileups):
 
         # create a new worksheet
