@@ -276,7 +276,7 @@ class FedSizePerVertexLinearFit:
 
             )
 
-        # perform lienar fit but only if the fitting range was specified
+        # perform linear fit but only if the fitting range was specified
 
         self.meanFitResult = {}
         self.uncertFitResult = {}
