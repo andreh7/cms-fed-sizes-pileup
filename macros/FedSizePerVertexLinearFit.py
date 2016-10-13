@@ -38,11 +38,11 @@ class FedSizePerVertexLinearFit:
 
     def __init__(self, 
                  parameters,
-                 size_expr = "size_total", subsys_name = None,
+                 fedSizeMatrix,
+                 fedIds, subsys_name = None,
                  grouping_name = None,
                  yaxis_unit_label = "MB", y_scale_factor = 0.001,
                  legendBottomLeft = None,
-                 numFeds = None,
                  ):
         """ @param size_expr is the expression to plot, typically
             something like size_<subsys> but can also be an expression
@@ -51,18 +51,18 @@ class FedSizePerVertexLinearFit:
         """
 
         self.parameters = parameters
-
+        self.fedSizeMatrix = fedSizeMatrix
+        self.fedIds = fedIds
 
         self.ymaxScale = getattr(self.parameters,'size_evolution_rel_yscale',1.2)
         self.ymaxScale = None
 
-
-        # assert(size_expr.startswith("size_"))
-        self.size_expr = size_expr
-
         #--------------------
 
-        if subsys_name == None or 'size' in subsys_name:
+        assert subsys_name != None
+
+        # if subsys_name == None or 'size' in subsys_name:
+        if False:
             import re
 
             # build an automatic name
@@ -112,7 +112,7 @@ class FedSizePerVertexLinearFit:
         self.subsys = subsys_name
         self.grouping = grouping_name
 
-        self.numFeds = numFeds
+        self.numFeds = len(self.fedIds)
 
         self.yaxis_unit_label = yaxis_unit_label
         self.y_scale_factor = y_scale_factor
@@ -128,39 +128,22 @@ class FedSizePerVertexLinearFit:
     #----------------------------------------
     def produce(self):
 
-        # produce histograms of the fed size distributions
-
-        ntuple = utils.openSizePerFedNtuples(self.parameters.input_data_dir, self.parameters.max_num_vertices)
-
+        # produce vectors of the fed sizes as function of number of vertices
         # maps from number of vertices to list of sum of fragment sizes
         self.fragmentSizes = {}
 
         for num_vertices in range(self.parameters.size_evolution_min_num_vertices,
                                   self.parameters.size_evolution_max_num_vertices + 1):
 
-            # make sure this subsystem is known
-            tupleVariables = [ x.GetName() for x in ntuple[num_vertices].GetListOfLeaves() ]
-            ## if not self.size_variable in  tupleVariables:
-            ##     raise Exception("no variable %s found in the per fed size tuple (is this a well known subsystem ?)" % self.size_variable)
-
-            # get all the values in the ntuple
-            ntuple[num_vertices].SetEstimate(ntuple[num_vertices].GetEntries())
-            ntuple[num_vertices].Draw(self.size_expr,"","goff")
-
-            # and write them out to a text file
-            nentries = ntuple[num_vertices].GetSelectedRows()
-            data = ntuple[num_vertices].GetV1()
-
             #----------
             # keep event sizes data
             #----------            
-            self.fragmentSizes[num_vertices] = [ data[i] for i in range(nentries) ]
+            self.fragmentSizes[num_vertices] = self.fedSizeMatrix.getFedSums(num_vertices, self.fedIds)
 
-        # close the input file again (otherwise we'll run out of
-        # file descriptors when running for all FEDs)
-        ROOT.gROOT.cd()
-        ntuple.values()[0].GetDirectory().GetFile().Close()
-            
+        # we don't need the pointer to the matrix anymore, avoid that it
+        # is pickled with this object into the output file...
+        del self.fedSizeMatrix
+
     #----------------------------------------
 
     def plot(self, outputFilePrefix):
@@ -195,11 +178,12 @@ class FedSizePerVertexLinearFit:
             event_sizes = self.fragmentSizes[num_vertices]
             
             event_sizes.sort()
-            if event_sizes:
+            if event_sizes != None and len(event_sizes) > 0:
+                # event_sizes is a numpy array
                 # there were events with this number of reconstructed vertices
 
                 # convert to kBytes
-                event_sizes = [ x / 1000.0 for x in event_sizes ]
+                event_sizes = event_sizes / 1000.0 
 
                 self.min_values.append(min(event_sizes))
                 self.max_values.append(max(event_sizes))
@@ -310,7 +294,7 @@ class FedSizePerVertexLinearFit:
             dict(fname = self.parameters.plots_output_dir + "/" + outputFilePrefix + "average-sizes-vs-vertex-" + self.subsys + ".C"),
             ]
 
-        # free memory
+        # free memory and avoid pickling this object
         del self.fragmentSizes
     
     #----------------------------------------
