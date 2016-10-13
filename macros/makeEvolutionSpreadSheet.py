@@ -501,7 +501,6 @@ class SingleGroupSheet:
 
             expr = " + ".join(parts)
 
-            print "expr=",expr
             self.makeNumericCell((thisRow, firstCol),  "=" + expr, "#,##0.0") 
 
         
