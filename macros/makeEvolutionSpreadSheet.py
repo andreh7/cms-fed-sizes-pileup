@@ -325,8 +325,6 @@ class SingleGroupSheet:
 
     def fillSheet(self):
         
-        numItems = len(self.evolutionData)
-
         # create a new worksheet
         self.ws = self.wb.create_sheet()
         
