@@ -35,12 +35,17 @@ class SingleGroupSheet:
     #----------------------------------------
     
     def __init__(self, workbook, groupingName, evolutionData, avgNumVertices, 
-                 triggerRateKHz):
+                 triggerRateKHz, sheetName = None):
+
+        # @param sheetName if not None will override the name of the worksheet
+        #        (which is otherwise taken from groupingName)
         self.wb = workbook
         self.groupingName = groupingName
         self.evolutionData = evolutionData
         self.avgNumVertices = avgNumVertices
         self.triggerRateKHz = triggerRateKHz
+        self.sheetName = sheetName
+
     #----------------------------------------
 
     def __makeHeaderCells(self):
