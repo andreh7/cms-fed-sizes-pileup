@@ -175,27 +175,25 @@ all_tasks = [
 #--------------------
 
 if True:
+
+    #----------
+    # read the input data once
+    #----------
+    inputTupleName = os.path.join(parameters.input_data_dir,"small-tuples.root")
+
+    from FedSizeMatrix import FedSizeMatrix
+    fedSizeMatrix = FedSizeMatrix()
+    fedSizeMatrix.read(inputTupleName, parameters.max_num_vertices,
+                       parameters.fedsInRun)
+
     for line in parameters.allSubsysToPlot:
 
-        # to keep backwards compatibility
-        if isinstance(line,str):
-            # old way
-            subsys = line
+        # expect a dict
+        assert isinstance(line, dict)
 
-            size_expr = subsys.lower()
-
-            if not 'size' in size_expr:
-                # assume it's a single subsystem
-                size_expr = "size_" + size_expr
-
-        else:
-            # expect a dict
-            subsys = line['label']
-            size_expr = line['expr']
-            grouping = line.get('grouping', None)
-
-
-        numFeds = line['numFeds']
+        subsys = line['label']
+        fedIds = line['fedIds']
+        grouping = line.get('grouping', None)
 
         yaxis_unit_label = "kB"
         y_scale_factor = 1.
@@ -205,14 +203,15 @@ if True:
             y_scale_factor = 0.001
 
 
-        thisTask = FedSizePerVertexLinearFit(parameters, size_expr = size_expr,
-                                                   subsys_name = subsys,
-                                                   grouping_name = grouping,
-                                                   yaxis_unit_label = yaxis_unit_label,
-                                                   y_scale_factor = y_scale_factor,
-                                                   legendBottomLeft = parameters.fedSizePerVertexLinearFitLegendPositions(parameters.run, subsys),
-                                                   numFeds = numFeds,
-                                                   )
+        thisTask = FedSizePerVertexLinearFit(parameters, 
+                                             fedSizeMatrix, 
+                                             fedIds = fedIds,
+                                             subsys_name = subsys,
+                                             grouping_name = grouping,
+                                             yaxis_unit_label = yaxis_unit_label,
+                                             y_scale_factor = y_scale_factor,
+                                             legendBottomLeft = parameters.fedSizePerVertexLinearFitLegendPositions(parameters.run, subsys),
+                                             )
 
         thisTask.instanceName = subsys
         all_tasks.append(thisTask)
