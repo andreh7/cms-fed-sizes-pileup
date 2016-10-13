@@ -18,13 +18,13 @@ def makeFRLgroups(run, fedsInRun):
         if thisFeds:
 
             # get the subsystem name of the first 
+            assert len(thisFeds) <= 2
 
             allSubsysToPlot.append(dict(
                     label = "+".join(str(x) for x in thisFeds),
                     grouping = "by FRL",
-                    expr = "+".join([ "size%03d" % x for x in thisFeds]),
-                    numFeds = len(set(thisFeds)),
-                                   )
+                    fedIds = thisFeds,
+                    )
                     )
 
     return allSubsysToPlot
@@ -41,8 +41,7 @@ def makeSingleFEDgroups(run, fedsInRun):
         allSubsysToPlot.append(dict(
                 label = "fed %d" % fed,
                 grouping = "by FED",
-                expr = "size%03d" % fed,
-                numFeds = 1,
+                fedIds = [ fed ],
                 )
               )
 
@@ -72,8 +71,7 @@ def makeSubSystemGroups(fedsInRun):
         groups.append(dict(
                 label = subdet,
                 grouping = "by subsystem",
-                expr = "+".join([ "size%03d" % x for x in thisFeds]),
-                numFeds = len(set(thisFeds)),
+                fedIds = thisFeds,
                      )
                 )
 
@@ -107,8 +105,7 @@ def makeTTCpartitionGroups(fedsInRun):
             groups.append(dict(
                     label = ttcpart,
                 grouping = "by TTC partition",
-                expr = "+".join([ "size%03d" % x for x in thisFeds]),
-                numFeds = len(set(thisFeds)),
+                fedIds = thisFeds,
                       )
                 )
 
@@ -142,8 +139,7 @@ def makeFEDbuilderGroups(run, fedsInRun):
 
         retval.append(dict(label = line['name'],
                            grouping = "by fedbuilder",
-                           expr = "+".join(["size%03d" % fed for fed in feds ]),
-                           numFeds = len(set(feds)),
+                           fedIds = feds
                            ))
 
     return retval
@@ -153,22 +149,10 @@ def makeFEDbuilderGroups(run, fedsInRun):
 def makeAllFedsGroup(fedsInRun):
     """ returns a plotting group for plotting the sum of all FEDs in the run (total event size) """
     
-    # use the sum expression instead of a dedicated variable (for simplicity)
-    # 
-    # in order to avoid the following ROOT error message:
-    # 
-    #  Error in <TTreeFormula::Compile>:  Too many operators !
-    # the main program should call TFormular::SetMaxima(..)
-    # (see https://root.cern.ch/phpBB3/viewtopic.php?t=8218 )
-    # 
-    # can't get this to work however (still getting a segmentation violation)
-    # using the 'size_total' variable instead
     return [ dict(
             label = "total",
             grouping = None,
-            # expr = "+".join([ "size%03d" % x for x in fedsInRun]),
-            expr = "size_total",
-            numFeds = len(set(fedsInRun)),
+            fedIds = fedsInRun,
             )
              ]
 
