@@ -584,8 +584,6 @@ class Plotter:
                 # horizontal arrow
                 #----------
 
-                print "PP",xpos,ypos,xleft
-
                 arrow = ROOT.TArrow(xpos, ypos,
                                     xleft, ypos)
 
