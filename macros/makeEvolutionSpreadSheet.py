@@ -438,8 +438,8 @@ class SingleGroupSheet:
         #----------
 
         self[(firstRow,    firstCol)] = "data rate [MByte/s]" 
-        self[(firstRow + 1,firstCol)]     = '=CONCATENATE("at ", TEXT(%s,"0.0")," pileup")' % pileupCellName 
-        self[(firstRow + 2,firstCol)]     = '=CONCATENATE("and ", TEXT(%s,"0.0")," kHz trigger rate")' % triggerRateCellName 
+        self[(firstRow + 1,firstCol)] = '=CONCATENATE("at ", TEXT(%s,"0.0")," pileup")' % pileupCellName 
+        self[(firstRow + 2,firstCol)] = '=CONCATENATE("and ", TEXT(%s,"0.0")," kHz trigger rate")' % triggerRateCellName 
 
         #----------
         # equations
