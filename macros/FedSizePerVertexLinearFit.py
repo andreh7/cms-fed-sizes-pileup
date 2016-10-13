@@ -284,14 +284,14 @@ class FedSizePerVertexLinearFit:
         #--------------------
 
         ROOT.gPad.SaveAs(self.parameters.plots_output_dir + "/" + outputFilePrefix + "average-sizes-vs-vertex-" + self.subsys + ".png")
-        ROOT.gPad.SaveAs(self.parameters.plots_output_dir + "/" + outputFilePrefix + "average-sizes-vs-vertex-" + self.subsys + ".C")
+        # ROOT.gPad.SaveAs(self.parameters.plots_output_dir + "/" + outputFilePrefix + "average-sizes-vs-vertex-" + self.subsys + ".C")
         
         #--------------------
         # set output files
         #--------------------
         self.outputFiles = [
             dict(fname = self.parameters.plots_output_dir + "/" + outputFilePrefix + "average-sizes-vs-vertex-" + self.subsys + ".png"),
-            dict(fname = self.parameters.plots_output_dir + "/" + outputFilePrefix + "average-sizes-vs-vertex-" + self.subsys + ".C"),
+            # dict(fname = self.parameters.plots_output_dir + "/" + outputFilePrefix + "average-sizes-vs-vertex-" + self.subsys + ".C"),
             ]
 
         # free memory and avoid pickling this object

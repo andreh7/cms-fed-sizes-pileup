@@ -305,14 +305,14 @@ class FedSizePerBXlumiLinearFit:
         #--------------------
 
         ROOT.gPad.SaveAs(self.parameters.plots_output_dir + "/average-sizes-vs-bxlumi-" + self.subsys + ".png")
-        ROOT.gPad.SaveAs(self.parameters.plots_output_dir + "/average-sizes-vs-bxlumi-" + self.subsys + ".C")
+        # ROOT.gPad.SaveAs(self.parameters.plots_output_dir + "/average-sizes-vs-bxlumi-" + self.subsys + ".C")
         
         #--------------------
         # set output files
         #--------------------
         self.outputFiles = [
             dict(fname = self.parameters.plots_output_dir + "/average-sizes-vs-bxlumi-" + self.subsys + ".png"),
-            dict(fname = self.parameters.plots_output_dir + "/average-sizes-vs-bxlumi-" + self.subsys + ".C"),
+            # dict(fname = self.parameters.plots_output_dir + "/average-sizes-vs-bxlumi-" + self.subsys + ".C"),
             ]
 
     
