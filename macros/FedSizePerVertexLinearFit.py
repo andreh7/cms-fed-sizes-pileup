@@ -244,14 +244,15 @@ class FedSizePerVertexLinearFit:
 
             plotter.fitAverage(linear_fit_min_value = self.parameters.linear_fit_min_num_vertices - 0.5,
                                linear_fit_max_value = self.parameters.linear_fit_max_num_vertices + 0.5,
-                               label_template = "size = (%(offset).3f + nvtx * %(slope).3f) %(unit)s",
+                               degree = self.parameters.fitFunctionDegree,
+                               label_func = labelFunc,
                                )
 
-            self.meanFitResult = dict(alpha = plotter.meanFitResult['alpha'], beta = plotter.meanFitResult['beta'])
-            self.uncertFitResult = dict(alpha = plotter.uncertFitResult['alpha'], beta = plotter.uncertFitResult['beta'])
+            self.meanFitResult = dict(coeffs = plotter.meanFitResult['coeffs'])
+            self.uncertFitResult = dict(coeffs = plotter.uncertFitResult['coeffs'])
         else:
-            self.meanFitResult = dict(alpha = None, beta = None)
-            self.uncertFitResult = dict(alpha = None, beta = None)
+            self.meanFitResult = dict(coeffs = None)
+            self.uncertFitResult = dict(coeffs = None)
 
         plotter.plot()
 
