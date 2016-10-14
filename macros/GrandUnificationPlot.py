@@ -32,12 +32,9 @@ def makeSubsystemEvolutionData(tasks):
         retval.setdefault(grouping, []).append({
                 "subsystem":  task.subsys, 
 
-                "offset":     task.meanFitResult['alpha'], 
-                "slope":      task.meanFitResult['beta'], 
+                "coeffs":     task.meanFitResult['coeffs'], 
 
-                "uncertOffset": task.uncertFitResult['alpha'], 
-                "uncertSlope":  task.uncertFitResult['beta'], 
-
+                "uncertCoeffs": task.uncertFitResult['coeffs'], 
 
                 "numFeds":    task.numFeds,
                 })
