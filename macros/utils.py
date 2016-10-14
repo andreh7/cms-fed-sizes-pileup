@@ -552,3 +552,21 @@ def weightedAverage(values, weights):
 
 
 #----------------------------------------------------------------------
+
+def getPowerName(power):
+    # returns a verbose name for the given power
+    # of a variable
+    if power == 0:
+        return "const"
+    elif power == 1:
+        return "linear"
+    elif power == 2:
+        return "quadratic"
+    elif power ==3:
+        return "cubic"
+    elif power == 4:
+        return "quartic"
+    else:
+        return "x^%d" % power
+
+#----------------------------------------------------------------------
