@@ -161,12 +161,23 @@ class SingleGroupSheet:
             # need absolute cell rows to allow sorting by the user
 
             inputRow = firstRowInputData + i 
+            
+            parts = []
 
-            self.makeNumericCell((thisRow, firstCol), "=%s+%s*%s" %( # G%d =D%d+E%d*B$1
-                    coordToName(inputRow, inputCol), # D%d
-                    coordToName(inputRow, inputCol + 1), # E%d
-                    numVtxCellName # B$1
-                    ), "#,##0.000")
+            for power in range(self.numCoeffs):
+                thisPart = coordToName(inputRow, inputCol + power) # D%d
+
+                if power == 1:
+                    thisPart += " * " + numVtxCellName # B$1
+                elif power >= 2:
+                    thisPart += " * POWER(%s, %d)" % (numVtxCellName, power)
+
+                parts.append(thisPart)
+
+            # G%d =D%d+E%d*B$1
+            self.makeNumericCell((thisRow, firstCol), 
+                                 "=" + " + " .join(parts), 
+                                 "#,##0.000")
 
 
     #----------------------------------------
