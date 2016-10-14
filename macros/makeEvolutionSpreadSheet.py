@@ -203,8 +203,9 @@ class SingleGroupSheet:
             self[(firstRow,    firstCol)] = "data rate [MByte/s]" # I3
 
         self[(firstRow + 1,firstCol)]     = '=CONCATENATE("at ", TEXT(%s,"0.0")," kHz trigger rate")' % triggerRateCellName # I4
-        self[(firstRow + 2,firstCol)]     = "offset"              # I5
-        self[(firstRow + 2,firstCol + 1)] = "slope"               # J5
+
+        for power in range(self.numCoeffs):
+            self[(firstRow + 2, firstCol + power)] = utils.getPowerName(power)  # I5
 
         #----------
         # equations
@@ -216,22 +217,22 @@ class SingleGroupSheet:
             inputRow = firstRowInputData + i
 
             # loop over offset and slope
-            for colOffs in (0,1):
+            for power in range(self.numCoeffs):
 
                 if divideByNumFeds:
-                    self.makeNumericCell((thisRow, firstCol + colOffs),  "=%s*%s/%s" % ( # I%d =D%d*I$1/B%d
-                            coordToName(inputRow, firstColInputData + colOffs), # D%d
+                    self.makeNumericCell((thisRow, firstCol + power),  "=%s*%s/%s" % ( # I%d =D%d*I$1/B%d
+                            coordToName(inputRow, firstColInputData + power), # D%d
                             triggerRateCellName,                                # I$1
                             coordToName(topLeftNumFeds[0] + i, topLeftNumFeds[1]), # B%d (number of FEDs in this group)
                             ),  
                                  "#,##0.000") 
 
                 else:
-                    self.makeNumericCell((thisRow, firstCol + colOffs),  "=%s*%s" % ( # I%d =D%d*I$1
-                            coordToName(inputRow, firstColInputData + colOffs), # D%d
+                    self.makeNumericCell((thisRow, firstCol + power),  "=%s*%s" % ( # I%d =D%d*I$1
+                            coordToName(inputRow, firstColInputData + power), # D%d
                             triggerRateCellName),    # I$1
                                  "#,##0.000") 
-            # loop over offset/slope
+            # loop over coefficients of polynomial
 
     #----------------------------------------
 
