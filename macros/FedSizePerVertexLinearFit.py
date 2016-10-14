@@ -10,6 +10,28 @@ import FedSizePerXUtils
 import ROOT
 import numpy as np
 
+#----------------------------------------------------------------------
+
+def labelFunc(coeffs, unit):
+    # function returning a label given the fitted coefficients
+    #
+    # older version: "size = (%(offset).3f + nvtx * %(slope).3f) %(unit)s"
+    
+    assert len(coeffs) >= 1
+    
+    if len(coeffs) == 1:
+        retval = "%.3f" % coeffs[0]
+    elif len(coeffs) == 2:
+        retval = "%.3f + nvtx * %.3f" % (coeffs[0], coeffs[1])
+    else:
+        retval = "%.3f + nvtx * %.3f + O(nvtx^2)" % (coeffs[0], coeffs[1])
+
+    # note the additional s for plural of the unit
+    return "size = (%s) %ss" % (retval, unit)
+
+
+#----------------------------------------------------------------------
+
 class FedSizePerVertexLinearFit:
 
     #----------------------------------------
