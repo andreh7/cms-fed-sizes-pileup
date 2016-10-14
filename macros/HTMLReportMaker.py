@@ -3,6 +3,7 @@
 # produces a HTML report with the given tasks
 from FedSizePerVertexLinearFit import FedSizePerVertexLinearFit
 
+import utils
 
 #----------------------------------------------------------------------
 
@@ -43,9 +44,23 @@ class HTMLReportMaker:
         # make a copy
         self.tasks = list(tasks)
 
+        # find maximum order of coefficients
+        self.numCoeffs = -1
+        for task in self.tasks:
+            if not isinstance(task, FedSizePerVertexLinearFit):
+                continue
+
+            self.numCoeffs = max(self.numCoeffs, len(task.meanFitResult['coeffs']))
+
     #----------------------------------------
         
     def printSizeCalculatorJavascriptAndForm(self, numLines):
+
+        # code to extract coefficients
+        coeffsCode = "var coeffs = [ " + ", ".join(
+            [ "parseFloat(document.getElementById('coeff%d_subsys' + subsys).innerHTML)" % power
+              for power in range(self.numCoeffs) ]) + "];"
+
         print >> self.os,"""
 <script language="javascript">
 //----------------------------------------------------------------------
@@ -65,10 +80,14 @@ function updateTable()
 
   for (var subsys = 0; subsys < """ + str(numLines) + """; ++subsys)
   {
-    var offset = parseFloat(document.getElementById('offset_subsys' + subsys).innerHTML);
-    var slope  = parseFloat(document.getElementById('slope_subsys' + subsys).innerHTML);
+    """ + coeffsCode + """
 
-    var value = offset + numVertices * slope;
+    var value = 0;
+    for (i = coeffs.length - 1; i >= 0; --i)
+    {  
+      value *= numVertices;
+      value += coeffs[i];
+    }
 
     document.getElementById('custom_size_subsys' + subsys).innerHTML = value.toFixed(3);
 
@@ -107,14 +126,27 @@ Custom number of vertices:
         print >> self.os, "<tbody>"
 
         # table header
-        print >> self.os,"<tr>" + "".join([ "<th>" + x + "</th>" for x in [
-                    'grouping',
-                    'group',
-                    'offset [kByte]',
-                    'slope [kByte/vtx]',
-                    'number of feds',
-                    'event size at <div id="customNumVerticesField">?</div> vertices [kByte]',
-                    ]]) + "</tr>"
+
+        colnames = [
+            'grouping',
+            'group',
+            ]
+
+        for power in range(self.numCoeffs):
+            unit = 'kByte'
+            if power == 1:
+                unit += '/vtx'
+            elif power >= 2:
+                unit += '/vtx^%d' % power
+
+            colnames.append(utils.getPowerName(power) + ' [%s]' % unit)
+
+        colnames += [
+            'number of feds',
+            'event size at <div id="customNumVerticesField">?</div> vertices [kByte]',
+            ]
+
+        print >> self.os,"<tr>" + "".join([ "<th>" + x + "</th>" for x in colnames ]) + "</tr>"
 
         for line in subsystemEvolutionData:
 
@@ -132,8 +164,9 @@ Custom number of vertices:
             print >> self.os,"<tr>"
             print >> self.os,"<td>" + grouping + "</td>"
             print >> self.os,"<td>" + '<a href="#subsys%04d">%s</a>' % (line['index'], line['subsystem']) + "</td>"
-            print >> self.os,'<td id="offset_subsys%d">' % line['index'] + sizeToString(line['offset']) + "</td>"
-            print >> self.os,'<td id="slope_subsys%d">'  % line['index'] + sizeToString(line['slope']) + "</td>"
+
+            for power in range(self.numCoeffs):
+                print >> self.os,'<td id="coeff%d_subsys%d">' % (power, line['index']) + sizeToString(line['coeffs'][power]) + "</td>"
 
             if line['numFeds'] != None:
                 numFedsStr = str(line['numFeds'])
@@ -173,11 +206,9 @@ Custom number of vertices:
 
             thisData = {"subsystem":  task.subsys, 
                                            "grouping":   task.grouping,
-                                           "offset":     task.meanFitResult['alpha'], 
-                                           "slope":      task.meanFitResult['beta'], 
+                                           "coeffs":     task.meanFitResult['coeffs'], 
 
-                                           "uncertOffset":     task.uncertFitResult['alpha'], 
-                                           "uncertSlope":      task.uncertFitResult['beta'], 
+                                           "uncertCoeffs":     task.uncertFitResult['coeffs'], 
 
                                            "numFeds":    task.numFeds, 
                                            "index":      index}
