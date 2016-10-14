@@ -33,6 +33,8 @@ dataset = "hltphysics"
 
 hlt_description = "HLT_Physics"
 
+fitFunctionDegree = 2
+
 #----------------------------------------------------------------------
 
 #----------------------------------------------------------------------
@@ -142,7 +144,8 @@ poisson_fit_start, poisson_fit_end = 11.5, 17.5
 
 # original range
 # linear_fit_min_num_vertices,linear_fit_max_num_vertices  = 20, 35
-linear_fit_min_num_vertices,linear_fit_max_num_vertices  = 35, 45
+# linear_fit_min_num_vertices,linear_fit_max_num_vertices  = 35, 45
+linear_fit_min_num_vertices,linear_fit_max_num_vertices  = 20, 45
 
 # range used later on to check for slope change
 # linear_fit_min_num_vertices,linear_fit_max_num_vertices  = 32, 42
