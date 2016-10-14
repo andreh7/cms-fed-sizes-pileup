@@ -247,7 +247,11 @@ class SingleGroupSheet:
         # @param usePileup: if this is True, the limit is shown in terms of pileup (number of interactions
         #                   per bunch crossing) rather than number of vertices, assuming
         #                   one interaction leads to 0.7 vertices on average
+        # 
+        # @return the number of solution columns added
 
+        assert self.numCoeffs <= 3, "only polynomials up to degree two are supported"
+        
         if divideByNumFeds:
             assert topLeftNumFeds != None
 
@@ -281,6 +285,10 @@ class SingleGroupSheet:
         else:
             self[topLeft] = "# vertices for " + title # O3
 
+
+        # number of columns added
+        retval = 1
+
         # number of vertices where we cross the limit is
         # (data rate limit - data rate offset) / data rate slope
         #
@@ -301,31 +309,79 @@ class SingleGroupSheet:
 
             inputRow = topLeftInputData[0] + i
 
-            replacements = dict(
-                maxDataRate = maxDataRateCellName,      # P$1
-                triggerRate = triggerRateCellName,      # I$1
-                    
-                groupSizeOffset = coordToName(inputRow, topLeftInputData[1]), # D%d
-                groupSizeSlope = coordToName(inputRow, topLeftInputData[1] + 1), # E%d
-                    
-                )
+            # solution for linear models:
+            # 
+            #   numVertices = (limit - data rate const) / data rate slope
+            #
+            # solution for quadratic models:
+            #
+            # (-b +/- sqrt( b^2 - 4ac) ) / 2a
+            # 
+            # where 
+            #   a = quadratic term
+            #   b = linear term
+            #   c = const term - limit
+            #
+            # for lack of a heuristic which of the two solutions is the
+            # wanted one (b can be negative) we just put two columns for the moment
 
-            if divideByNumFeds:
-                expr = "({maxDataRate} - {groupSizeOffset} * {triggerRate} / {numFeds}) / ({groupSizeSlope} * {triggerRate} / {numFeds})"
-                replacements['numFeds'] = coordToName(topLeftNumFeds[0] + i, topLeftNumFeds[1]) # B%d 
+            if self.numCoeffs < 2:
+                # no dependence on pileup
+                self[(thisRow, limitColumn)] = 'N/A'
+                continue
+
+            # build expressions for the different coefficients, divided by number
+            # or FEDS or not
+            coeffExprs = []
+            for power in range(self.numCoeffs):
+
+                coeffCell = coordToName(inputRow, topLeftInputData[1] + power) # D%d
+
+                if divideByNumFeds:
+                    numFedsCell = coordToName(topLeftNumFeds[0] + i, topLeftNumFeds[1]) # B%d 
+                    coeffExprs.append("%s * %s / %s"  % (coeffCell, triggerRateCellName, numFedsCell))
+                else:
+                    coeffExprs.append("%s * %s"  % (coeffCell, triggerRateCellName))
+
+            if self.numCoeffs == 2:
+                # linear model
+                exprs = [ "({maxDataRate} - ({coeff0})) / ({coeff1)".format(
+                        maxDataRate = maxDataRateCellName,      # P$1
+                        coeff0 = coeffExprs[0],
+                        coeff1 = coeffExprs[0],
+                        )
+                          ]
+
+                retval = 1
+            elif self.numCoeffs == 3:
+                # quadratic model
+
+                
+                exprs = [ ("(-({b}) " + sign + " SQRT(POWER({b},2) - 4 * ({a}) * ({c}))) / (2 * ({a}))").format(
+                        a = coeffExprs[2],
+                        b = coeffExprs[1],
+                        c = "(%s - %s)" % (coeffExprs[0], maxDataRateCellName)
+                        )
+                          for sign in ('-', '+')
+                          ]
+                
+                retval = 2
+
             else:
-                # do not divide by number of feds in the group
-                expr = "({maxDataRate} - {groupSizeOffset} * {triggerRate}) / ({groupSizeSlope} * {triggerRate})"
+                raise Exception("uncaught case - internal error")
 
-            if usePileup:
-                expr = "(%s) / 0.7" % expr
+            for colOffset, expr in enumerate(exprs):
+                if usePileup:
+                    expr = "(%s) / 0.7" % expr
 
-            self.makeNumericCell((thisRow, limitColumn), # O%d
-                                 "=" + expr.format(**replacements),
-                                 "0.0")
+                self.makeNumericCell((thisRow, limitColumn + colOffset), # O%d
+                                     "=" + expr,
+                                     "0.0")
+            # loop over expressions
         # end of loop over rows
-                               
 
+        # return number of columns added
+        return retval
 
     #----------------------------------------
 
@@ -423,27 +479,28 @@ class SingleGroupSheet:
         # when do we reach 200 MByte/s per FED ?
         #----------
 
-        maxDataRateCell = (1, nextCol)
+        if self.numCoeffs <= 3:
+            maxDataRateCell = (1, nextCol)
 
-        # maximum data rate per FED
-        if self.groupingName == 'by fedbuilder':
-            maxDataRate = 4000 # in MByte/s
-            divideByNumFeds = False
-        else:
-            maxDataRate = 200 # in MByte/s
-            divideByNumFeds = True
+            # maximum data rate per FED
+            if self.groupingName == 'by fedbuilder':
+                maxDataRate = 4000 # in MByte/s
+                divideByNumFeds = False
+            else:
+                maxDataRate = 200 # in MByte/s
+                divideByNumFeds = True
 
-        # now this is independent on any precalculations
-        self.__fillLimit(topLeft = (row, nextCol),  # column O
-                         topLeftInputData = topLeftInputData,
-                         maxDataRate = maxDataRate,
-                         maxDataRateCell = maxDataRateCell,
-                         triggerRateCellName = self.triggerRateCellName,
-                         divideByNumFeds = divideByNumFeds,
-                         topLeftNumFeds = topLeftNumFeds
-                         )
+            # now this is independent on any precalculations
+            numCols = self.__fillLimit(topLeft = (row, nextCol),  # column O
+                                       topLeftInputData = topLeftInputData,
+                                       maxDataRate = maxDataRate,
+                                       maxDataRateCell = maxDataRateCell,
+                                       triggerRateCellName = self.triggerRateCellName,
+                                       divideByNumFeds = divideByNumFeds,
+                                       topLeftNumFeds = topLeftNumFeds
+                                       )
 
-        nextCol += 2
+            nextCol += 1 + numCols
 
         #----------
         # offset and slope of uncertainties fit
@@ -659,28 +716,31 @@ class SingleGroupSheet:
         # when do we reach 4000 GByte/s per fedbuilder ?
         #----------
 
-        maxDataRateCell = (1, nextCol)
+        if self.numCoeffs <= 3:
+            maxDataRateCell = (1, nextCol)
 
-        # maximum data rate per FED
-        if self.groupingName == 'by fedbuilder':
-            maxDataRate = 4000 # in MByte/s
-            divideByNumFeds = False
+            # maximum data rate per FED
+            if self.groupingName == 'by fedbuilder':
+                maxDataRate = 4000 # in MByte/s
+                divideByNumFeds = False
+            else:
+                maxDataRate = 200 # in MByte/s
+                divideByNumFeds = True
+
+            # now this is independent on any precalculations
+            numCols = self.__fillLimit(topLeft = (row, nextCol), 
+                                       topLeftInputData = topLeftInputData,
+                                       maxDataRate = maxDataRate,
+                                       maxDataRateCell = maxDataRateCell,
+                                       triggerRateCellName = self.triggerRateCellName,
+                                       divideByNumFeds = divideByNumFeds,
+                                       topLeftNumFeds = topLeftNumFeds,
+                                       usePileup = True
+                                       )
+
+            nextCol += 1 + numCols
         else:
-            maxDataRate = 200 # in MByte/s
-            divideByNumFeds = True
-
-        # now this is independent on any precalculations
-        self.__fillLimit(topLeft = (row, nextCol), 
-                         topLeftInputData = topLeftInputData,
-                         maxDataRate = maxDataRate,
-                         maxDataRateCell = maxDataRateCell,
-                         triggerRateCellName = self.triggerRateCellName,
-                         divideByNumFeds = divideByNumFeds,
-                         topLeftNumFeds = topLeftNumFeds,
-                         usePileup = True
-                         )
-
-        nextCol += 2
+            maxDataRateCell = None
 
         #--------------------
         # data rate at given trigger rate and given number of pileup
@@ -698,8 +758,9 @@ class SingleGroupSheet:
                                         pileupCellName = coordToName(*pileupCell, rowPrefix = '$', colPrefix = '$')
                                         )
 
-            self.__conditionalFormattingForDataRate(topLeftsUnweightedRates[-1],
-                                                    maxDataRateCell)
+            if maxDataRateCell != None:
+                self.__conditionalFormattingForDataRate(topLeftsUnweightedRates[-1],
+                                                        maxDataRateCell)
 
 
         #--------------------
@@ -714,8 +775,9 @@ class SingleGroupSheet:
                                                weightCells = weightCells,
                                                )
 
-            self.__conditionalFormattingForDataRate(topLeft,
-                                                    maxDataRateCell)
+            if maxDataRateCell != None:
+                self.__conditionalFormattingForDataRate(topLeft,
+                                                        maxDataRateCell)
 
     #----------------------------------------
 
