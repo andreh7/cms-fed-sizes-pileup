@@ -529,18 +529,23 @@ class SingleGroupSheet:
 
             inputRow = firstRowInputData + i
 
-            expr = "({groupSizeOffset} + {groupSizeSlope} * {pileup} * 0.7) * {triggerRate}"
+            parts = []
 
-            replacements = dict(
-                triggerRate = triggerRateCellName,  # I$1
-                pileup = pileupCellName, 
-                    
-                groupSizeOffset = coordToName(inputRow, topLeftInputData[1]), # D%d
-                groupSizeSlope = coordToName(inputRow, topLeftInputData[1] + 1), # E%d
-                )
+            for power in range(self.numCoeffs):
+                thisPart = coordToName(inputRow, topLeftInputData[1] + power) # D%d
 
+                if power == 1:
+                    thisPart += " * %s * 0.7 " % pileupCellName # B$1
+                elif power >= 2:
+                    thisPart += " * POWER(%s * 0.7, %d)" % (pileupCellName, power)
 
-            self.makeNumericCell((thisRow, firstCol),  "=" + expr.format(**replacements),
+                parts.append(thisPart)
+
+            expr = "(%s) * %s" % (" + ".join(parts),
+                                  triggerRateCellName,  # I$1    
+                                  )
+
+            self.makeNumericCell((thisRow, firstCol),  "=" + expr,
                                  "#,##0.0") 
 
     #----------------------------------------
