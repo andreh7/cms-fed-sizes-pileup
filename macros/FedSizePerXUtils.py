@@ -83,6 +83,39 @@ def makeGraph(xpos, lowerValues, centerValues, upperValues, fillColor, x_error_s
 
     return gr
 
+
+#----------------------------------------------------------------------
+
+def makePolynomialFunction(funcName, coeffs, xmin, xmax, scaleFactor = None):
+    # makes a polynomial TF1 with the given coefficients
+    # @param coeffs the first coefficient is the constant etc.
+    
+    # build the expression first
+    expr = ""
+    for power in range(len(coeffs)):
+
+        if expr:
+            expr += "+ x * ("
+
+        expr = expr + "[%d]" % power
+
+    expr += ")" * (len(coeffs) - 1)
+
+    if scaleFactor != None:
+        expr = "%f * (%s)" % (scaleFactor, expr)
+
+    func = ROOT.TF1(funcName, expr,
+                    xmin, xmax)
+
+    import utils
+
+    for power in range(len(coeffs)):
+
+        func.SetParName(power, utils.getPowerName(power))
+        func.SetParameter(power, coeffs[power])
+
+    return func
+
 #----------------------------------------------------------------------
 # class plotter:
 #
