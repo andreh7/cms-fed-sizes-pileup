@@ -356,24 +356,44 @@ class SingleGroupSheet:
             elif self.numCoeffs == 3:
                 # quadratic model
 
+                replacements = dict(
+                    a = coeffExprs[2],
+                    b = coeffExprs[1],
+                    c = "(%s - %s)" % (coeffExprs[0], maxDataRateCellName)
+                    )
+
+                # add a protection against negative values under the square root
+                determinantExpr = "POWER({b},2) - 4 * ({a}) * ({c})"
+
+                exprs = []
+
+                for sign in ('-', '+'):
                 
-                exprs = [ ("(-({b}) " + sign + " SQRT(POWER({b},2) - 4 * ({a}) * ({c}))) / (2 * ({a}))").format(
-                        a = coeffExprs[2],
-                        b = coeffExprs[1],
-                        c = "(%s - %s)" % (coeffExprs[0], maxDataRateCellName)
+                    # solution of the quadratic equation
+                    solutionExpr = "(-({b}) " + sign + " SQRT(" + determinantExpr + ")) / (2 * ({a}))"
+
+                    if usePileup:
+                        solutionExpr = "(%s) / 0.7" % solutionExpr
+
+                    exprs.append(
+                        ("IF(" + determinantExpr + ">=0," + 
+
+                         # determinant non-negative
+                         solutionExpr + 
+                         
+                         "," +
+                         '"(no solution)"' + # determinant negative
+                         ")"
+                         ).format(**replacements)
                         )
-                          for sign in ('-', '+')
-                          ]
-                
+                # end of loop over signs
+
                 retval = 2
 
             else:
                 raise Exception("uncaught case - internal error")
 
             for colOffset, expr in enumerate(exprs):
-                if usePileup:
-                    expr = "(%s) / 0.7" % expr
-
                 self.makeNumericCell((thisRow, limitColumn + colOffset), # O%d
                                      "=" + expr,
                                      "0.0")
