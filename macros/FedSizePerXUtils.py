@@ -228,30 +228,26 @@ class Plotter:
 
     #----------------------------------------
 
-    def addFitResult(self, prefix, linear_fit_min_value, linear_fit_max_value, fitResultDict, alpha, beta):
+    def addFitResult(self, prefix, linear_fit_min_value, linear_fit_max_value, fitResultDict, coeffs):
 
-        fitResultDict['alpha'] = alpha
-        fitResultDict['beta'] = beta
+        fitResultDict['coeffs'] = coeffs
 
-        func = ROOT.TF1(prefix + "linearfunc","[0]+x*[1]",
-                        linear_fit_min_value,
-                        linear_fit_max_value,
-                        )
-        func.SetParName(0,"const")
-        func.SetParName(1,"slope")
-        func.SetParameter(0,alpha)
-        func.SetParameter(1,beta)
+        # build an expression for the plotting function
+        func = makePolynomialFunction(
+            prefix + "linearfunc",
+            coeffs,
+            linear_fit_min_value,
+            linear_fit_max_value,
+            )
         fitResultDict['fittedFunc'] = func
 
         # create a scaled version for drawing
-        func = ROOT.TF1(prefix + "scaledFittedFunc","%f*([0]+x*[1])" % self.y_scale_factor,
-                                         linear_fit_min_value,
-                                         linear_fit_max_value,
-                                         )
-        func.SetParName(0,"const")
-        func.SetParName(1,"slope")
-        func.SetParameter(0,alpha)
-        func.SetParameter(1,beta)
+        func = makePolynomialFunction(prefix + "scaledFittedFunc",
+                                      coeffs,
+                                      linear_fit_min_value,
+                                      linear_fit_max_value,
+                                      self.y_scale_factor
+                                      )
 
         fitResultDict['scaledFittedFunc'] = func
 
