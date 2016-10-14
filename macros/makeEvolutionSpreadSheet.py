@@ -86,9 +86,11 @@ class SingleGroupSheet:
 
     #----------------------------------------
 
-    def __fillInputData(self, firstRow):
+    def __fillInputData(self, topLeft):
         # fills the fitted data per FED group on which almost
         # any other numbers are based on
+
+        firstRow, firstCol = topLeft
 
         #----------
         # column headers
@@ -100,13 +102,13 @@ class SingleGroupSheet:
         # does not work with POI
         # self.ws['F3'] = '="data size at "&A2&" vertices"'
 
-        self[(firstRow + 2, 1)] = 'FED group'               # A5                  
-        self[(firstRow + 2, 2)] = 'number of feds'          # B5
-        self[(firstRow + 2, 3)] = 'subsys' # do we still need this ? # C5
-        self[(firstRow + 2, 4)] = 'offset'                  # D5
-        self[(firstRow + 2, 5)] = 'slope'                   # E5
+        self[(firstRow + 2, firstCol)]     = 'FED group'               # A5                  
+        self[(firstRow + 2, firstCol + 1)] = 'number of feds'          # B5
+        self[(firstRow + 2, firstCol + 2)] = 'subsys' # do we still need this ? # C5
+        self[(firstRow + 2, firstCol + 3)] = 'offset'                  # D5
+        self[(firstRow + 2, firstCol + 4)] = 'slope'                   # E5
 
-        self.ws.column_dimensions[_get_column_letter(2)].width = 14
+        self.ws.column_dimensions[_get_column_letter(firstCol + 1)].width = 14
 
         #----------
         # fill the evolution data
@@ -114,10 +116,11 @@ class SingleGroupSheet:
         
         for rowOffset, data in enumerate(self.evolutionData):
             thisRow = rowOffset + firstRow + 3
-            self[(thisRow, 1)] = data['subsystem']                          # A%d
-            self[(thisRow, 2)] = data['numFeds']                            # B%d
-            self.makeNumericCell((thisRow, 4), data['offset'], "#,##0.000") # D%d
-            self.makeNumericCell((thisRow, 5), data['slope'], "#,##0.000")  # E%d
+            self[(thisRow, firstCol)]     = data['subsystem']                          # A%d
+            self[(thisRow, firstCol + 1)] = data['numFeds']                            # B%d
+            self.makeNumericCell((thisRow, firstCol + 3), data['offset'], "#,##0.000") # D%d
+            self.makeNumericCell((thisRow, firstCol + 4), data['slope'], "#,##0.000")  # E%d
+
 
 
     #----------------------------------------
@@ -356,7 +359,7 @@ class SingleGroupSheet:
         row = self.__makeHeaderCells()
 
         # fill input data (fit results)
-        self.__fillInputData(row)
+        self.__fillInputData((row, 1))
 
         topLeftInputData = (row + 3, 4)
         topLeftNumFeds   = (row + 3, 2)
