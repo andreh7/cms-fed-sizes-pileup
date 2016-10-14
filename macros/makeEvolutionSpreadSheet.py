@@ -643,7 +643,7 @@ class SingleGroupSheet:
         #----------
         # fill input data (fit results)
         #----------
-        self.__fillInputData(row)
+        self.__fillInputData((row,1))
 
         topLeftInputData = (row + 3, 4)
         topLeftNumFeds   = (row + 3, 2)
