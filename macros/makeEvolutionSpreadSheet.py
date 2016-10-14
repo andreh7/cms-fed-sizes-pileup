@@ -737,7 +737,7 @@ class SingleGroupSheet:
         #----------
 
         if self.numCoeffs <= 3:
-            maxDataRateCell = (1, nextCol)
+            maxDataRateCell = (1, 5)
 
             # maximum data rate per FED
             if self.groupingName == 'by fedbuilder':
