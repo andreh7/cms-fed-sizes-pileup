@@ -4,6 +4,7 @@
 
 import sys, os, re
 import GrandUnificationPlot
+import utils
 
 #----------------------------------------------------------------------
 
@@ -39,12 +40,18 @@ class SingleGroupSheet:
 
         # @param sheetName if not None will override the name of the worksheet
         #        (which is otherwise taken from groupingName)
+
+        assert len(evolutionData) >= 1
+
         self.wb = workbook
         self.groupingName = groupingName
         self.evolutionData = evolutionData
         self.avgNumVertices = avgNumVertices
         self.triggerRateKHz = triggerRateKHz
         self.sheetName = sheetName
+
+        # number of coefficients for each fit
+        self.numCoeffs = len(evolutionData[0]['coeffs'])
 
     #----------------------------------------
 
@@ -105,23 +112,25 @@ class SingleGroupSheet:
         self[(firstRow + 2, firstCol)]     = 'FED group'               # A5                  
         self[(firstRow + 2, firstCol + 1)] = 'number of feds'          # B5
         self[(firstRow + 2, firstCol + 2)] = 'subsys' # do we still need this ? # C5
-        self[(firstRow + 2, firstCol + 3)] = 'offset'                  # D5
-        self[(firstRow + 2, firstCol + 4)] = 'slope'                   # E5
+
+        for power in range(self.numCoeffs):
+            self[(firstRow + 2, firstCol + 3 + power)] = utils.getPowerName(power)  # D5
 
         self.ws.column_dimensions[_get_column_letter(firstCol + 1)].width = 14
 
         #----------
         # fill the evolution data
         #----------
-        
+
         for rowOffset, data in enumerate(self.evolutionData):
             thisRow = rowOffset + firstRow + 3
             self[(thisRow, firstCol)]     = data['subsystem']                          # A%d
             self[(thisRow, firstCol + 1)] = data['numFeds']                            # B%d
-            self.makeNumericCell((thisRow, firstCol + 3), data['offset'], "#,##0.000") # D%d
-            self.makeNumericCell((thisRow, firstCol + 4), data['slope'], "#,##0.000")  # E%d
 
+            coeffs = data['coeffs']
 
+            for power in range(self.numCoeffs):
+                self.makeNumericCell((thisRow, firstCol + 3 + power), data['coeffs'][power], "#,##0.000") # D%d
 
     #----------------------------------------
 
@@ -317,8 +326,9 @@ class SingleGroupSheet:
         #----------
 
         self[(firstRow,     firstCol)]     = 'one sigma spread on data sizes [kByte/ev]' # Q3 
-        self[(firstRow + 2, firstCol)]     = 'offset'                                    # Q5
-        self[(firstRow + 2, firstCol + 1)] = 'slope'                                     # R5
+
+        for power in range(self.numCoeffs):
+            self[(firstRow + 2, firstCol + power)] = utils.getPowerName(power) # Q5
 
         #----------
         # data
@@ -326,8 +336,9 @@ class SingleGroupSheet:
 
         for i, data in enumerate(self.evolutionData):
             thisRow = firstRow + 3 + i 
-            self.makeNumericCell((thisRow, firstCol    ), data['uncertOffset'], "#,##0.000") # Q%d
-            self.makeNumericCell((thisRow, firstCol + 1), data['uncertSlope'],  "#,##0.000") # R%d
+
+            for power in range(self.numCoeffs):
+                self.makeNumericCell((thisRow, firstCol + power), data['uncertCoeffs'][power], "#,##0.000") # Q%d
 
     #----------------------------------------
 
