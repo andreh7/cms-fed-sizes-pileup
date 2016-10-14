@@ -375,37 +375,43 @@ class SingleGroupSheet:
         topLeftInputData = (row + 3, 4)
         topLeftNumFeds   = (row + 3, 2)
 
+        nextCol = 5 + self.numCoeffs
+
         #----------
         # data size at given number of vertices
         #----------
-        self.__fillDataSizeAtNumVertices(topLeft = (row, 7), 
+        self.__fillDataSizeAtNumVertices(topLeft = (row, nextCol), 
                                          topLeftInputData = topLeftInputData,
                                          numVtxCellName = self.avgNumVtxCellName)
+
+        nextCol += 2
 
         #--------------------
         # data rate
         #--------------------
-        self.__fillDataRateOffsetSlope(topLeft = (row, 9),
+        self.__fillDataRateOffsetSlope(topLeft = (row, nextCol),
                                        topLeftInputData = topLeftInputData,
                                        triggerRateCellName = self.triggerRateCellName,
                                        divideByNumFeds = False)
 
-
+        nextCol += 1 + self.numCoeffs
 
         #----------
         # per FED data rate
         #----------
 
-        self.__fillDataRateOffsetSlope(topLeft = (row, 12),
+        self.__fillDataRateOffsetSlope(topLeft = (row, nextCol),
                                        topLeftInputData = topLeftInputData,
                                        triggerRateCellName = self.triggerRateCellName,
                                        divideByNumFeds = True,
                                        topLeftNumFeds = topLeftNumFeds)
+
+        nextCol += 1 + self.numCoeffs
         #----------
         # when do we reach 200 MByte/s per FED ?
         #----------
 
-        maxDataRateCell = (1, 15)
+        maxDataRateCell = (1, nextCol)
 
         # maximum data rate per FED
         if self.groupingName == 'by fedbuilder':
@@ -416,7 +422,7 @@ class SingleGroupSheet:
             divideByNumFeds = True
 
         # now this is independent on any precalculations
-        self.__fillLimit(topLeft = (row, 15),  # column O
+        self.__fillLimit(topLeft = (row, nextCol),  # column O
                          topLeftInputData = topLeftInputData,
                          maxDataRate = maxDataRate,
                          maxDataRateCell = maxDataRateCell,
@@ -425,11 +431,13 @@ class SingleGroupSheet:
                          topLeftNumFeds = topLeftNumFeds
                          )
 
+        nextCol += 2
+
         #----------
         # offset and slope of uncertainties fit
         #----------
 
-        topLeftUncertainties = (row, 17)
+        topLeftUncertainties = (row, nextCol)
         self.__fillUncertainties(topLeftUncertainties)
 
     #----------------------------------------
