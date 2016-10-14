@@ -648,12 +648,13 @@ class SingleGroupSheet:
         topLeftInputData = (row + 3, 4)
         topLeftNumFeds   = (row + 3, 2)
 
+        nextCol = 5 + self.numCoeffs
 
         #----------
         # when do we reach 4000 GByte/s per fedbuilder ?
         #----------
 
-        maxDataRateCell = (1, 7)
+        maxDataRateCell = (1, nextCol)
 
         # maximum data rate per FED
         if self.groupingName == 'by fedbuilder':
@@ -664,7 +665,7 @@ class SingleGroupSheet:
             divideByNumFeds = True
 
         # now this is independent on any precalculations
-        self.__fillLimit(topLeft = (row, 7), 
+        self.__fillLimit(topLeft = (row, nextCol), 
                          topLeftInputData = topLeftInputData,
                          maxDataRate = maxDataRate,
                          maxDataRateCell = maxDataRateCell,
@@ -674,6 +675,8 @@ class SingleGroupSheet:
                          usePileup = True
                          )
 
+        nextCol += 2
+
         #--------------------
         # data rate at given trigger rate and given number of pileup
         #--------------------
@@ -682,7 +685,7 @@ class SingleGroupSheet:
 
         for j, pileupCell in enumerate(pileupCells):
 
-            topLeftsUnweightedRates.append((row, 9 + 2 * j))
+            topLeftsUnweightedRates.append((row, nextCol + 2 * j))
 
             self.__fillDataRateAtPileup(topLeft = topLeftsUnweightedRates[-1],
                                         topLeftInputData = topLeftInputData,
@@ -699,7 +702,7 @@ class SingleGroupSheet:
         #--------------------
 
         if len(pileups) > 1:
-            topLeft = (row, 9 + 2 * len(pileups))
+            topLeft = (row, nextCol + 2 * len(pileups))
             self.__fillDataRateAtAveragePileup(topLeft = topLeft,
                                                triggerRateCellName = self.triggerRateCellName,
                                                topLeftsUnweightedRates = topLeftsUnweightedRates,
