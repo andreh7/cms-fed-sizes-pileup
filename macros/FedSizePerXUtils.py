@@ -274,10 +274,13 @@ class Plotter:
                    linear_fit_min_value,
                    linear_fit_max_value,
 
-                   # template for writing a text on the graph
-                   # with the fit result
-                   label_template,
+                   degree,
 
+                   # function taking the list of parameters
+                   # and translating it into a label for writing 
+                   # a text on the graph
+                   # with the fit result
+                   label_func,
                    ):
         """ perform a linear fit to the average values """
         import utils
@@ -307,17 +310,21 @@ class Plotter:
             raise Exception("must have at least two points for a linear fit (linear_fit_min_value=" + str(linear_fit_min_value) + " linear_fit_max_value=" + str(linear_fit_max_value) + ")")
 
         # perform fit to means
-        alpha, beta = utils.linearFit(xpos_for_fit, ypos_for_fit)
-        self.addFitResult('mean', linear_fit_min_value, linear_fit_max_value, self.meanFitResult, alpha, beta)
+        # note that pylab.polyfit returns coefficients in an order
+        # where the first coefficient corresponds to the highest power of x, 
+        # we reverse this
+        import pylab
 
-        self.fitResultLabel = label_template % dict(
-            offset = alpha * self.y_scale_factor,
-            slope  = beta  * self.y_scale_factor,
-            unit   = self.yaxis_unit_label)
+        fittedCoeffs = pylab.polyfit(xpos_for_fit, ypos_for_fit, degree)
+        fittedCoeffs = fittedCoeffs[::-1]
+        self.addFitResult('mean', linear_fit_min_value, linear_fit_max_value, self.meanFitResult, fittedCoeffs)
+
+        self.fitResultLabel = label_func(fittedCoeffs * self.y_scale_factor, self.yaxis_unit_label)
         
         # perform fit to symmetrized 1 sigma bands
-        alpha, beta = utils.linearFit(xpos_for_fit, uncert_for_fit)
-        self.addFitResult('uncert', linear_fit_min_value, linear_fit_max_value, self.uncertFitResult, alpha, beta)
+        fittedCoeffs = pylab.polyfit(xpos_for_fit, uncert_for_fit, degree)
+        fittedCoeffs = fittedCoeffs[::-1]
+        self.addFitResult('uncert', linear_fit_min_value, linear_fit_max_value, self.uncertFitResult, fittedCoeffs)
 
     #----------------------------------------
     def plot(self):
