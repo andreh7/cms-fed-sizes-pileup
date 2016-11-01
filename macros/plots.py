@@ -169,7 +169,7 @@ all_tasks = [
     
     NumEventsPerLumiSection(parameters, small_tuple),
     NumVerticesPerLumiSection(parameters, small_tuple),
-    LuminosityEvolution(parameters, small_tuple),
+    # LuminosityEvolution(parameters, small_tuple),
 
     # this is not yet implemented (or not needed any more ?)
     # PerFedSize(),
