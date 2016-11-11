@@ -41,14 +41,6 @@ ROOT.gStyle.SetErrorX(0.5)
 
 gc_saver = []
 
-# single file
-# fin = ROOT.TFile.Open("../data/myOutputFile.root")
-# Events = fin.Get("Events")
-
-# produce a chain
-Events = ROOT.TChain("Events")
-Events.Add(parameters.input_data_dir + "/*.root")
-
 #----------------------------------------------------------------------
 # global variables
 #----------------------------------------------------------------------
@@ -76,15 +68,6 @@ def groupInts(integer_list):
                                                      lambda x,c=itertools.count(): next(c)-x))
 
     return [ (g[0], g[-1]) for g in groups ]
-
-#----------------------------------------
-
-def getNumEvents():
-
-    if num_events == None:
-        num_events = Events.GetEntries()
-
-    return num_events
 
 #----------------------------------------------------------------------
 
