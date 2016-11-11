@@ -118,22 +118,6 @@ class PerFedSize():
 # main
 #----------------------------------------------------------------------
 
-# fit the 
-
-
-#----------------------------------------
-# cross check: number of feds should be
-#              the same throughout the run
-#----------------------------------------
-
-
-# Events.Draw("fedSizeData.getNumFeds()")
-# for the run analyzed, this is always 635
-
-#----------------------------------------
-# Events.Draw("fedSizeData.getSumAllFedSizes()")
-
-#----------------------------------------------------------------------
 from FedSizePerBXlumiLinearFit import FedSizePerBXlumiLinearFit
 
 all_tasks = [
