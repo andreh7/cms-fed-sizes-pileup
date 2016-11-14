@@ -153,8 +153,15 @@ if True:
 
     from FedSizeMatrix import FedSizeMatrix
     fedSizeMatrix = FedSizeMatrix()
+    
     fedSizeMatrix.read(inputTupleName, parameters.max_num_vertices,
-                       parameters.fedsInRun)
+                       parameters.fedsInRun,
+                       
+                       # cut to apply to events used for
+                       # the fed size distributions
+                       # (e.g. restrict bunch crossings etc.)
+                       getattr(parameters, 'fedSizeCut', "")
+                       )
 
     #----------
     # check if we should override some fed sizes

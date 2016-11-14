@@ -10,7 +10,7 @@ class FedSizeMatrix:
 
     #----------------------------------------
     
-    def read(self, fname, maxNumVertices, allFedIds):
+    def read(self, fname, maxNumVertices, allFedIds, cut = ""):
 
         # reads data from a small tuples file where we have one ntuple
         # per number of vertices
@@ -48,18 +48,26 @@ class FedSizeMatrix:
             nevents = ntuple.GetEntries()
             ntuple.SetEstimate(nevents)
 
+            nentries = None
+
             print >> sys.stderr,"reading",nv,"vertices"
 
             for fedId in allFedIds:
-                ntuple.Draw("size%03d" % fedId,"","goff")
+                ntuple.Draw("size%03d" % fedId, cut, "goff")
                 
-                # this should actually be equal to nevents
-                # nentries = ntuple.GetSelectedRows()
+                # note that we may have less than nevents rows
+                # selected due to the cut
+                
+                if nentries == None:
+                    nentries = ntuple.GetSelectedRows()
+                else:
+                    assert nentries == ntuple.GetSelectedRows()
+
                 data = ntuple.GetV1()
 
-                vec = np.zeros(nevents, dtype = 'int32')
+                vec = np.zeros(nentries, dtype = 'int32')
 
-                for i in range(nevents):
+                for i in range(nentries):
                     vec[i] = data[i]
 
                 thisVtxData[fedId] = vec
