@@ -50,7 +50,8 @@ class FedSizeDist:
             print "cut_expr=",cut_expr
             
 
-            self.small_tuple.tree.Draw(plot_expr,cut_expr)
+            self.small_tuple.tree.Draw(plot_expr,
+                                       self.small_tuple.makeFullCut(cut_expr))
 
             import ROOT
 

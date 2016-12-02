@@ -51,7 +51,12 @@ num_events = None
 # calculated from the original CMSSW tree
 
 from SmallTuple import SmallTuple
-small_tuple = SmallTuple(parameters)
+small_tuple = SmallTuple(parameters,
+                         # cut to apply to events used for
+                         # the fed size distributions
+                         # (e.g. restrict bunch crossings etc.)
+                         getattr(parameters, 'fedSizeCut', "")
+                         )
 
 #----------------------------------------
 

@@ -26,7 +26,9 @@ class NumEventsPerLumiSection:
         #--------------------
         # determine the maximum luminosity section automatically
         self.small_tuple.tree.SetEstimate(self.small_tuple.tree.GetEntries())
-        self.small_tuple.tree.Draw("lumisection","","goff")
+        self.small_tuple.tree.Draw("lumisection",
+                                   self.small_tuple.makeFullCut(),
+                                   "goff")
         entries = self.small_tuple.tree.GetSelectedRows()
 
         v1 = self.small_tuple.tree.GetV1()
@@ -37,7 +39,9 @@ class NumEventsPerLumiSection:
 
         # let root fill the histogram
         self.small_tuple.tree.Draw("lumisection>>htemp(%d,-0.5,%f)" %
-                    (max_lumi_section, max_lumi_section - 0.5))
+                    (max_lumi_section, max_lumi_section - 0.5),
+                                   self.small_tuple.makeFullCut(),                                   
+                                   )
 
         ROOT.gPad.SetGrid()
         ROOT.gPad.SetLogy(0)

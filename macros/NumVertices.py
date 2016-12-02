@@ -37,7 +37,9 @@ class NumVertices:
 
                     # ")>>histo_num_vertices(8,-0.5,7.5)"
 
-        self.small_tuple.tree.Draw(draw_expr)
+        self.small_tuple.tree.Draw(draw_expr,
+                                   self.small_tuple.makeFullCut()
+                                   )
 
         ROOT.histo_num_vertices.Sumw2()
 
