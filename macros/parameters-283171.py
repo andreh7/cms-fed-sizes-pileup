@@ -35,6 +35,10 @@ hlt_description = "HLT_Physics"
 
 fitFunctionDegree = 2
 
+# there were three bunch crossings with high pileup in this
+# fill, the other 96 were 'standard' pileup
+useHighPU = True
+
 #----------------------------------------------------------------------
 
 #----------------------------------------------------------------------
@@ -145,7 +149,10 @@ poisson_fit_start, poisson_fit_end = 11.5, 17.5
 # original range
 # linear_fit_min_num_vertices,linear_fit_max_num_vertices  = 20, 35
 # linear_fit_min_num_vertices,linear_fit_max_num_vertices  = 35, 45
-linear_fit_min_num_vertices,linear_fit_max_num_vertices  = 50, 70
+
+# high pileup bunch crossings
+if useHighPU:
+    linear_fit_min_num_vertices,linear_fit_max_num_vertices  = 40, 80
 
 #----------
 
@@ -229,3 +236,8 @@ if True:
     allSubsysToPlot.extend(items)    
 
 
+# cuts on bunch crossings
+if useHighPU:
+    fedSizeCut = "bx == 11 || bx == 1247 || bx == 2430"
+else:
+    fedSizeCut = "bx != 11 && bx != 1247 && bx != 2430"
