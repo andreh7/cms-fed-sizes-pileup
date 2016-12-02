@@ -91,6 +91,16 @@ perLumiSize_relYmax = 1.6
 #
 def fedSizePerVertexLinearFitLegendPositions(run, subsys_name):
 
+    if useHighPU:
+
+        if subsys_name == "HF":
+            return (0.6, 0.1)
+
+        if subsys_name in ("BMTF", "GMTGT", "CALTRIGUP"):
+            return (0.1, 0.1)
+
+        return None
+
     if subsys_name == "DTTF":
         return (0.6, 0.65)
 
