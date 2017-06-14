@@ -37,7 +37,7 @@ fitFunctionDegree = 2
 
 # there were three bunch crossings with high pileup in this
 # fill, the other 96 were 'standard' pileup
-useHighPU = True
+useHighPU = False
 
 #----------------------------------------------------------------------
 
@@ -151,9 +151,7 @@ poissonFitYscalingFactor = 100
 if useHighPU:
     poisson_fit_start, poisson_fit_end = 49.5, 60.5
 else:
-    poisson_fit_start, poisson_fit_end = 11.5, 17.5
-    # poisson_fit_start, poisson_fit_end = 4.5, 27.5
-    #poisson_fit_start, poisson_fit_end = 20.5, 40.5
+    poisson_fit_start, poisson_fit_end = 20.5, 30.5
 
 #--------------------
 # parameters for the linear fit of event size
@@ -166,7 +164,8 @@ else:
 # high pileup bunch crossings
 if useHighPU:
     linear_fit_min_num_vertices,linear_fit_max_num_vertices  = 40, 80
-
+else:
+    linear_fit_min_num_vertices,linear_fit_max_num_vertices  = 15, 50
 #----------
 
 # parameters for the corresponding plot
