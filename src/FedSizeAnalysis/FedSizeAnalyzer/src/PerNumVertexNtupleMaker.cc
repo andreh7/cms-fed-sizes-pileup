@@ -509,6 +509,15 @@ PerNumVertexNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup
       edm::LogWarning("PerNumVertexNtupleMaker") << "event found with " << numVertices << " vertices which exceeds the maximum number of vertices " << maxNumVertices << ". Assigning to " << maxNumVertices << ".";
       numVertices = maxNumVertices;
     }
+  else if ((unsigned)numVertices == maxNumVertices)
+    {
+      // print run/ls/event number for events with highest 
+      // number of vertices
+      std::cout << "found event with maximum number of vertices (" << numVertices << "): run/ls/event=" 
+                << iEvent.run() << "/" 
+                << iEvent.luminosityBlock() << "/" 
+                << iEvent.id().event() << std::endl;
+    }
   // get the corresponding output buffer
   Float_t *outputBuffer = outputTupleBuffers[(unsigned) numVertices];
 

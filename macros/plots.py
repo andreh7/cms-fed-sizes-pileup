@@ -41,14 +41,6 @@ ROOT.gStyle.SetErrorX(0.5)
 
 gc_saver = []
 
-# single file
-# fin = ROOT.TFile.Open("../data/myOutputFile.root")
-# Events = fin.Get("Events")
-
-# produce a chain
-Events = ROOT.TChain("Events")
-Events.Add(parameters.input_data_dir + "/*.root")
-
 #----------------------------------------------------------------------
 # global variables
 #----------------------------------------------------------------------
@@ -59,7 +51,12 @@ num_events = None
 # calculated from the original CMSSW tree
 
 from SmallTuple import SmallTuple
-small_tuple = SmallTuple(parameters)
+small_tuple = SmallTuple(parameters,
+                         # cut to apply to events used for
+                         # the fed size distributions
+                         # (e.g. restrict bunch crossings etc.)
+                         getattr(parameters, 'fedSizeCut', "")
+                         )
 
 #----------------------------------------
 
@@ -76,15 +73,6 @@ def groupInts(integer_list):
                                                      lambda x,c=itertools.count(): next(c)-x))
 
     return [ (g[0], g[-1]) for g in groups ]
-
-#----------------------------------------
-
-def getNumEvents():
-
-    if num_events == None:
-        num_events = Events.GetEntries()
-
-    return num_events
 
 #----------------------------------------------------------------------
 
@@ -135,22 +123,6 @@ class PerFedSize():
 # main
 #----------------------------------------------------------------------
 
-# fit the 
-
-
-#----------------------------------------
-# cross check: number of feds should be
-#              the same throughout the run
-#----------------------------------------
-
-
-# Events.Draw("fedSizeData.getNumFeds()")
-# for the run analyzed, this is always 635
-
-#----------------------------------------
-# Events.Draw("fedSizeData.getSumAllFedSizes()")
-
-#----------------------------------------------------------------------
 from FedSizePerBXlumiLinearFit import FedSizePerBXlumiLinearFit
 
 all_tasks = [
@@ -186,8 +158,15 @@ if True:
 
     from FedSizeMatrix import FedSizeMatrix
     fedSizeMatrix = FedSizeMatrix()
+    
     fedSizeMatrix.read(inputTupleName, parameters.max_num_vertices,
-                       parameters.fedsInRun)
+                       parameters.fedsInRun,
+                       
+                       # cut to apply to events used for
+                       # the fed size distributions
+                       # (e.g. restrict bunch crossings etc.)
+                       getattr(parameters, 'fedSizeCut', "")
+                       )
 
     #----------
     # check if we should override some fed sizes

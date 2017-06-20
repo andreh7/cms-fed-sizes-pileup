@@ -27,7 +27,9 @@ class NumVerticesPerLumiSection:
         #--------------------
         # determine the maximum luminosity section automatically
         self.small_tuple.tree.SetEstimate(self.small_tuple.tree.GetEntries())
-        self.small_tuple.tree.Draw("lumisection","","goff")
+        self.small_tuple.tree.Draw("lumisection",
+                                   self.small_tuple.makeFullCut(),
+                                   "goff")
         entries = self.small_tuple.tree.GetSelectedRows()
 
         v1 = self.small_tuple.tree.GetV1()
@@ -39,7 +41,8 @@ class NumVerticesPerLumiSection:
         # let root fill the histogram
         # we call the histogram htemp2 to avoid problems
         # with the previous plotting step....
-        self.small_tuple.tree.Draw("num_vertices:lumisection>>htemp2(%d,-0.5,%f)" % (max_lumi_section, max_lumi_section - 0.5),"",
+        self.small_tuple.tree.Draw("num_vertices:lumisection>>htemp2(%d,-0.5,%f)" % (max_lumi_section, max_lumi_section - 0.5),
+                                   self.small_tuple.makeFullCut(),
                                    "prof")
 
         ROOT.gPad.SetGrid()

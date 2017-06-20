@@ -69,7 +69,11 @@ FedSizeAnalyzer::FedSizeAnalyzer(const edm::ParameterSet& iConfig) :
    beamSpotToken = consumes<reco::BeamSpot>(edm::InputTag("offlineBeamSpot"));
 
    // see https://hypernews.cern.ch/HyperNews/CMS/get/recoTracking/1000/1.html
-   primaryVerticesToken = consumes<std::vector<reco::Vertex> >(edm::InputTag("offlinePrimaryVertices"));
+   
+   // used to work for RECO files
+   // primaryVerticesToken = consumes<std::vector<reco::Vertex> >(edm::InputTag("offlinePrimaryVertices"));
+   // using this for MINIAOD
+   primaryVerticesToken = consumes<std::vector<reco::Vertex> >(edm::InputTag("offlineSlimmedPrimaryVertices"));
 
    useRECO = iConfig.getUntrackedParameter<bool>("useRECO", true);
 

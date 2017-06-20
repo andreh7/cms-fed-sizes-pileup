@@ -3,7 +3,7 @@
 import sys, os, commands, re, pprint
 
 # tool to make a list of files for the given raw and reco datasets
-# using dascli
+# using das_client
 #
 # compared to what was done in Run1, we do NOT group by lumisection
 # anymore here (seems to need more queries with DAS than it did with DBS)
@@ -17,7 +17,7 @@ parser = OptionParser("""
 
   usage: %prog [options] rawdataset recodataset
 
-  runs dascli to get the logical files of the given RAW and RECO datasets
+  runs das_client to get the logical files of the given RAW and RECO datasets
   
 """
 )
@@ -46,11 +46,11 @@ else:
 #----------------------------------------
 
 #----------
-# check presence of dascli
+# check presence of das_client
 #----------
 
-if os.system("which dascli >/dev/null 2>&1") != 0:
-    print >> sys.stderr,"can't find 'dascli' command, exiting"
+if os.system("which das_client >/dev/null 2>&1") != 0:
+    print >> sys.stderr,"can't find 'das_client' command, exiting"
     sys.exit(1)
 
 #----------------------------------------
@@ -67,7 +67,7 @@ for dstier, dataset in (
 
     query = "file dataset=%s" % dataset + " " + run_spec
 
-    cmd = "dascli --limit 0 --query '" + query + "'"
+    cmd = "das_client --limit 0 --query '" + query + "'"
     print >> sys.stderr, "executing",cmd
     lines = commands.getoutput(cmd).splitlines()
 

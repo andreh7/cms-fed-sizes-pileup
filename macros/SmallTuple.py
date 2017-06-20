@@ -8,7 +8,7 @@ class SmallTuple:
     
     #----------------------------------------
 
-    def __init__(self, parameters):
+    def __init__(self, parameters, cut):
         
         # open the file and keep a pointer to the tree
 
@@ -28,6 +28,8 @@ class SmallTuple:
             self.__loadSmallTuple(fname)
         else:
             raise Exception("small tuple " + fname + " is out of date (files in " + parameters.input_data_dir + " seem newer) or not existing, need to rerun cmsRun")
+
+        self.cut = cut
 
     #----------------------------------------
 
@@ -57,7 +59,7 @@ class SmallTuple:
         """ returns a list of all luminosity sections found """
 
         self.tree.SetEstimate(self.tree.GetEntries())
-        self.tree.Draw("lumisection","","goff")
+        self.tree.Draw("lumisection",self.cut,"goff")
 
         num_entries = self.tree.GetSelectedRows()
         data = self.tree.GetV1()
@@ -65,5 +67,19 @@ class SmallTuple:
         lumi_sections = set([ data[i] for i in xrange(num_entries) ])
 
         return lumi_sections
+
+    #----------------------------------------
+
+    def makeFullCut(self, cutexpr = ""):
+        # combines the custom cutexpr with the cut given
+        # to the constructor
+
+        if cutexpr == "":
+            return self.cut
+
+        if self.cut == "":
+            return cutexpr
+
+        return "(%s) && (%s)" % (cutexpr, self.cut)
 
     #----------------------------------------

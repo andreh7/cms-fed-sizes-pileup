@@ -15,7 +15,11 @@ import sys, os
 
 ARGV = sys.argv[1:]
 
-assert len(ARGV) == 1
+assert len(ARGV) >= 1
+
+if len(ARGV) > 1:
+    print >> sys.stderr,"warning: more than one command line argument given, only looking at first file"
+
 
 inputFname = ARGV.pop(0)
 
