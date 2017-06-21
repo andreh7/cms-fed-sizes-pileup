@@ -15,7 +15,7 @@ import sys, os, commands, re, pprint
 from optparse import OptionParser
 parser = OptionParser("""
 
-  usage: %prog [options] rawdataset recodataset
+  usage: %prog [options] rawdataset[,rawdataset2...] recodataset[,recodataset2...]
 
   runs das_client to get the logical files of the given RAW and RECO datasets
   
@@ -61,17 +61,19 @@ import operator
 output_data = {}
 
 assert len(ARGV) == 2
-for dstier, dataset in (
+for dstier, datasetSpec in (
     ('raw', ARGV[0]),
     ('reco', ARGV[1])):
 
-    query = "file dataset=%s" % dataset + " " + run_spec
+    for dataset in datasetSpec.split(','):
 
-    cmd = "das_client --limit 0 --query '" + query + "'"
-    print >> sys.stderr, "executing",cmd
-    lines = commands.getoutput(cmd).splitlines()
+        query = "file dataset=%s" % dataset + " " + run_spec
 
-    output_data[dstier] = lines
+        cmd = "das_client --limit 0 --query '" + query + "'"
+        print >> sys.stderr, "executing",cmd
+        lines = commands.getoutput(cmd).splitlines()
+
+        output_data.setdefault(dstier,[]).extend(lines)
 
 # end loop over datasets
 
