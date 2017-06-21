@@ -6,7 +6,7 @@
 # (e.g. when running on the express stream)
 #--------------------
 
-good_lumi_section_json_file = "json_DCSONLY.txt"
+good_lumi_section_json_file = "json_DCSONLY-282092.txt"
 
 
 #--------------------
