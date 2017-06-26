@@ -71,7 +71,23 @@ for dstier, datasetSpec in (
 
         cmd = "das_client --limit 0 --query '" + query + "'"
         print >> sys.stderr, "executing",cmd
-        lines = commands.getoutput(cmd).splitlines()
+
+        status = 1
+
+        for retry in range(3):
+            status, lines = commands.getstatusoutput(cmd)
+            lines = lines.splitlines()
+            if status == 0:
+                break
+
+            # sometimes we get a good result when just retrying
+            # (different backend server ?)
+            time.sleep(10)
+            print >> sys.stderr,"retrying"
+
+        if status != 0:
+            print >> sys.stderr,"failed to run das_client multiple times"
+            sys.exit(1)
 
         output_data.setdefault(dstier,[]).extend(lines)
 
