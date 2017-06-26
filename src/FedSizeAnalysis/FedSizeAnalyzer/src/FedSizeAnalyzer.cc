@@ -232,8 +232,8 @@ FedSizeAnalyzer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   // output product
   //--------------------
 
-  std::auto_ptr<FedSizeAnalysisData> pOut(data);
-  iEvent.put(pOut);
+  std::unique_ptr<FedSizeAnalysisData> pOut(data);
+  iEvent.put(std::move(pOut));
 
  
 }
