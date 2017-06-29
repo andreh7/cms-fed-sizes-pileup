@@ -1,0 +1,5 @@
+#Data tag : v1 , Norm tag: None
+#run:fill,ls,time,beamstatus,E(GeV),delivered(/ub),recorded(/ub),avgpu,source
+#Summary:
+#nfill,nrun,nls,ncms,totdelivered(/ub),totrecorded(/ub)
+#0,0,0,0,0.000,0.000
