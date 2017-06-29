@@ -134,7 +134,7 @@ def fedSizePerVertexLinearFitLegendPositions(run, subsys_name):
 # set to None if no scaling requested
 poissonFitYscalingFactor = 100
 
-poisson_fit_start, poisson_fit_end = 11.5, 17.5
+poisson_fit_start, poisson_fit_end = 27.5, 37.5
 
 #--------------------
 # parameters for the linear fit of event size
