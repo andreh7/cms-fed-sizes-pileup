@@ -168,69 +168,6 @@ fedsize_histo_xmax = 0.9
 fedsize_histo_nbins = 14
 
 #----------------------------------------------------------------------
-allSubsysToPlot = [
-
-                # these groups are defined in
-                # FedSizeAnalysis/FedSizeAnalyzer/src/PerNumVertexNtupleMaker.cc 
-
-                'CSCTF',
-                'DTTF',
-                'GCT',
-                'LumiScalers', 
-                'GlobalTrigger',
-                'CSC',
-                'DT',
-                'CASTOR',
-                'Pixel',
-
-                # special request on 2011-07-06
-                'BPIX',
-                'FPIX',
-
-                # special request on 2011-09-27
-                "HF",
-
-                #--------------------
-                # requests 2011-10-04 by Christoph
-                # for tracker FEDs
-                # specify sums of individual FEDS
-
-                # 1) The FEDs 413 and 368 form currently a pair and are thought to be the pair with the largest data volume.
-                # "size413+size368",
-                # "size413",
-                # "size368",
-         
-                # 2) FED 53 is currently the FED with the largest data volume and which is NOT paired.
-                # "size053",
-
-                # The same as above but "typical" (i.e. NOT worst case) cases:
-                # 3) pair 295 and 263
-                # "size295+size263",
-                # "size295",
-                # "size263",
-
-                # 4) single 151
-                # "size151",
-
-                #--------------------
-                # testing for the above
-                #--------------------
-                # "size413+size368",
-                # "size413",
-                # "size368",
-                #--------------------
-                
-                'Preshower',
-                'ECAL',
-                'HCAL',
-                'RPC',
-                'Tracker',
-
-                "total",
-                ]
-
-#--------------------
-
 allSubsysToPlot = []
 
 #--------------------
