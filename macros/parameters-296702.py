@@ -135,16 +135,12 @@ def fedSizePerVertexLinearFitLegendPositions(run, subsys_name):
 poissonFitYscalingFactor = 100
 
 poisson_fit_start, poisson_fit_end = 11.5, 17.5
-# poisson_fit_start, poisson_fit_end = 4.5, 27.5
-#poisson_fit_start, poisson_fit_end = 20.5, 40.5
 
 #--------------------
 # parameters for the linear fit of event size
 # vs. number of vertices
 
 # original range
-# linear_fit_min_num_vertices,linear_fit_max_num_vertices  = 20, 35
-# linear_fit_min_num_vertices,linear_fit_max_num_vertices  = 35, 45
 linear_fit_min_num_vertices,linear_fit_max_num_vertices  = 20, 45
 
 # range used later on to check for slope change
