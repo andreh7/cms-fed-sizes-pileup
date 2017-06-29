@@ -18,7 +18,7 @@ def makeFRLgroups(run, fedsInRun):
         if thisFeds:
 
             # get the subsystem name of the first 
-            assert len(thisFeds) <= 2
+            assert len(thisFeds) <= 4
 
             allSubsysToPlot.append(dict(
                     label = "+".join(str(x) for x in thisFeds),
