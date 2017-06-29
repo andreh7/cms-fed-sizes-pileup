@@ -2,6 +2,16 @@
 
 # utilities to make plotting tasks for different ways of grouping FEDs
 
+#----------
+# initialize
+#----------
+
+fedAssociation = {}
+import glob
+for fname in glob.glob("hwdb/fedAssoc-*.py"):
+    execfile(fname)
+
+
 #----------------------------------------------------------------------
 def makeFRLgroups(run, fedsInRun):
     """ summing by FRL/FEROL, i.e. many tracker FEDs are in pairs, most others are single FEDs """
