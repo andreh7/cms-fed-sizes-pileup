@@ -81,6 +81,8 @@ def makeSubSystemGroups(fedsInRun):
 #----------------------------------------------------------------------
 
 def makeTTCpartitionGroups(fedsInRun):
+    # returns a map for TTC partition name to list of FEDs
+    # (restricted to those in fedsInRun)
 
     import utils, operator
 
@@ -115,6 +117,7 @@ def makeTTCpartitionGroups(fedsInRun):
 
 #----------------------------------------------------------------------
 def makeFEDbuilderGroups(run, fedsInRun):
+    # returns groups of fedbuilders (based on fbset)
 
     import sys
 
