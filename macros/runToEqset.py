@@ -14,6 +14,8 @@ runToEqset = {
 
     283171 : "eq_160913_01",
 
+    296702 : "eq_170531",
+
     }
 
 def getEqsetFromRun(run):
