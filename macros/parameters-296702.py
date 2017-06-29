@@ -141,7 +141,7 @@ poisson_fit_start, poisson_fit_end = 27.5, 37.5
 # vs. number of vertices
 
 # original range
-linear_fit_min_num_vertices,linear_fit_max_num_vertices  = 20, 45
+linear_fit_min_num_vertices,linear_fit_max_num_vertices  = 20, 55
 
 # range used later on to check for slope change
 # linear_fit_min_num_vertices,linear_fit_max_num_vertices  = 32, 42
