@@ -130,36 +130,11 @@ def makeTTCpartitionGroups(run, fedsInRun):
     return makeFedGroups(run, fedsInRun, "TTC partition", lambda fedData: fedData['ttcPartition'])
 
 #----------------------------------------------------------------------
+
 def makeFEDbuilderGroups(run, fedsInRun):
     # returns groups of fedbuilders (based on fbset)
 
-    import sys
-
-    import runToFbset
-    fbset = runToFbset.getFbsetFromRun(run)
-
-    retval = []
-
-    fedsInRun = set(fedsInRun)
-
-    import FedBuilderData
-
-    assert FedBuilderData.fedBuilderGroups.has_key(fbset), "could not find data for fbset " + fbset
-
-    for line in FedBuilderData.fedBuilderGroups[fbset]:
-
-        # exclude fedbuilders for which no single FED was in the run
-        feds = [ fed for fed in line['feds'] if fed in fedsInRun ]
-        if not feds:
-            print >> sys.stderr,"skipping fedbuilder",line['name'],", no feds included in run"
-            continue
-
-        retval.append(dict(label = line['name'],
-                           grouping = "by fedbuilder",
-                           fedIds = feds
-                           ))
-
-    return retval
+    return makeFedGroups(run, fedsInRun, "fedbuilder", lambda fedData: fedData['fedbuilder'])
 
 #----------------------------------------------------------------------
 
