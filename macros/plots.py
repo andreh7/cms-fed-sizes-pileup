@@ -216,15 +216,15 @@ if True:
 # collect information about the evolution of the fed sizes
 # per subsystem ('grand unification plot')
 #----------------------------------------------------------------------
-from GrandUnificationPlot import GrandUnificationPlot
-
-for grouping in [
-    "by subsystem",
-    ]:
-    all_tasks.append(GrandUnificationPlot(parameters, all_tasks, grouping,
-                                          printCSV = True,
-                                          )
-                     )
+### from GrandUnificationPlot import GrandUnificationPlot
+### 
+### for grouping in [
+###     "by subsystem",
+###     ]:
+###     all_tasks.append(GrandUnificationPlot(parameters, all_tasks, grouping,
+###                                           printCSV = True,
+###                                           )
+###                      )
 
 
 # special version for fedbuilders size at 30 vertices
