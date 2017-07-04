@@ -208,7 +208,7 @@ if True:
 # per subsystem
 #--------------------
 if True:
-    items = fedgroups.makeSubSystemGroups(fedsInRun)
+    items = fedgroups.makeSubSystemGroups(run, fedsInRun)
 
     # DEBUG
     # items = [ items[0] ]

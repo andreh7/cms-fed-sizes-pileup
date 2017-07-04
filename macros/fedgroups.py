@@ -117,34 +117,9 @@ def makeSingleFEDgroups(run, fedsInRun):
 
 #----------------------------------------------------------------------
 
-def makeSubSystemGroups(fedsInRun):
-    import utils, operator
+def makeSubSystemGroups(run, fedsInRun):
 
-    groups = []
-
-    for subdet in sorted(utils.subdetTTCpartFEDs.keys()):
-        # put all FEDs of all ttcpartitions in this subdetector into one group
-        
-        thisFeds = reduce(operator.__add__, utils.subdetTTCpartFEDs[subdet].values())
-
-        # make sure we don't count any FED more than once
-        thisFeds = sorted(set(thisFeds))
-
-        # filter only FEDs in this run
-        thisFeds = [ x for x in thisFeds if x in fedsInRun ]
-
-        if not thisFeds:
-            continue
-
-        groups.append(dict(
-                label = subdet,
-                grouping = "by subsystem",
-                fedIds = thisFeds,
-                     )
-                )
-
-    # end of loop over subdetectors
-    return groups
+    return makeFedGroups(run, fedsInRun, "subsystem", lambda fedData: fedData['subsystem'])
 
 #----------------------------------------------------------------------
 
