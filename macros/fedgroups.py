@@ -123,40 +123,11 @@ def makeSubSystemGroups(run, fedsInRun):
 
 #----------------------------------------------------------------------
 
-def makeTTCpartitionGroups(fedsInRun):
+def makeTTCpartitionGroups(run, fedsInRun):
     # returns a map for TTC partition name to list of FEDs
     # (restricted to those in fedsInRun)
 
-    import utils, operator
-
-    groups = []
-
-    for subdet in sorted(utils.subdetTTCpartFEDs.keys()):
-        # put all FEDs of all ttcpartitions in this subdetector into one group
-        
-        for ttcpart in sorted(utils.subdetTTCpartFEDs[subdet].keys()):
-
-            thisFeds = utils.subdetTTCpartFEDs[subdet][ttcpart]
-
-            # make sure we don't count any FED more than once
-            thisFeds = sorted(set(thisFeds))
-            
-            # filter only FEDs in this run
-            thisFeds = [ x for x in thisFeds if x in fedsInRun ]
-
-            if not thisFeds:
-                continue
-
-            groups.append(dict(
-                    label = ttcpart,
-                grouping = "by TTC partition",
-                fedIds = thisFeds,
-                      )
-                )
-
-    # end of loop over subdetectors
-    return groups
-
+    return makeFedGroups(run, fedsInRun, "TTC partition", lambda fedData: fedData['ttcPartition'])
 
 #----------------------------------------------------------------------
 def makeFEDbuilderGroups(run, fedsInRun):

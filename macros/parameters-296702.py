@@ -218,7 +218,7 @@ if True:
 # per TTC partition
 #--------------------
 if True:
-    items = fedgroups.makeTTCpartitionGroups(fedsInRun)
+    items = fedgroups.makeTTCpartitionGroups(run, fedsInRun)
 
     # DEBUG
     # items = [ items[0] ]
