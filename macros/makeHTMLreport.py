@@ -30,3 +30,9 @@ fout.close()
 
 print >> sys.stderr,"wrote report to", outputFname
 
+#----------
+# also write out the spreadsheet (for convenience)
+#----------
+spreadsheetOutputFname = os.path.join(plotDir, "evolution.xlsx")
+reportMaker.spreadSheetCreator.writeToFile(spreadsheetOutputFname)
+print >> sys.stderr,"wrote spreadsheet to",spreadsheetOutputFname
