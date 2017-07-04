@@ -92,29 +92,10 @@ def makeFedGroups(run, fedsInRun, groupingName, groupNameFunc, postGroupingNameF
 #----------------------------------------------------------------------
 def makeFRLgroups(run, fedsInRun):
     """ summing by FRL/FEROL, i.e. many tracker FEDs are in pairs, most others are single FEDs """
-    
-    import FEDtoFRLMappingData
-    frlTuples = FEDtoFRLMappingData.makeFRLtuples(run, fedsInRun)
 
-    allSubsysToPlot = []
-
-    for thisFeds in frlTuples:
-        # only keep those FEDs which were in the run
-        thisFeds = [ x for x in thisFeds if x in fedsInRun ]
-
-        if thisFeds:
-
-            # get the subsystem name of the first 
-            assert len(thisFeds) <= 4
-
-            allSubsysToPlot.append(dict(
-                    label = "+".join(str(x) for x in thisFeds),
-                    grouping = "by FRL",
-                    fedIds = thisFeds,
-                    )
-                    )
-
-    return allSubsysToPlot
+    return makeFedGroups(run, fedsInRun, "FRL", lambda fedData: fedData['frl'],
+                         lambda outputData: "+".join([str(x) for x in sorted(outputData['fedIds'])])
+                         )
 
 #----------------------------------------------------------------------
 
