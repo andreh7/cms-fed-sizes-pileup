@@ -7,13 +7,11 @@ import sys, os
 
 #----------------------------------------------------------------------
 class FileListMaker:
-    def __init__(self, options, prevTasks):
-        sys.path.append(os.path.join(os.environ["CMSSW_BASE"], "src/FedSizeAnalysis/FedSizeAnalyzer"))
+    def __init__(self, options, prevTasks, runDir):
+        sys.path.append(runDir)
         self.options = options
 
-        self.outputFname = os.path.join(os.environ["CMSSW_BASE"],
-                                        "src/FedSizeAnalysis/FedSizeAnalyzer",
-                                        "file_list_" + options.dstitle + "_" + str(options.run) + ".py")
+        self.outputFname = os.path.join(runDir, "file_list_" + options.dstitle + "_" + str(options.run) + ".py")
 
         self.name = 'make_file_list'
     #----------------------------------------
@@ -34,15 +32,13 @@ class FileListMaker:
 #----------------------------------------------------------------------
 
 class JsonFileCopy:
-    def __init__(self, options, prevTasks):
+    def __init__(self, options, prevTasks, runDir):
         self.origJsonFile = options.jsonFile
         self.name = 'copy_json'
 
         parts = os.path.splitext(os.path.basename(self.origJsonFile))
 
-        self.outputFname = os.path.join(os.environ["CMSSW_BASE"],
-                                        "src/FedSizeAnalysis/FedSizeAnalyzer",
-                                        parts[0] + "-" + str(options.run) + parts[1])
+        self.outputFname = os.path.join(runDir, parts[0] + "-" + str(options.run) + parts[1])
 
     #----------------------------------------
 
@@ -63,7 +59,7 @@ class JsonFileCopy:
 class Step1ConfigFile:
     # creates a config file for step1 from the template
 
-    def __init__(self, options, prevTasks):
+    def __init__(self, options, prevTasks, runDir):
         self.name = 'step1_config_file'
 
         self.jsonFile = None
@@ -75,13 +71,10 @@ class Step1ConfigFile:
 
         assert self.jsonFile is not None
 
-        workdir = os.path.join(os.environ["CMSSW_BASE"],
-                                       "src/FedSizeAnalysis/FedSizeAnalyzer")
-
-        self.outputFname = os.path.join(workdir, 
+        self.outputFname = os.path.join(runDir, 
                                        "fedsizeanalyzer-" + str(options.run) + ".py")
 
-        self.templateFile = os.path.join(workdir, 
+        self.templateFile = os.path.join(runDir, 
                                          "fedsizeanalyzer-template.py")
 
 
@@ -157,13 +150,15 @@ options = parser.parse_args()
 options.rawDataSet  = options.rawDataSet.split(',')
 options.recoDataSet = options.recoDataSet.split(',')
 
+runDir = os.path.join(os.environ["CMSSW_BASE"], "src/FedSizeAnalysis/FedSizeAnalyzer")
+
 tasks = []
 for clazz in [
     FileListMaker,
     JsonFileCopy,
     Step1ConfigFile,
     ]:
-    tasks.append(clazz(options, tasks))
+    tasks.append(clazz(options, tasks, runDir))
 
 for task in tasks:
     if not task.needsRunning():
