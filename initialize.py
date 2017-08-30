@@ -29,6 +29,8 @@ class FileListMaker:
         output_data = makeFileList.findFiles(options.rawDataSet, options.recoDataSet, options.run)
         makeFileList.printData(output_data, self.outputFname)
 
+        print >> sys.stderr,"wrote",self.outputFname
+
 #----------------------------------------------------------------------
 
 class JsonFileCopy:
