@@ -121,7 +121,7 @@ for task in tasks:
         print >> sys.stderr, "skipping",task.name
         continue
     
-    print >> sys.stderr, "skipping",task.name
+    print >> sys.stderr, "running",task.name
     task.doRun()
 
 
