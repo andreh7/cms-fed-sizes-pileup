@@ -7,7 +7,7 @@ import sys, os
 
 #----------------------------------------------------------------------
 class FileListMaker:
-    def __init__(self, options):
+    def __init__(self, options, prevTasks):
         sys.path.append(os.path.join(os.environ["CMSSW_BASE"], "src/FedSizeAnalysis/FedSizeAnalyzer"))
         self.options = options
 
@@ -34,7 +34,7 @@ class FileListMaker:
 #----------------------------------------------------------------------
 
 class JsonFileCopy:
-    def __init__(self, options):
+    def __init__(self, options, prevTasks):
         self.origJsonFile = options.jsonFile
         self.name = 'copy_json'
 
@@ -111,10 +111,12 @@ options = parser.parse_args()
 options.rawDataSet  = options.rawDataSet.split(',')
 options.recoDataSet = options.recoDataSet.split(',')
 
-tasks = [
-    FileListMaker(options),
-    JsonFileCopy(options),
-    ]
+tasks = []
+for clazz in [
+    FileListMaker,
+    JsonFileCopy,
+    ]:
+    tasks.append(clazz(options, tasks))
 
 for task in tasks:
     if not task.needsRunning():
