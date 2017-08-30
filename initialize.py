@@ -57,6 +57,52 @@ class JsonFileCopy:
 
         print >> sys.stderr,"wrote",self.outputFname
 
+
+#----------------------------------------------------------------------
+
+class Step1ConfigFile:
+    # creates a config file for step1 from the template
+
+    def __init__(self, options, prevTasks):
+        self.name = 'step1_config_file'
+
+        self.jsonFile = None
+
+        # get the name of the local json file
+        for task in prevTasks:
+            if isinstance(task, JsonFileCopy):
+                self.jsonFile = task.outputFname
+
+        assert self.jsonFile is not None
+
+        workdir = os.path.join(os.environ["CMSSW_BASE"],
+                                       "src/FedSizeAnalysis/FedSizeAnalyzer")
+
+        self.outputFname = os.path.join(workdir, 
+                                       "fedsizeanalyzer-" + str(options.run) + ".py")
+
+        self.templateFile = os.path.join(workdir, 
+                                         "fedsizeanalyzer-template.py")
+
+
+    #----------------------------------------
+
+    def needsRunning(self):
+        return not os.path.exists(self.outputFname)
+
+    #----------------------------------------
+
+    def doRun(self):
+        text = open(self.templateFile).read()
+
+        output = text.format(text, JSONFILE=os.path.basename(self.jsonFile))
+
+        fout = open(self.outputFname, "w")
+        fout.write(output)
+        fout.close()
+
+        print >> sys.stderr,"wrote",self.outputFname
+
 #----------------------------------------------------------------------
 # main 
 #----------------------------------------------------------------------
@@ -115,6 +161,7 @@ tasks = []
 for clazz in [
     FileListMaker,
     JsonFileCopy,
+    Step1ConfigFile,
     ]:
     tasks.append(clazz(options, tasks))
 
