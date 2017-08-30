@@ -29,6 +29,31 @@ class FileListMaker:
         output_data = makeFileList.findFiles(options.rawDataSet, options.recoDataSet, options.run)
         makeFileList.printData(output_data, self.outputFname)
 
+#----------------------------------------------------------------------
+
+class JsonFileCopy:
+    def __init__(self, options):
+        self.origJsonFile = options.jsonFile
+        self.name = 'copy_json'
+
+        parts = os.path.splitext(os.path.basename(self.origJsonFile))
+
+        self.outputFname = os.path.join(os.environ["CMSSW_BASE"],
+                                        "src/FedSizeAnalysis/FedSizeAnalyzer",
+                                        parts[0] + "-" + str(options.run) + parts[1])
+
+    #----------------------------------------
+
+    def needsRunning(self):
+        return not os.path.exists(self.outputFname)
+    #----------------------------------------
+
+    def doRun(self):
+
+        status = os.system("scp -p lxplus.cern.ch:" + self.origJsonFile + " " + self.outputFname)
+        assert(status == 0)
+
+        print >> sys.stderr,"wrote",self.outputFname
 
 #----------------------------------------------------------------------
 # main 
@@ -71,7 +96,12 @@ parser.add_argument("--dstitle",
                     required = True,
                     )
 
-
+parser.add_argument("--json",
+                    type = str,
+                    dest = "jsonFile",
+                    help = "original json file on lxplus for lumi section validation",
+                    required = True,
+                    )
 
 options = parser.parse_args()
 #----------------------------------------
@@ -80,7 +110,8 @@ options.rawDataSet  = options.rawDataSet.split(',')
 options.recoDataSet = options.recoDataSet.split(',')
 
 tasks = [
-    FileListMaker(options)
+    FileListMaker(options),
+    JsonFileCopy(options),
     ]
 
 for task in tasks:
