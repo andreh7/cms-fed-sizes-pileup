@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import sys, os, commands, re, pprint
+import sys, os, commands, re, pprint, time
 
 # tool to make a list of files for the given raw and reco datasets
 # using das_client
