@@ -4,6 +4,19 @@
 
 import sys, os
 
+#----------------------------------------------------------------------
+
+def getLocalJsonFname(tasks):
+    # finds the name of the json file created on the local file system
+    # from the previous tasks
+
+    # get the name of the local json file
+    for task in tasks:
+        if isinstance(task, JsonFileCopy):
+            return task.outputFname
+    
+    # not found
+    return None
 
 #----------------------------------------------------------------------
 class FileListMaker:
@@ -62,13 +75,7 @@ class Step1ConfigFile:
     def __init__(self, options, prevTasks, runDir):
         self.name = 'step1_config_file'
 
-        self.jsonFile = None
-
-        # get the name of the local json file
-        for task in prevTasks:
-            if isinstance(task, JsonFileCopy):
-                self.jsonFile = task.outputFname
-
+        self.jsonFile = getLocalJsonFname(prevTasks)
         assert self.jsonFile is not None
 
         self.outputFname = os.path.join(runDir, 
