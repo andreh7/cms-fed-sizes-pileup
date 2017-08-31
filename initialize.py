@@ -104,6 +104,64 @@ class Step1ConfigFile:
         print >> sys.stderr,"wrote",self.outputFname
 
 #----------------------------------------------------------------------
+
+class MakeRunScript:
+
+    def __init__(self, options, prevTasks, runDir):
+        self.name = 'step1_config_file'
+
+        self.dstitle = options.dstitle
+        self.run = options.run
+
+        jsonFile = getLocalJsonFname(tasks)
+        assert jsonFile is not None
+
+        # get the lumi section range for our run
+        # (for the moment we only care about the minimum and maximum)
+
+        import json
+        lumiSecs = json.load(open(jsonFile))
+
+        # get the good lumi sections for the run in question
+        lumiSecs = lumiSecs[str(options.run)]
+        
+        # lumiSecs is now a list of (min,max) pairs
+        self.firstLs = min( x[0] for x in lumiSecs)
+        self.lastLs  = max( x[1] for x in lumiSecs)
+
+        self.outputFname = os.path.join(runDir, 
+                                       "run-" + str(options.run) + "-" + self.dstitle + ".sh")
+
+        self.templateFile = os.path.join(runDir, 
+                                         "run-template.sh")
+
+    #----------------------------------------
+
+    def needsRunning(self):
+        return not os.path.exists(self.outputFname)
+
+    #----------------------------------------
+
+    def doRun(self):
+        text = open(self.templateFile).read()
+
+        output = text.format(text, 
+                             firstLs = self.firstLs,
+                             lastLs = self.lastLs,
+                             dstitle = self.dstitle,
+                             run = self.run,
+                             )
+
+        fout = open(self.outputFname, "w")
+        fout.write(output)
+        fout.close()
+
+        os.chmod(self.outputFname, 0755)
+
+        print >> sys.stderr,"wrote",self.outputFname
+    
+
+#----------------------------------------------------------------------
 # main 
 #----------------------------------------------------------------------
 
@@ -164,6 +222,7 @@ for clazz in [
     FileListMaker,
     JsonFileCopy,
     Step1ConfigFile,
+    MakeRunScript,
     ]:
     tasks.append(clazz(options, tasks, runDir))
 
