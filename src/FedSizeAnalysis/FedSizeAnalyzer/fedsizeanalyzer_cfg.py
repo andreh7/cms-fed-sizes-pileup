@@ -126,7 +126,7 @@ process.out = cms.OutputModule("PoolOutputModule",
     # running interactively                           
     # fileName = cms.untracked.string('/tmp/myOutputFile.root'),
 
-    fileName = cms.untracked.string('out-%06d-%04d-%04d.root' % (run, min_ls, max_ls)),
+    fileName = cms.untracked.string('out-%06d-%s-%04d-%04d.root' % (run, dataset, min_ls, max_ls)),
                                
     # dropMetaDataForDroppedData = cms.untracked.bool(True),
     outputCommands = cms.untracked.vstring([
