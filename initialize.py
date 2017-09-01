@@ -18,6 +18,12 @@ def getLocalJsonFname(tasks):
     # not found
     return None
 
+
+#----------------------------------------------------------------------
+
+def ensureCmsEnv():
+    assert os.environ.has_key('CMSSW_BASE'), "CMSSW_BASE environment variable not set, did you run cmsenv ?"
+
 #----------------------------------------------------------------------
 class FileListMaker:
     def __init__(self, options, prevTasks, runDir):
@@ -178,7 +184,7 @@ class MakeRunScript:
 # main 
 #----------------------------------------------------------------------
 
-assert os.environ.has_key('CMSSW_BASE'), "CMSSW_BASE environment variable not set, did you run cmsenv ?"
+ensureCmsEnv()
 
 from argparse import ArgumentParser, RawTextHelpFormatter
 
