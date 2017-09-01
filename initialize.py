@@ -73,6 +73,7 @@ class FileListMaker:
 class JsonFileCopy:
     def __init__(self, options, prevTasks, runDir):
         self.origJsonFile = options.jsonFile
+        self.skip = options.skipJsonCopy
         self.name = 'copy_json'
 
         parts = os.path.splitext(os.path.basename(self.origJsonFile))
@@ -82,6 +83,10 @@ class JsonFileCopy:
     #----------------------------------------
 
     def needsRunning(self):
+
+        if self.skip:
+            return False
+
         return not os.path.exists(self.outputFname)
     #----------------------------------------
 
@@ -181,6 +186,7 @@ class MakeRunScript:
                              lastLs = self.lastLs,
                              dstitle = self.dstitle,
                              run = self.run,
+                             jsonFile = self.jsonFile,
                              )
 
         fout = open(self.outputFname, "w")
@@ -240,6 +246,13 @@ if __name__ == '__main__':
                         dest = "jsonFile",
                         help = "original json file on lxplus for lumi section validation",
                         required = True,
+                        )
+
+    parser.add_argument("--skip-json-copy",
+                        default = False,
+                        action = 'store_true',
+                        dest = 'skipJsonCopy',
+                        help = "skip the json copy file step, assume the json file is already there (useful for hand written json files)",
                         )
 
     options = parser.parse_args()
