@@ -113,21 +113,8 @@ class MakeRunScript:
         self.dstitle = options.dstitle
         self.run = options.run
 
-        jsonFile = getLocalJsonFname(tasks)
-        assert jsonFile is not None
-
-        # get the lumi section range for our run
-        # (for the moment we only care about the minimum and maximum)
-
-        import json
-        lumiSecs = json.load(open(jsonFile))
-
-        # get the good lumi sections for the run in question
-        lumiSecs = lumiSecs[str(options.run)]
-        
-        # lumiSecs is now a list of (min,max) pairs
-        self.firstLs = min( x[0] for x in lumiSecs)
-        self.lastLs  = max( x[1] for x in lumiSecs)
+        self.jsonFile = getLocalJsonFname(tasks)
+        assert self.jsonFile is not None
 
         self.outputFname = os.path.join(runDir, 
                                        "run-" + str(options.run) + "-" + self.dstitle + ".sh")
@@ -142,7 +129,33 @@ class MakeRunScript:
 
     #----------------------------------------
 
+    def __findLumiSectionRange(self):
+        # we can only do this after the previous task
+        # copying the lumi section file is complete
+
+        # get the lumi section range for our run
+        # (for the moment we only care about the minimum and maximum)
+
+        import json
+        lumiSecs = json.load(open(self.jsonFile))
+
+        # get the good lumi sections for the run in question
+        lumiSecs = lumiSecs[str(options.run)]
+        
+        # lumiSecs is now a list of (min,max) pairs
+        self.firstLs = min( x[0] for x in lumiSecs)
+        self.lastLs  = max( x[1] for x in lumiSecs)
+
+        
+
+
+    #----------------------------------------
+
     def doRun(self):
+
+        # get lumi section range
+        self.__findLumiSectionRange()
+
         text = open(self.templateFile).read()
 
         output = text.format(text, 
