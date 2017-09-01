@@ -184,74 +184,76 @@ class MakeRunScript:
 # main 
 #----------------------------------------------------------------------
 
-ensureCmsEnv()
+if __name__ == '__main__':
 
-from argparse import ArgumentParser, RawTextHelpFormatter
+    ensureCmsEnv()
 
-parser = ArgumentParser(
-    description =
-     """
-     performs setup operations for a new run
-    """,
-    formatter_class=RawTextHelpFormatter,
-)
-parser.add_argument("--run",
-                    type = int,
-                    help = "run to analyze",
-                    required = True,
-                    )
+    from argparse import ArgumentParser, RawTextHelpFormatter
 
-parser.add_argument("--raw",
-                    dest = "rawDataSet",
-                    type = str,
-                    help = "comma separated list of RAW datasets",
-                    required = True,
-                    )
+    parser = ArgumentParser(
+        description =
+         """
+         performs setup operations for a new run
+        """,
+        formatter_class=RawTextHelpFormatter,
+    )
+    parser.add_argument("--run",
+                        type = int,
+                        help = "run to analyze",
+                        required = True,
+                        )
 
-parser.add_argument("--reco",
-                    dest = "recoDataSet",
-                    type = str,
-                    help = "comma separated list of RECO/AOD/MINIAOD datasets",
-                    required = True,
-                    )
+    parser.add_argument("--raw",
+                        dest = "rawDataSet",
+                        type = str,
+                        help = "comma separated list of RAW datasets",
+                        required = True,
+                        )
 
-parser.add_argument("--dstitle",
-                    type = str,
-                    help = "short name (selected by user) for the dataset to distinguish e.g. multiple analyses on same run",
-                    required = True,
-                    )
+    parser.add_argument("--reco",
+                        dest = "recoDataSet",
+                        type = str,
+                        help = "comma separated list of RECO/AOD/MINIAOD datasets",
+                        required = True,
+                        )
 
-parser.add_argument("--json",
-                    type = str,
-                    dest = "jsonFile",
-                    help = "original json file on lxplus for lumi section validation",
-                    required = True,
-                    )
+    parser.add_argument("--dstitle",
+                        type = str,
+                        help = "short name (selected by user) for the dataset to distinguish e.g. multiple analyses on same run",
+                        required = True,
+                        )
 
-options = parser.parse_args()
-#----------------------------------------
+    parser.add_argument("--json",
+                        type = str,
+                        dest = "jsonFile",
+                        help = "original json file on lxplus for lumi section validation",
+                        required = True,
+                        )
 
-options.rawDataSet  = options.rawDataSet.split(',')
-options.recoDataSet = options.recoDataSet.split(',')
+    options = parser.parse_args()
+    #----------------------------------------
 
-runDir = os.path.join(os.environ["CMSSW_BASE"], "src/FedSizeAnalysis/FedSizeAnalyzer")
+    options.rawDataSet  = options.rawDataSet.split(',')
+    options.recoDataSet = options.recoDataSet.split(',')
 
-tasks = []
-for clazz in [
-    FileListMaker,
-    JsonFileCopy,
-    Step1ConfigFile,
-    MakeRunScript,
-    ]:
-    tasks.append(clazz(options, tasks, runDir))
+    runDir = os.path.join(os.environ["CMSSW_BASE"], "src/FedSizeAnalysis/FedSizeAnalyzer")
 
-for task in tasks:
-    if not task.needsRunning():
-        print >> sys.stderr, "skipping",task.name
-        continue
-    
-    print >> sys.stderr, "running",task.name
-    task.doRun()
+    tasks = []
+    for clazz in [
+        FileListMaker,
+        JsonFileCopy,
+        Step1ConfigFile,
+        MakeRunScript,
+        ]:
+        tasks.append(clazz(options, tasks, runDir))
+
+    for task in tasks:
+        if not task.needsRunning():
+            print >> sys.stderr, "skipping",task.name
+            continue
+
+        print >> sys.stderr, "running",task.name
+        task.doRun()
 
 
 
