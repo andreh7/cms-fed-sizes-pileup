@@ -24,6 +24,26 @@ def getLocalJsonFname(tasks):
 def ensureCmsEnv():
     assert os.environ.has_key('CMSSW_BASE'), "CMSSW_BASE environment variable not set, did you run cmsenv ?"
 
+
+#----------------------------------------------------------------------
+
+def getLumiSectionsForRun(jsonFname, run):
+    # returns the (expanded) list of lumi sections for the given 
+    # returns an empty list if this run is not found in this json file
+
+    import json
+    lumiSecs = json.load(open(jsonFname))
+
+    # get the good lumi sections for the run in question
+    ranges = lumiSecs.get(str(run),[])
+
+    retval = []
+
+    for theRange in ranges:
+        retval.extend(list(range(theRange[0], theRange[1]+1)))
+
+    return retval
+
 #----------------------------------------------------------------------
 class FileListMaker:
     def __init__(self, options, prevTasks, runDir):
@@ -142,18 +162,10 @@ class MakeRunScript:
         # get the lumi section range for our run
         # (for the moment we only care about the minimum and maximum)
 
-        import json
-        lumiSecs = json.load(open(self.jsonFile))
+        lumiSections = getLumiSectionsForRun(self.jsonFile, options.run)
 
-        # get the good lumi sections for the run in question
-        lumiSecs = lumiSecs[str(options.run)]
-        
-        # lumiSecs is now a list of (min,max) pairs
-        self.firstLs = min( x[0] for x in lumiSecs)
-        self.lastLs  = max( x[1] for x in lumiSecs)
-
-        
-
+        self.firstLs = min(lumiSections)
+        self.lastLs  = max(lumiSections)
 
     #----------------------------------------
 
