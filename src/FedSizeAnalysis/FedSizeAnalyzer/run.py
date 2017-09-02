@@ -14,8 +14,10 @@ import threading
 
 class Runner(threading.Thread):
 
-    def __init__(self, run, dstitle, startLs, lastLs):
+    def __init__(self, jobIndex, totNumJobs, run, dstitle, startLs, lastLs):
         threading.Thread.__init__(self)
+        self.jobIndex = jobIndex
+        self.totNumJobs = totNumJobs
         self.runNumber = run
         self.dstitle = dstitle
         self.startLs = startLs
@@ -46,9 +48,9 @@ class Runner(threading.Thread):
         global threadLimiter
         threadLimiter.acquire()
         try:
-            print >> sys.stderr,"starting","run",self.runNumber,"ds",self.dstitle,"ls %d..%d" % (self.startLs, self.lastLs)
+            print >> sys.stderr,"starting %d/%d" % (self.jobIndex + 1, self.totNumJobs),"run",self.runNumber,"ds",self.dstitle,"ls %d..%d" % (self.startLs, self.lastLs)
             self.status = os.system(self.cmd)
-            print >> sys.stderr,"finished","run",self.runNumber,"ds",self.dstitle,"ls %d..%d" % (self.startLs, self.lastLs),"status=",self.status
+            print >> sys.stderr,"finished %d/%d" % (self.jobIndex + 1, self.totNumJobs),"run",self.runNumber,"ds",self.dstitle,"ls %d..%d" % (self.startLs, self.lastLs),"status=",self.status
 
         finally:
             threadLimiter.release()        
@@ -134,7 +136,9 @@ for i in range(options.njobs):
     thisLumiSections = lumiSections[:thisNumLs]
 
     # create the job object
-    tasks.append(Runner(options.run,
+    tasks.append(Runner(i, 
+                        options.njobs,
+                        options.run,
                         options.dstitle,
                         min(thisLumiSections),
                         max(thisLumiSections)))
@@ -143,6 +147,7 @@ for i in range(options.njobs):
 
 
 assert len(lumiSections) == 0
+assert len(tasks) == options.njobs
 
 print >> sys.stderr, "have",len(tasks),"tasks"
 
