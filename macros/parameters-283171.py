@@ -45,7 +45,7 @@ useHighPU = False
 # quantities derived from the above parameters
 #----------------------------------------------------------------------
 
-input_data_dir = "../data/%s-%d" % (dataset,run)
+input_data_dir = "../../small-tuples/%s-%d" % (dataset,run)
 
 output_data_dir = "data/%s-%d/%s"  % (dataset,run, hlt_description)
 
