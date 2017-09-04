@@ -88,6 +88,8 @@ process.tupler = cms.EDAnalyzer('PerNumVertexNtupleMaker',
                                 src = cms.untracked.InputTag('fedSizeData'),
 
                                 fedIDs = cms.untracked.vuint32(*fedIDsSeen),
+
+                                lumiFile = cms.untracked.string(lumiFile),
                                 )
 
 #----------------------------------------------------------------------
