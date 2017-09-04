@@ -10,7 +10,7 @@ runToFbset = {
 
     276870 : "fb_all",
 
-    282092 : "fb_all_with1240_withCASTOR",
+    282092 : "/daq2/eq_160913_01/fb_all_with1240_withCASTOR",
 
     283171 : "/daq2/eq_160913_01/fb_all_with1240_withCASTOR_w582_583",
 
