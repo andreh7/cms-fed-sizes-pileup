@@ -22,6 +22,7 @@
 #include "FWCore/Framework/interface/LuminosityBlock.h"
 #include "DataFormats/Luminosity/interface/LumiDetails.h"
 
+#include "FedSizeAnalysis/FedSizeAnalyzer/interface/BrilCalcReader.h"
 
 //--------------------
 // for TFileService 
@@ -100,6 +101,14 @@ class PerNumVertexNtupleMaker : public edm::EDAnalyzer
   bool isFirstRun;
 
   bool isFirstEventInRun;
+
+  // (optional) name of .csv file containing detailed ber bunch crossing
+  // and lumi section instantaneous luminosity. If this is the empty
+  // string (defualt if parameter not given in the configuration file)
+  // the instantaneous luminosity will be returned as -1 by getLumi().
+  const std::string lumiFname;
+  
+  BrilCalcReader brilCalcReader;
 
   //----------
 
@@ -228,11 +237,19 @@ protected:
 
 //----------------------------------------------------------------------
 PerNumVertexNtupleMaker::PerNumVertexNtupleMaker(const edm::ParameterSet& iConfig) : 
-  isFirstRun(true)
+  isFirstRun(true),
+
+  // we could use edm::FileInPath but we do not want to restrict the
+  // file location to within the CMSSW area
+  lumiFname(iConfig.getUntrackedParameter<std::string>("lumiFile"))
 {
   maxNumVertices = iConfig.getUntrackedParameter<unsigned>("maxNumVertices");
   sourceToken = consumes<FedSizeAnalysisData>(iConfig.getUntrackedParameter<edm::InputTag>("src"));
   lumiDetailsToken = consumes<LumiDetails, edm::InLumi>(edm::InputTag("lumiProducer"));
+
+  if (! lumiFname.empty()) {
+    brilCalcReader.addFile(lumiFname);
+  }
 
   for (unsigned i = 0; i <= FEDNumbering::MAXFEDID; ++i)
   {
@@ -722,9 +739,14 @@ PerNumVertexNtupleMaker::fillLumi(const edm::Event& iEvent, Float_t *outputBuffe
 double 
 PerNumVertexNtupleMaker::getLumi(const edm::Event& iEvent)
 {
+  // use the brilcalc reader instead for LHC Run II
+  return brilCalcReader.getLumi(iEvent.run(), 
+                                iEvent.luminosityBlock(),
+                                iEvent.bunchCrossing());
+
+
   iEvent.getLuminosityBlock().getByToken(lumiDetailsToken, lumiDetails); 
   // lb.getByToken(lumiDetailsToken, lumiDetails); 
-
 
   // this luminosity should be in Hz/ubarn (i.e. 10^30 s^-1 cm^-2)
   if (! lumiDetails.isValid())  
