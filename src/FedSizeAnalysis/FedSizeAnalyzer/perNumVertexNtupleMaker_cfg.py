@@ -12,7 +12,7 @@ if not os.environ.has_key('RUN'):
     sys.exit(1)
 
 
-inputFiles = glob.glob("out-" + os.environ['RUN'] + "-*-*.root")
+inputFiles = glob.glob("root-files/run-" + os.environ['RUN'] + "/out-" + os.environ['RUN'] + "-*-*.root")
 
 assert inputFiles,"no input files found for run " + os.environ['RUN']
 
