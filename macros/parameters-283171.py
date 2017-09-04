@@ -230,7 +230,7 @@ if True:
 # per subsystem
 #--------------------
 if True:
-    items = fedgroups.makeSubSystemGroups(fedsInRun)
+    items = fedgroups.makeSubSystemGroups(run, fedsInRun)
 
     # DEBUG
     # items = [ items[0] ]
@@ -240,7 +240,7 @@ if True:
 # per TTC partition
 #--------------------
 if True:
-    items = fedgroups.makeTTCpartitionGroups(fedsInRun)
+    items = fedgroups.makeTTCpartitionGroups(run, fedsInRun)
 
     # DEBUG
     # items = [ items[0] ]
