@@ -394,6 +394,11 @@ fout = open(tasksOutputFile, "w")
 import cPickle as pickle
 pickle.dump(dict(
         tasks = all_tasks,
+        globalParams = dict(
+            run     = parameters.run,
+            dataset = parameters.dataset,
+            xvar    = parameters.xvar,
+            ),
         ), fout)
 fout.close()
 
