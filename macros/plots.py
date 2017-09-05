@@ -391,7 +391,9 @@ tasksOutputFile = os.path.join(parameters.plots_output_dir, "allTasks.pkl")
 print >> sys.stderr,"writing task data to",tasksOutputFile
 fout = open(tasksOutputFile, "w")
 import cPickle as pickle
-pickle.dump(all_tasks, fout)
+pickle.dump(dict(
+        tasks = all_tasks,
+        ), fout)
 fout.close()
 
 

@@ -15,7 +15,7 @@ tasksFile = ARGV.pop(0)
 
 import pickle
 
-all_tasks = pickle.load(open(tasksFile))
+all_tasks = pickle.load(open(tasksFile))['tasks']
 
 plotDir = os.path.dirname(tasksFile)
 
