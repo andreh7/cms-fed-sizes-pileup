@@ -4,9 +4,23 @@ import os, sys
 
 class FedSizeMatrix:
     # class to hold the individual fed sizes accessible by fed id and 
-    # number of vertices in memory
+    # number of vertices or pileup in memory
     # 
     # replaces openSizePerFedNtuples(..) in utils.py ?
+
+    def __init__(self):
+
+        # 13 TeV total cross section (in microbarn) recommended by Lumi experts
+        # to get pileup
+        self.totalXsect = 80000.
+        # orbit frequency (from Lumi expert)
+        self.orbitFreq = 11245.6
+
+        # conversion factor to multiply the per bx instantaneous
+        # luminosities (in Hz per microbarn) with to get
+        # the (average) number of interactions per bunch crossing
+        # (pileup)
+        self.lumiToPuFactor = self.totalXsect / self.orbitFreq
 
     #----------------------------------------
     
