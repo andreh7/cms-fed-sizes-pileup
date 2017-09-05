@@ -15,7 +15,13 @@ tasksFile = ARGV.pop(0)
 
 import pickle
 
-all_tasks = pickle.load(open(tasksFile))['tasks']
+reportData = pickle.load(open(tasksFile))
+all_tasks = reportData['tasks']
+
+run     = reportData['globalParams']['run']
+dataset = reportData['globalParams']['dataset']
+xvar    = reportData['globalParams']['xvar']
+
 
 plotDir = os.path.dirname(tasksFile)
 
