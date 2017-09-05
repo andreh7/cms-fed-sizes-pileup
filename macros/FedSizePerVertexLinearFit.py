@@ -65,7 +65,7 @@ class FedSizePerVertexLinearFit:
                  grouping_name = None,
                  yaxis_unit_label = "MB", y_scale_factor = 0.001,
                  legendBottomLeft = None,
-                 xvar = 'pu',
+                 xvar = 'vtx',
                  ):
         """ @param size_expr is the expression to plot, typically
             something like size_<subsys> but can also be an expression
