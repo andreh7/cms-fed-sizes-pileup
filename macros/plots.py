@@ -207,6 +207,7 @@ if True:
                                              yaxis_unit_label = yaxis_unit_label,
                                              y_scale_factor = y_scale_factor,
                                              legendBottomLeft = parameters.fedSizePerVertexLinearFitLegendPositions(parameters.run, subsys),
+                                             xvar = parameters.xvar,
                                              )
 
         thisTask.instanceName = subsys
