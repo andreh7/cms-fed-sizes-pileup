@@ -26,9 +26,9 @@ xvar    = reportData['globalParams']['xvar']
 plotDir = os.path.dirname(tasksFile)
 
 from HTMLReportMaker import HTMLReportMaker
-outputFname = os.path.join(plotDir, "report.html")
+outputFname = os.path.join(plotDir, "report-%d-%s.html" % (run, dataset))
 
-reportMaker = HTMLReportMaker(all_tasks)
+reportMaker = HTMLReportMaker(all_tasks, run, dataset, xvar)
 
 fout = open(outputFname, "w")
 fout.write(reportMaker.make())
@@ -39,6 +39,6 @@ print >> sys.stderr,"wrote report to", outputFname
 #----------
 # also write out the spreadsheet (for convenience)
 #----------
-spreadsheetOutputFname = os.path.join(plotDir, "evolution.xlsx")
+spreadsheetOutputFname = os.path.join(plotDir, "evolution-%d-%s.xlsx" % (run, dataset))
 reportMaker.spreadSheetCreator.writeToFile(spreadsheetOutputFname)
 print >> sys.stderr,"wrote spreadsheet to",spreadsheetOutputFname
