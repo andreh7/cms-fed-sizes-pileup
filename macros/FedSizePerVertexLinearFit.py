@@ -371,12 +371,19 @@ class FedSizePerVertexLinearFit:
 
         assert len(coeffs) >= 1
 
+        if self.xvar == 'vtx':
+            varname = 'nvtx'
+        elif self.xvar == 'pu':
+            varname = 'pu'
+        else:
+            raise Exception("internal error")
+
         if len(coeffs) == 1:
             retval = "%.3f" % coeffs[0]
         elif len(coeffs) == 2:
-            retval = "%.3f + nvtx * %.3f" % (coeffs[0], coeffs[1])
+            retval = "%.3f + %s * %.3f" % (coeffs[0], varname, coeffs[1])
         else:
-            retval = "%.3f + nvtx * %.3f + O(nvtx^2)" % (coeffs[0], coeffs[1])
+            retval = "%.3f + %s * %.3f + O(%s^2)" % (coeffs[0], varname, coeffs[1], varname)
 
         # note the additional s for plural of the unit
         return "size = (%s) %ss" % (retval, unit)
