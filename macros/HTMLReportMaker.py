@@ -128,7 +128,7 @@ Custom """ + suffix + """:
         else:
             raise Exception("internal error")
 
-        print >> self.os, "<h2>Overview of FED size vs. " + suffix + " evolution</h2><br/>"
+        print >> self.os, "<h2>Overview of FED size vs. " + suffix + " evolution (run %d %s)</h2><br/>" % (self.run, self.dataset)
 
         print >> self.os, encodeDocument(self.spreadSheetCreator.makeString(),
                                          "spreadsheet",
@@ -255,7 +255,7 @@ Custom """ + suffix + """:
         print >> self.os,"<html>"
 
         print >> self.os,"<head>"
-        print >> self.os,"<title>Event sizes evolution</title>"
+        print >> self.os,"<title>Event sizes evolution run %d %s</title>" % (self.run, self.dataset)
 
         # see e.g. http://www.w3schools.com/css/css_table.asp for table CSS
         # attributes
