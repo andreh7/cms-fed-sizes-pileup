@@ -12,26 +12,6 @@ import numpy as np
 
 #----------------------------------------------------------------------
 
-def labelFunc(coeffs, unit):
-    # function returning a label given the fitted coefficients
-    #
-    # older version: "size = (%(offset).3f + nvtx * %(slope).3f) %(unit)s"
-    
-    assert len(coeffs) >= 1
-    
-    if len(coeffs) == 1:
-        retval = "%.3f" % coeffs[0]
-    elif len(coeffs) == 2:
-        retval = "%.3f + nvtx * %.3f" % (coeffs[0], coeffs[1])
-    else:
-        retval = "%.3f + nvtx * %.3f + O(nvtx^2)" % (coeffs[0], coeffs[1])
-
-    # note the additional s for plural of the unit
-    return "size = (%s) %ss" % (retval, unit)
-
-
-#----------------------------------------------------------------------
-
 class FedSizePerVertexLinearFit:
 
     #----------------------------------------
@@ -307,7 +287,7 @@ class FedSizePerVertexLinearFit:
             plotter.fitAverage(linear_fit_min_value = linearFitXmin - 0.5,
                                linear_fit_max_value = linearFitXmax + 0.5,
                                degree = self.parameters.fitFunctionDegree,
-                               label_func = labelFunc,
+                               label_func = self.labelFunc,
                                )
 
             self.meanFitResult = dict(coeffs = plotter.meanFitResult['coeffs'])
@@ -383,3 +363,23 @@ class FedSizePerVertexLinearFit:
             print >> os, ",".join([ str(x) for x in parts ])
 
     #----------------------------------------
+
+    def labelFunc(self, coeffs, unit):
+        # function returning a label given the fitted coefficients
+        #
+        # older version: "size = (%(offset).3f + nvtx * %(slope).3f) %(unit)s"
+
+        assert len(coeffs) >= 1
+
+        if len(coeffs) == 1:
+            retval = "%.3f" % coeffs[0]
+        elif len(coeffs) == 2:
+            retval = "%.3f + nvtx * %.3f" % (coeffs[0], coeffs[1])
+        else:
+            retval = "%.3f + nvtx * %.3f + O(nvtx^2)" % (coeffs[0], coeffs[1])
+
+        # note the additional s for plural of the unit
+        return "size = (%s) %ss" % (retval, unit)
+
+    #----------------------------------------
+
