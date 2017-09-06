@@ -206,7 +206,7 @@ if True:
                                              grouping_name = grouping,
                                              yaxis_unit_label = yaxis_unit_label,
                                              y_scale_factor = y_scale_factor,
-                                             legendBottomLeft = parameters.fedSizePerVertexLinearFitLegendPositions(parameters.run, subsys),
+                                             legendBottomLeft = parameters.fedSizePerVertexLinearFitLegendPositions(parameters.run, subsys, parameters.xvar),
                                              xvar = parameters.xvar,
                                              )
 
