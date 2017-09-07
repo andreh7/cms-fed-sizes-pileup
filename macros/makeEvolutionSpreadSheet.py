@@ -61,16 +61,18 @@ class SingleGroupSheet:
         #
         # @return the next row index to be used
 
-        self.avgNumVtxCell = (1,2)
-        self.avgNumVtxCellName = coordToName(*self.avgNumVtxCell, rowPrefix = '$') # B$1
 
-        self[(self.avgNumVtxCell[0], self.avgNumVtxCell[1] - 1)] = 'avg. number of vertices'
+        self.avgXvalueCell = (1,2)
+        self.avgXvalueCellName = coordToName(*self.avgXvalueCell, rowPrefix = '$') # B$1
+
+        self[(self.avgXvalueCell[0], self.avgXvalueCell[1] - 1)] = 'avg. number of vertices'
+
         if self.avgNumVertices == None:
-            self[self.avgNumVtxCell] = "unknown"
+            self[self.avgXvalueCell] = "unknown"
         else:
-            self.makeNumericCell(self.avgNumVtxCell, self.avgNumVertices, "0.0")
+            self.makeNumericCell(self.avgXvalueCell, self.avgNumVertices, "0.0")
 
-        self.ws.column_dimensions[_get_column_letter(self.avgNumVtxCell[1] - 1)].width = 20
+        self.ws.column_dimensions[_get_column_letter(self.avgXvalueCell[1] - 1)].width = 20
 
         #----------
         # trigger rate
@@ -134,7 +136,7 @@ class SingleGroupSheet:
 
     #----------------------------------------
 
-    def __fillDataSizeAtNumVertices(self, topLeft, topLeftInputData, numVtxCellName):
+    def __fillDataSizeAtNumVertices(self, topLeft, topLeftInputData, xvalueCellName):
         # produces cells calculating the data size at a given number
         # of vertices
         #
@@ -150,7 +152,7 @@ class SingleGroupSheet:
         #----------
 
         self[(firstRow,     firstCol)] = 'data size [kByte/ev]'                                            # G3
-        self[(firstRow + 1, firstCol)] = '=CONCATENATE("at ",TEXT(%s,"0.0")," vertices")' % numVtxCellName # G4
+        self[(firstRow + 1, firstCol)] = '=CONCATENATE("at ",TEXT(%s,"0.0")," vertices")' % xvalueCellName # G4
 
         #----------
         # fill the formulas
@@ -168,9 +170,9 @@ class SingleGroupSheet:
                 thisPart = coordToName(inputRow, inputCol + power) # D%d
 
                 if power == 1:
-                    thisPart += " * " + numVtxCellName # B$1
+                    thisPart += " * " + xvalueCellName # B$1
                 elif power >= 2:
-                    thisPart += " * POWER(%s, %d)" % (numVtxCellName, power)
+                    thisPart += " * POWER(%s, %d)" % (xvalueCellName, power)
 
                 parts.append(thisPart)
 
@@ -470,7 +472,7 @@ class SingleGroupSheet:
         #----------
         self.__fillDataSizeAtNumVertices(topLeft = (row, nextCol), 
                                          topLeftInputData = topLeftInputData,
-                                         numVtxCellName = self.avgNumVtxCellName)
+                                         xvalueCellName = self.avgXvalueCellName)
 
         nextCol += 2
 
