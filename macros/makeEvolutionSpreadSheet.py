@@ -36,7 +36,7 @@ class SingleGroupSheet:
     #----------------------------------------
     
     def __init__(self, workbook, groupingName, evolutionData, avgNumVertices, 
-                 triggerRateKHz, sheetName = None):
+                 triggerRateKHz, xvar, sheetName = None):
 
         # @param sheetName if not None will override the name of the worksheet
         #        (which is otherwise taken from groupingName)
@@ -48,6 +48,7 @@ class SingleGroupSheet:
         self.evolutionData = evolutionData
         self.avgNumVertices = avgNumVertices
         self.triggerRateKHz = triggerRateKHz
+        self.xvar = xvar
         self.sheetName = sheetName
 
         # number of coefficients for each fit
@@ -823,10 +824,11 @@ class SpreadsheetCreator:
 
     #----------------------------------------
 
-    def __init__(self, subsystemEvolutionData, avgNumVertices = None,
+    def __init__(self, subsystemEvolutionData, xvar, avgNumVertices = None,
                  triggerRateKHz = 100, pileups = None):
         import openpyxl
 
+        self.xvar = xvar
         self.subsystemEvolutionData = subsystemEvolutionData
         self.triggerRateKHz = triggerRateKHz
         self.avgNumVertices = avgNumVertices
@@ -840,7 +842,7 @@ class SpreadsheetCreator:
         # fill the workbook
         for groupingName, groupingData in self.subsystemEvolutionData.items():
             # make one sheet per grouping
-            sheetFiller = SingleGroupSheet(self.wb, groupingName, groupingData, avgNumVertices, triggerRateKHz)
+            sheetFiller = SingleGroupSheet(self.wb, groupingName, groupingData, avgNumVertices, triggerRateKHz, xvar)
             sheetFiller.fillSheet()
 
         if pileups != None:
@@ -849,7 +851,7 @@ class SpreadsheetCreator:
             groupingName = 'by fedbuilder'
             groupingData = self.subsystemEvolutionData[groupingName]
 
-            sheetFiller = SingleGroupSheet(self.wb, groupingName, groupingData, avgNumVertices, triggerRateKHz, sheetName = "multi pileup " + groupingName)
+            sheetFiller = SingleGroupSheet(self.wb, groupingName, groupingData, avgNumVertices, triggerRateKHz, xvar, sheetName = "multi pileup " + groupingName)
             sheetFiller.fillMultiPileupProjectionSheet(pileups)
 
     #----------------------------------------
@@ -909,11 +911,13 @@ if __name__ == "__main__":
     import pickle
 
     tasks = pickle.load(open(tasksFile))['tasks']
+    xvar  = reportData['globalParams']['xvar']
 
     plotDir = os.path.dirname(tasksFile)
 
     subsystemEvolutionData = GrandUnificationPlot.makeSubsystemEvolutionData(tasks)
     sc = SpreadsheetCreator(subsystemEvolutionData,
+                            xvar,
                             getAverageNumVerticesFromTasks(tasks),
                             pileups = options.pileups)
 
