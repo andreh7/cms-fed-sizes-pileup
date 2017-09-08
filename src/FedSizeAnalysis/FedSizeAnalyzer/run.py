@@ -98,6 +98,13 @@ parser.add_argument("--num-parallel",
                     default = 5,
                     )
 
+parser.add_argument("--skip",
+                    type = str,
+                    dest = "skipStartLs",
+                    help = "comma separated list of start lumi sections for jobs to be skipped",
+                    default = None,
+                    )
+
 parser.add_argument("--njobs",
                     type = int,
                     help = "number of jobs to split this task into",
@@ -105,6 +112,7 @@ parser.add_argument("--njobs",
                     )
 
 options = parser.parse_args()
+
 #----------------------------------------
 
 runDir = os.path.join(os.environ["CMSSW_BASE"], "src/FedSizeAnalysis/FedSizeAnalyzer")
@@ -145,11 +153,24 @@ for i in range(options.njobs):
 
     lumiSections = lumiSections[thisNumLs:]
 
-
 assert len(lumiSections) == 0
 assert len(tasks) == options.njobs
 
-print >> sys.stderr, "have",len(tasks),"tasks"
+# skip selected jobs
+if options.skipStartLs:
+    options.skipStartLs = set([ int(x) for x in options.skipStartLs.split(',') ])
+
+    # insist that all specified jobs to skip are there
+    for startLs in options.skipStartLs:
+        indices = [ index for index,task in enumerate(tasks) if task.startLs == startLs ]
+        assert len(indices) <= 1
+        if len(indices) < 1:
+            print >> sys.stderr,"could not find any task starting with ls",startLs,"to skip, exiting"
+            sys.exit(1)
+        
+        del tasks[indices[0]]
+
+print >> sys.stderr, "have",len(tasks),"active tasks"
 
 # start all tasks
 for task in tasks:
