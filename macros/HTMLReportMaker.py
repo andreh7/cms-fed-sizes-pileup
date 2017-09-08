@@ -247,6 +247,7 @@ Custom """ + suffix + """:
 
 
         self.spreadSheetCreator = SpreadsheetCreator(groupedSubsystemEvolutionData,
+                                                     self.xvar,
                                                      getAverageNumVerticesFromTasks(self.tasks))
 
 
