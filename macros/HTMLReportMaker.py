@@ -40,9 +40,13 @@ class HTMLReportMaker:
 
     #----------------------------------------
 
-    def __init__(self, tasks):
+    def __init__(self, tasks, run, dataset, xvar):
         # make a copy
         self.tasks = list(tasks)
+
+        self.run = run
+        self.dataset = dataset
+        self.xvar = xvar
 
         # find maximum order of coefficients
         self.numCoeffs = -1
@@ -55,6 +59,14 @@ class HTMLReportMaker:
     #----------------------------------------
         
     def printSizeCalculatorJavascriptAndForm(self, numLines):
+
+        if self.xvar == 'vtx':
+            suffix = "number of reconstructed vertices"
+        elif self.xvar == 'pu':
+            suffix = "pileup"
+        else:
+            raise Exception("internal error")
+
 
         # code to extract coefficients
         coeffsCode = "var coeffs = [ " + ", ".join(
@@ -99,7 +111,7 @@ function updateTable()
 
 </script>
 <form>
-Custom number of vertices:
+Custom """ + suffix + """:
 <input type='text' id='customNumVertices' />
 <button type="button" onclick="updateTable();">update table</button>
 </form>
@@ -109,7 +121,14 @@ Custom number of vertices:
 
     def __printEvolutionOverviewTable(self, subsystemEvolutionData):
 
-        print >> self.os, "<h2>Overview of FED size vs. number of reconstructed vertices evolution</h2><br/>"
+        if self.xvar == 'vtx':
+            suffix = "number of reconstructed vertices"
+        elif self.xvar == 'pu':
+            suffix = "pileup"
+        else:
+            raise Exception("internal error")
+
+        print >> self.os, "<h2>Overview of FED size vs. " + suffix + " evolution (run %d %s)</h2><br/>" % (self.run, self.dataset)
 
         print >> self.os, encodeDocument(self.spreadSheetCreator.makeString(),
                                          "spreadsheet",
@@ -135,15 +154,22 @@ Custom number of vertices:
         for power in range(self.numCoeffs):
             unit = 'kByte'
             if power == 1:
-                unit += '/vtx'
+                unit += '/' + self.xvar
             elif power >= 2:
-                unit += '/vtx^%d' % power
+                unit += '/%s^%d' % (self.xvar, power)
 
             colnames.append(utils.getPowerName(power) + ' [%s]' % unit)
 
+        if self.xvar == 'vtx':
+            suffix = "vertices"
+        elif self.xvar == 'pu':
+            suffix = "pileup"
+        else:
+            raise Exception("internal error")
+
         colnames += [
             'number of feds',
-            'event size at <div id="customNumVerticesField">?</div> vertices [kByte]',
+            'event size at <div id="customNumVerticesField">?</div> ' + suffix + ' [kByte]',
             ]
 
         print >> self.os,"<tr>" + "".join([ "<th>" + x + "</th>" for x in colnames ]) + "</tr>"
@@ -221,6 +247,7 @@ Custom number of vertices:
 
 
         self.spreadSheetCreator = SpreadsheetCreator(groupedSubsystemEvolutionData,
+                                                     self.xvar,
                                                      getAverageNumVerticesFromTasks(self.tasks))
 
 
@@ -229,7 +256,7 @@ Custom number of vertices:
         print >> self.os,"<html>"
 
         print >> self.os,"<head>"
-        print >> self.os,"<title>Event sizes evolution</title>"
+        print >> self.os,"<title>Event sizes evolution run %d %s</title>" % (self.run, self.dataset)
 
         # see e.g. http://www.w3schools.com/css/css_table.asp for table CSS
         # attributes

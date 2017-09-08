@@ -206,7 +206,8 @@ if True:
                                              grouping_name = grouping,
                                              yaxis_unit_label = yaxis_unit_label,
                                              y_scale_factor = y_scale_factor,
-                                             legendBottomLeft = parameters.fedSizePerVertexLinearFitLegendPositions(parameters.run, subsys),
+                                             legendBottomLeft = parameters.fedSizePerVertexLinearFitLegendPositions(parameters.run, subsys, parameters.xvar),
+                                             xvar = parameters.xvar,
                                              )
 
         thisTask.instanceName = subsys
@@ -391,7 +392,14 @@ tasksOutputFile = os.path.join(parameters.plots_output_dir, "allTasks.pkl")
 print >> sys.stderr,"writing task data to",tasksOutputFile
 fout = open(tasksOutputFile, "w")
 import cPickle as pickle
-pickle.dump(all_tasks, fout)
+pickle.dump(dict(
+        tasks = all_tasks,
+        globalParams = dict(
+            run     = parameters.run,
+            dataset = parameters.dataset,
+            xvar    = parameters.xvar,
+            ),
+        ), fout)
 fout.close()
 
 

@@ -24,3 +24,5 @@ fedIDsSeen = eval("[ " +
                                     "data",
                                     "fedids-%d.txt" % run)).read() + 
                   "]")
+
+lumiFile = "lumi-files/lumi-by-bx-and-ls-%s.csv" % os.environ['RUN']
