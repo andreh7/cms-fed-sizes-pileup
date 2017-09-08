@@ -36,7 +36,7 @@ class SingleGroupSheet:
     #----------------------------------------
     
     def __init__(self, workbook, groupingName, evolutionData, avgNumVertices, 
-                 triggerRateKHz, sheetName = None):
+                 triggerRateKHz, xvar, sheetName = None):
 
         # @param sheetName if not None will override the name of the worksheet
         #        (which is otherwise taken from groupingName)
@@ -48,6 +48,7 @@ class SingleGroupSheet:
         self.evolutionData = evolutionData
         self.avgNumVertices = avgNumVertices
         self.triggerRateKHz = triggerRateKHz
+        self.xvar = xvar
         self.sheetName = sheetName
 
         # number of coefficients for each fit
@@ -61,16 +62,25 @@ class SingleGroupSheet:
         #
         # @return the next row index to be used
 
-        self.avgNumVtxCell = (1,2)
-        self.avgNumVtxCellName = coordToName(*self.avgNumVtxCell, rowPrefix = '$') # B$1
 
-        self[(self.avgNumVtxCell[0], self.avgNumVtxCell[1] - 1)] = 'avg. number of vertices'
-        if self.avgNumVertices == None:
-            self[self.avgNumVtxCell] = "unknown"
+        self.avgXvalueCell = (1,2)
+        self.avgXvalueCellName = coordToName(*self.avgXvalueCell, rowPrefix = '$') # B$1
+
+        if self.xvar == 'vtx':
+            txt = 'avg. number of vertices'
+        elif self.xvar == 'pu':
+            txt = 'pileup'
         else:
-            self.makeNumericCell(self.avgNumVtxCell, self.avgNumVertices, "0.0")
+            raise Exception("internal error " + self.xvar)
 
-        self.ws.column_dimensions[_get_column_letter(self.avgNumVtxCell[1] - 1)].width = 20
+        self[(self.avgXvalueCell[0], self.avgXvalueCell[1] - 1)] = txt
+
+        if self.xvar != 'vtx' or self.avgNumVertices == None:
+            self[self.avgXvalueCell] = "unknown"
+        else:
+            self.makeNumericCell(self.avgXvalueCell, self.avgNumVertices, "0.0")
+
+        self.ws.column_dimensions[_get_column_letter(self.avgXvalueCell[1] - 1)].width = 20
 
         #----------
         # trigger rate
@@ -134,7 +144,7 @@ class SingleGroupSheet:
 
     #----------------------------------------
 
-    def __fillDataSizeAtNumVertices(self, topLeft, topLeftInputData, numVtxCellName):
+    def __fillDataSizeAtNumVertices(self, topLeft, topLeftInputData, xvalueCellName):
         # produces cells calculating the data size at a given number
         # of vertices
         #
@@ -150,7 +160,15 @@ class SingleGroupSheet:
         #----------
 
         self[(firstRow,     firstCol)] = 'data size [kByte/ev]'                                            # G3
-        self[(firstRow + 1, firstCol)] = '=CONCATENATE("at ",TEXT(%s,"0.0")," vertices")' % numVtxCellName # G4
+        
+        if self.xvar == 'vtx':
+            txt = 'vertices'
+        elif self.xvar == 'pu':
+            txt = 'pileup'
+        else:
+            raise Exception("internal error")
+
+        self[(firstRow + 1, firstCol)] = '=CONCATENATE("at ",TEXT(%s,"0.0")," %s")' % (xvalueCellName,txt) # G4
 
         #----------
         # fill the formulas
@@ -168,9 +186,9 @@ class SingleGroupSheet:
                 thisPart = coordToName(inputRow, inputCol + power) # D%d
 
                 if power == 1:
-                    thisPart += " * " + numVtxCellName # B$1
+                    thisPart += " * " + xvalueCellName # B$1
                 elif power >= 2:
-                    thisPart += " * POWER(%s, %d)" % (numVtxCellName, power)
+                    thisPart += " * POWER(%s, %d)" % (xvalueCellName, power)
 
                 parts.append(thisPart)
 
@@ -470,7 +488,7 @@ class SingleGroupSheet:
         #----------
         self.__fillDataSizeAtNumVertices(topLeft = (row, nextCol), 
                                          topLeftInputData = topLeftInputData,
-                                         numVtxCellName = self.avgNumVtxCellName)
+                                         xvalueCellName = self.avgXvalueCellName)
 
         nextCol += 2
 
@@ -821,10 +839,11 @@ class SpreadsheetCreator:
 
     #----------------------------------------
 
-    def __init__(self, subsystemEvolutionData, avgNumVertices = None,
+    def __init__(self, subsystemEvolutionData, xvar, avgNumVertices = None,
                  triggerRateKHz = 100, pileups = None):
         import openpyxl
 
+        self.xvar = xvar
         self.subsystemEvolutionData = subsystemEvolutionData
         self.triggerRateKHz = triggerRateKHz
         self.avgNumVertices = avgNumVertices
@@ -838,7 +857,7 @@ class SpreadsheetCreator:
         # fill the workbook
         for groupingName, groupingData in self.subsystemEvolutionData.items():
             # make one sheet per grouping
-            sheetFiller = SingleGroupSheet(self.wb, groupingName, groupingData, avgNumVertices, triggerRateKHz)
+            sheetFiller = SingleGroupSheet(self.wb, groupingName, groupingData, avgNumVertices, triggerRateKHz, xvar)
             sheetFiller.fillSheet()
 
         if pileups != None:
@@ -847,7 +866,7 @@ class SpreadsheetCreator:
             groupingName = 'by fedbuilder'
             groupingData = self.subsystemEvolutionData[groupingName]
 
-            sheetFiller = SingleGroupSheet(self.wb, groupingName, groupingData, avgNumVertices, triggerRateKHz, sheetName = "multi pileup " + groupingName)
+            sheetFiller = SingleGroupSheet(self.wb, groupingName, groupingData, avgNumVertices, triggerRateKHz, xvar, sheetName = "multi pileup " + groupingName)
             sheetFiller.fillMultiPileupProjectionSheet(pileups)
 
     #----------------------------------------
@@ -906,12 +925,14 @@ if __name__ == "__main__":
 
     import pickle
 
-    tasks = pickle.load(open(tasksFile))
+    tasks = pickle.load(open(tasksFile))['tasks']
+    xvar  = reportData['globalParams']['xvar']
 
     plotDir = os.path.dirname(tasksFile)
 
     subsystemEvolutionData = GrandUnificationPlot.makeSubsystemEvolutionData(tasks)
     sc = SpreadsheetCreator(subsystemEvolutionData,
+                            xvar,
                             getAverageNumVerticesFromTasks(tasks),
                             pileups = options.pileups)
 

@@ -31,13 +31,17 @@ fedsInRun = eval("[ " +
 
 dataset = "hltphysics"
 
+# can be vtx or pu (to plot the size evolution vs. number of vertices
+# or pileup)
+xvar = "pu"
+
 hlt_description = "HLT_Physics"
 
 fitFunctionDegree = 2
 
 # there were three bunch crossings with high pileup in this
 # fill, the other 96 were 'standard' pileup
-useHighPU = False
+useHighPU = True
 
 #----------------------------------------------------------------------
 
@@ -45,7 +49,7 @@ useHighPU = False
 # quantities derived from the above parameters
 #----------------------------------------------------------------------
 
-input_data_dir = "../data/%s-%d" % (dataset,run)
+input_data_dir = "../../small-tuples/%s-%d" % (dataset,run)
 
 output_data_dir = "data/%s-%d/%s"  % (dataset,run, hlt_description)
 
@@ -89,7 +93,10 @@ perLumiSize_relYmax = 1.6
 # could use collections.defaultdict(dict) here
 # but would have to be nested
 #
-def fedSizePerVertexLinearFitLegendPositions(run, subsys_name):
+def fedSizePerVertexLinearFitLegendPositions(run, subsys_name, xvar):
+
+    if xvar == 'pu':
+        return (0.1, 0.7)        
 
     if useHighPU:
 
@@ -164,8 +171,11 @@ else:
 # high pileup bunch crossings
 if useHighPU:
     linear_fit_min_num_vertices,linear_fit_max_num_vertices  = 40, 80
+    linear_fit_min_pu, linear_fit_max_pu = 110, 170    
 else:
     linear_fit_min_num_vertices,linear_fit_max_num_vertices  = 15, 50
+    linear_fit_min_pu, linear_fit_max_pu = 35, 50
+
 #----------
 
 # parameters for the corresponding plot
@@ -173,6 +183,9 @@ size_evolution_min_num_vertices = 0
 size_evolution_max_num_vertices = max_num_vertices
 
 size_evolution_rel_yscale = 1.6
+
+size_evolution_min_pu = 0
+size_evolution_max_pu = 300
 
 #--------------------
 # binning parameters for distributions of fed sizes
@@ -230,7 +243,7 @@ if True:
 # per subsystem
 #--------------------
 if True:
-    items = fedgroups.makeSubSystemGroups(fedsInRun)
+    items = fedgroups.makeSubSystemGroups(run, fedsInRun)
 
     # DEBUG
     # items = [ items[0] ]
@@ -240,7 +253,7 @@ if True:
 # per TTC partition
 #--------------------
 if True:
-    items = fedgroups.makeTTCpartitionGroups(fedsInRun)
+    items = fedgroups.makeTTCpartitionGroups(run, fedsInRun)
 
     # DEBUG
     # items = [ items[0] ]

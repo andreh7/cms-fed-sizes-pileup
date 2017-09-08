@@ -12,26 +12,6 @@ import numpy as np
 
 #----------------------------------------------------------------------
 
-def labelFunc(coeffs, unit):
-    # function returning a label given the fitted coefficients
-    #
-    # older version: "size = (%(offset).3f + nvtx * %(slope).3f) %(unit)s"
-    
-    assert len(coeffs) >= 1
-    
-    if len(coeffs) == 1:
-        retval = "%.3f" % coeffs[0]
-    elif len(coeffs) == 2:
-        retval = "%.3f + nvtx * %.3f" % (coeffs[0], coeffs[1])
-    else:
-        retval = "%.3f + nvtx * %.3f + O(nvtx^2)" % (coeffs[0], coeffs[1])
-
-    # note the additional s for plural of the unit
-    return "size = (%s) %ss" % (retval, unit)
-
-
-#----------------------------------------------------------------------
-
 class FedSizePerVertexLinearFit:
 
     #----------------------------------------
@@ -65,11 +45,17 @@ class FedSizePerVertexLinearFit:
                  grouping_name = None,
                  yaxis_unit_label = "MB", y_scale_factor = 0.001,
                  legendBottomLeft = None,
+                 xvar = 'vtx',
                  ):
         """ @param size_expr is the expression to plot, typically
             something like size_<subsys> but can also be an expression
             summing individual FEDs
-            
+
+            @param xvar can be vtx or pu: for vtx, the sizes are
+            plotted against the number of reconstructed primary
+            vertices, for pu against the (average) number of pileup
+            for the given instantaneous luminosity of this
+            bunch crossing and lumi section
         """
 
         self.parameters = parameters
@@ -78,6 +64,9 @@ class FedSizePerVertexLinearFit:
 
         self.ymaxScale = getattr(self.parameters,'size_evolution_rel_yscale',1.2)
         self.ymaxScale = None
+
+        assert xvar in ('vtx', 'pu')
+        self.xvar = xvar
 
         #--------------------
 
@@ -100,19 +89,46 @@ class FedSizePerVertexLinearFit:
         #     self.legendYBottom = legendYBottom
 
     #----------------------------------------
+
+    def getXvarRange(self):
+        # @return minVal, maxVal
+
+        if self.xvar == 'vtx':
+            return self.parameters.size_evolution_min_num_vertices, self.parameters.size_evolution_max_num_vertices
+        elif self.xvar == 'pu':
+            return self.parameters.size_evolution_min_pu, self.parameters.size_evolution_max_pu
+        else:
+            raise Exception("internal error")
+
+    #----------------------------------------
+    def getLinearFitRange(self):
+        # returns min,max of range for linear fit. Note that
+        # one or both values can be None
+        
+        if self.xvar == 'vtx':
+            return self.parameters.linear_fit_min_num_vertices, self.parameters.linear_fit_max_num_vertices
+        elif self.xvar == 'pu':
+            return getattr(self.parameters,'linear_fit_min_pu', None), getattr(self.parameters, 'linear_fit_max_pu', None)
+        else:
+            raise Exception("internal error")
+
+    #----------------------------------------
+
     def produce(self):
 
         # produce vectors of the fed sizes as function of number of vertices
-        # maps from number of vertices to list of sum of fragment sizes
+        # maps from number of vertices or average pileup to list of sum of fragment sizes
         self.fragmentSizes = {}
 
-        for num_vertices in range(self.parameters.size_evolution_min_num_vertices,
-                                  self.parameters.size_evolution_max_num_vertices + 1):
+        minVal, maxVal = self.getXvarRange()
+
+        # loop over number of vertices or pileup
+        for xvalue in range(minVal, maxVal + 1):
 
             #----------
             # keep event sizes data
             #----------            
-            self.fragmentSizes[num_vertices] = self.fedSizeMatrix.getFedSums(num_vertices, self.fedIds)
+            self.fragmentSizes[xvalue] = self.fedSizeMatrix.getFedSums(xvalue, self.fedIds, self.xvar == 'pu')
 
         # we don't need the pointer to the matrix anymore, avoid that it
         # is pickled with this object into the output file...
@@ -123,10 +139,15 @@ class FedSizePerVertexLinearFit:
     def plot(self, outputFilePrefix):
 
         #----------
-        if os.path.exists(self.parameters.plots_output_dir + "/avg-num-vertices.txt"):
-            avg_num_vertices = float(open(self.parameters.plots_output_dir + "/avg-num-vertices.txt").read())
-        else:
-            avg_num_vertices = None
+
+        # get average number of vertices if we plot the sizes
+        # vs. number of vertices
+        # TODO: should get this from one of the previous tasks
+        avg_xvalue = None
+
+        if self.xvar == 'vtx':
+            if os.path.exists(self.parameters.plots_output_dir + "/avg-num-vertices.txt"):
+                avg_xvalue = float(open(self.parameters.plots_output_dir + "/avg-num-vertices.txt").read())
 
         #----------
         import array
@@ -145,11 +166,13 @@ class FedSizePerVertexLinearFit:
         # we should support the case where there were no events
         # for a given number of vertices
 
-        for num_vertices in range(self.parameters.size_evolution_min_num_vertices,
-                                  self.parameters.size_evolution_max_num_vertices + 1):
+        minVal, maxVal = self.getXvarRange()
+
+        # loop over number of vertices or pileup
+        for xvalue in range(minVal, maxVal + 1):
 
             # reading them back:
-            event_sizes = self.fragmentSizes[num_vertices]
+            event_sizes = self.fragmentSizes[xvalue]
             
             event_sizes.sort()
             if event_sizes != None and len(event_sizes) > 0:
@@ -167,7 +190,7 @@ class FedSizePerVertexLinearFit:
 
                 # only append the current number of vertices
                 # if there were actually some events
-                self.xpos.append(num_vertices)
+                self.xpos.append(xvalue)
 
                 #--------------------
                 # calculate quantiles
@@ -186,6 +209,24 @@ class FedSizePerVertexLinearFit:
         #--------------------
         # use the helper class to actually perform the fit
         #--------------------
+
+
+        if self.xvar == 'vtx':
+            extrapolationXmin = getattr(self.parameters, 'linear_fit_extrapolation_min_num_vertices', None),
+            extrapolationXmax = getattr(self.parameters, 'linear_fit_extrapolation_max_num_vertices', None)
+
+            xaxisTitle = "Number of rec. primary vertices"
+
+        elif self.xvar == 'pu':
+            extrapolationXmin = getattr(self.parameters, 'linear_fit_extrapolation_min_pu', None),
+            extrapolationXmax = getattr(self.parameters, 'linear_fit_extrapolation_max_pu', None)
+
+            xaxisTitle = "avg. interactions per BX"
+        else:
+            raise Exception("internal error")
+
+        
+
         plotter = FedSizePerXUtils.Plotter(
             self.parameters,
             xpos = self.xpos,
@@ -212,7 +253,7 @@ class FedSizePerVertexLinearFit:
 
             ymaxScale = self.ymaxScale,
 
-            xaxisTitle = "Number of rec. primary vertices",
+            xaxisTitle = xaxisTitle,
 
             yaxisTitle = "Sum of FED sizes %s [%s]" % (self.subsys, self.yaxis_unit_label),
 
@@ -224,13 +265,13 @@ class FedSizePerVertexLinearFit:
 
             xbinWidth = 0.8,
 
-            averageNumVertices = avg_num_vertices,
+            averageNumVertices = avg_xvalue,
 
             y_scale_factor = self.y_scale_factor,
 
             # for drawing the extrapolation
-            linear_fit_extrapolation_min_num_vertices = getattr(self.parameters, 'linear_fit_extrapolation_min_num_vertices', None),
-            linear_fit_extrapolation_max_num_vertices = getattr(self.parameters, 'linear_fit_extrapolation_max_num_vertices', None),
+            linear_fit_extrapolation_min_num_vertices = extrapolationXmin,
+            linear_fit_extrapolation_max_num_vertices = extrapolationXmax,
 
             )
 
@@ -239,13 +280,14 @@ class FedSizePerVertexLinearFit:
         self.meanFitResult = {}
         self.uncertFitResult = {}
 
-        if self.parameters.linear_fit_min_num_vertices != None and \
-                self.parameters.linear_fit_max_num_vertices != None:
+        linearFitXmin, linearFitXmax = self.getLinearFitRange()
 
-            plotter.fitAverage(linear_fit_min_value = self.parameters.linear_fit_min_num_vertices - 0.5,
-                               linear_fit_max_value = self.parameters.linear_fit_max_num_vertices + 0.5,
+        if  not linearFitXmin is None and not linearFitXmax is None:
+
+            plotter.fitAverage(linear_fit_min_value = linearFitXmin - 0.5,
+                               linear_fit_max_value = linearFitXmax + 0.5,
                                degree = self.parameters.fitFunctionDegree,
-                               label_func = labelFunc,
+                               label_func = self.labelFunc,
                                )
 
             self.meanFitResult = dict(coeffs = plotter.meanFitResult['coeffs'])
@@ -258,15 +300,21 @@ class FedSizePerVertexLinearFit:
 
         #--------------------
 
-        ROOT.gPad.SaveAs(self.parameters.plots_output_dir + "/" + outputFilePrefix + "average-sizes-vs-vertex-" + self.subsys + ".png")
-        # ROOT.gPad.SaveAs(self.parameters.plots_output_dir + "/" + outputFilePrefix + "average-sizes-vs-vertex-" + self.subsys + ".C")
+        if self.xvar == 'vtx':
+            xvarName = "vertex"
+        elif self.xvar == 'pu':
+            xvarName = 'pu'
+        else:
+            raise Exception("internal error")
+
+        outputFname = self.parameters.plots_output_dir + "/" + outputFilePrefix + "average-sizes-vs-" + xvarName + "-" + self.subsys + ".png"
+        ROOT.gPad.SaveAs(outputFname)
         
         #--------------------
         # set output files
         #--------------------
         self.outputFiles = [
-            dict(fname = self.parameters.plots_output_dir + "/" + outputFilePrefix + "average-sizes-vs-vertex-" + self.subsys + ".png"),
-            # dict(fname = self.parameters.plots_output_dir + "/" + outputFilePrefix + "average-sizes-vs-vertex-" + self.subsys + ".C"),
+            dict(fname = outputFname),
             ]
 
         # free memory and avoid pickling this object
@@ -296,9 +344,9 @@ class FedSizePerVertexLinearFit:
         #----------
         assert len(self.avg_values) == len(self.xpos)
 
-        for index, num_vertices in enumerate(self.xpos):
+        for index, xvalue in enumerate(self.xpos):
 
-            parts = [ self.subsys, num_vertices ]
+            parts = [ self.subsys, xvalue ]
 
             # add mean
             parts.append(self.avg_values[index])
@@ -315,3 +363,30 @@ class FedSizePerVertexLinearFit:
             print >> os, ",".join([ str(x) for x in parts ])
 
     #----------------------------------------
+
+    def labelFunc(self, coeffs, unit):
+        # function returning a label given the fitted coefficients
+        #
+        # older version: "size = (%(offset).3f + nvtx * %(slope).3f) %(unit)s"
+
+        assert len(coeffs) >= 1
+
+        if self.xvar == 'vtx':
+            varname = 'nvtx'
+        elif self.xvar == 'pu':
+            varname = 'pu'
+        else:
+            raise Exception("internal error")
+
+        if len(coeffs) == 1:
+            retval = "%.3f" % coeffs[0]
+        elif len(coeffs) == 2:
+            retval = "%.3f + %s * %.3f" % (coeffs[0], varname, coeffs[1])
+        else:
+            retval = "%.3f + %s * %.3f + O(%s^2)" % (coeffs[0], varname, coeffs[1], varname)
+
+        # note the additional s for plural of the unit
+        return "size = (%s) %ss" % (retval, unit)
+
+    #----------------------------------------
+

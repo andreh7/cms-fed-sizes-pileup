@@ -19,7 +19,7 @@ if __name__ == "__main__":
 
     import pickle
 
-    tasks = pickle.load(open(tasksFile))
+    tasks = pickle.load(open(tasksFile))['tasks']
 
     plotDir = os.path.dirname(tasksFile)
     outputFname = os.path.join(plotDir, "distributions.csv")
