@@ -48,7 +48,8 @@ if not os.path.exists(os.path.dirname(outputFile)):
 #--------------------
 
 # set to non-None if you want to keep the filtered CMSSW events
-cmsswOutputFname = '/tmp/ah/events.root'
+# cmsswOutputFname = '/tmp/ah/events.root'
+cmsswOutputFname = None
 
 #----------------------------------------------------------------------
 # load per-run configuration
