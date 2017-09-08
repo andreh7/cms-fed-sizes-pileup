@@ -177,8 +177,6 @@ if True:
 #--------------------
 if True:
 
-    import FedBuilderData
-
     allSubsysToPlot.extend(fedgroups.makeFEDbuilderGroups(run, fedsInRun = fedsInRun))
 
     # DEBUG
