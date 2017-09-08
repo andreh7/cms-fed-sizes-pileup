@@ -18,30 +18,36 @@ ARGV = sys.argv[1:]
 assert len(ARGV) >= 1
 
 if len(ARGV) > 1:
-    print >> sys.stderr,"warning: more than one command line argument given, only looking at first file"
+    print >> sys.stderr,"warning: more than one command line argument given, only looking at first file with at least one event"
 
 
-inputFname = ARGV.pop(0)
+for inputFname in ARGV:
 
-#----------
-from DataFormats.FWLite import Events, Handle
+    #----------
+    from DataFormats.FWLite import Events, Handle
 
-events = Events(inputFname)
-handle  = Handle ('FedSizeAnalysisData')
+    events = Events(inputFname)
+    handle  = Handle ('FedSizeAnalysisData')
 
-label = ("fedSizeData", )
+    label = ("fedSizeData", )
 
-for event in events:
-    event.getByLabel (label, handle)
+    eventFound = False
+    for event in events:
+        event.getByLabel (label, handle)
 
-    dataObj = handle.product()
-    
-    fedids = list(dataObj.getFedIds())
-    fedids.sort()
+        dataObj = handle.product()
 
-    print ", ".join(str(x) for x in fedids)
+        fedids = list(dataObj.getFedIds())
+        fedids.sort()
 
-    # just run on the first event
-    break
+        print ", ".join(str(x) for x in fedids)
 
+        # just run on the first event
+        eventFound = True
+        break
+
+    if not eventFound:
+        print >> sys.stderr,"WARNING: no events found in",inputFname
+    else:
+        break
 
