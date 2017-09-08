@@ -16,7 +16,13 @@ if not os.environ.has_key('DATASET'):
     sys.exit(1)
 
 
-inputFiles = glob.glob("root-files/run-" + os.environ['RUN'] + "/out-" + os.environ['RUN'] + "-*-*.root")
+inputFiles = glob.glob("root-files/run-" + os.environ['RUN'] + "/" +
+                       "-".join([ "out",
+                                  os.environ['RUN'],
+                                  os.environ['DATASET'],
+                                  "*",
+                                  "*",
+                                  ]) + ".root")
 
 assert inputFiles,"no input files found for run " + os.environ['RUN']
 
