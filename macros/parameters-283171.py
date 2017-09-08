@@ -41,7 +41,7 @@ fitFunctionDegree = 2
 
 # there were three bunch crossings with high pileup in this
 # fill, the other 96 were 'standard' pileup
-useHighPU = False
+useHighPU = True
 
 #----------------------------------------------------------------------
 
