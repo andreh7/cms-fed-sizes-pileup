@@ -31,6 +31,10 @@ fedsInRun = eval("[ " +
 
 dataset = "hltphysics"
 
+# can be vtx or pu (to plot the size evolution vs. number of vertices
+# or pileup)
+xvar = "pu"
+
 hlt_description = "HLT_Physics"
 
 fitFunctionDegree = 2
@@ -89,7 +93,10 @@ perLumiSize_relYmax = 1.6
 # could use collections.defaultdict(dict) here
 # but would have to be nested
 #
-def fedSizePerVertexLinearFitLegendPositions(run, subsys_name):
+def fedSizePerVertexLinearFitLegendPositions(run, subsys_name, xvar):
+
+    if xvar == 'pu':
+        return (0.1, 0.7)        
 
     if useHighPU:
 
@@ -164,8 +171,11 @@ else:
 # high pileup bunch crossings
 if useHighPU:
     linear_fit_min_num_vertices,linear_fit_max_num_vertices  = 40, 80
+    linear_fit_min_pu, linear_fit_max_pu = 110, 170    
 else:
     linear_fit_min_num_vertices,linear_fit_max_num_vertices  = 15, 50
+    linear_fit_min_pu, linear_fit_max_pu = 35, 50
+
 #----------
 
 # parameters for the corresponding plot
@@ -173,6 +183,9 @@ size_evolution_min_num_vertices = 0
 size_evolution_max_num_vertices = max_num_vertices
 
 size_evolution_rel_yscale = 1.6
+
+size_evolution_min_pu = 0
+size_evolution_max_pu = 300
 
 #--------------------
 # binning parameters for distributions of fed sizes
