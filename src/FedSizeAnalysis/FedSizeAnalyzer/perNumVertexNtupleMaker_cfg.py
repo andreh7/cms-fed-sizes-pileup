@@ -11,6 +11,10 @@ if not os.environ.has_key('RUN'):
     print >> sys.stderr,"environment variable RUN must be set"
     sys.exit(1)
 
+if not os.environ.has_key('DATASET'):
+    print >> sys.stderr,"environment variable DATASET must be set"
+    sys.exit(1)
+
 
 inputFiles = glob.glob("root-files/run-" + os.environ['RUN'] + "/out-" + os.environ['RUN'] + "-*-*.root")
 
