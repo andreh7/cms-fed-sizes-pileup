@@ -28,7 +28,11 @@ assert inputFiles,"no input files found for run " + os.environ['RUN']
 
 inputFiles = [ 'file:' + fname for fname in inputFiles ]
 
-outputFile = "/tmp/ah/small-tuples.root"
+outputFile = os.path.expandvars("$CMSSW_BASE/../small-tuples/$DATASET-$RUN/small-tuples.root")
+
+# create output file if not yet existing
+if not os.path.exists(os.path.dirname(outputFile)):
+    os.makedirs(os.path.dirname(outputFile))
 
 
 #--------------------
