@@ -66,9 +66,16 @@ class SingleGroupSheet:
         self.avgXvalueCell = (1,2)
         self.avgXvalueCellName = coordToName(*self.avgXvalueCell, rowPrefix = '$') # B$1
 
-        self[(self.avgXvalueCell[0], self.avgXvalueCell[1] - 1)] = 'avg. number of vertices'
+        if self.xvar == 'vtx':
+            txt = 'avg. number of vertices'
+        elif self.xvar == 'pu':
+            txt = 'pileup'
+        else:
+            raise Exception("internal error " + self.xvar)
 
-        if self.avgNumVertices == None:
+        self[(self.avgXvalueCell[0], self.avgXvalueCell[1] - 1)] = txt
+
+        if self.xvar != 'vtx' or self.avgNumVertices == None:
             self[self.avgXvalueCell] = "unknown"
         else:
             self.makeNumericCell(self.avgXvalueCell, self.avgNumVertices, "0.0")
@@ -153,7 +160,15 @@ class SingleGroupSheet:
         #----------
 
         self[(firstRow,     firstCol)] = 'data size [kByte/ev]'                                            # G3
-        self[(firstRow + 1, firstCol)] = '=CONCATENATE("at ",TEXT(%s,"0.0")," vertices")' % xvalueCellName # G4
+        
+        if self.xvar == 'vtx':
+            txt = 'vertices'
+        elif self.xvar == 'pu':
+            txt = 'pileup'
+        else:
+            raise Exception("internal error")
+
+        self[(firstRow + 1, firstCol)] = '=CONCATENATE("at ",TEXT(%s,"0.0")," %s")' % (xvalueCellName,txt) # G4
 
         #----------
         # fill the formulas
