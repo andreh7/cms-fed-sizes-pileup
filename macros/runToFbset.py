@@ -15,6 +15,8 @@ runToFbset = {
     283171 : "/daq2/eq_160913_01/fb_all_with1240_withCASTOR_w582_583",
 
     296702 : "/daq2/eq_170531/fb_all",
+
+    301694 : "/daq2/eq_170622/fb_all",
     }
 
 def getFbsetFromRun(run):
