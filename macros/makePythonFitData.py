@@ -50,6 +50,11 @@ if __name__ == "__main__":
 
     print >> fout, "fedSizeData = dict("
     print >> fout, "avgNumVertices =", getAverageNumVerticesFromTasks(tasks),","
+
+    print >> fout
+    print >> fout, "#"
+    print >> fout, "# coefficients: constant term first, linear term next etc."
+    print >> fout, "#"
     print >> fout, "evolutionData = [",
     
     #----------
