@@ -15,7 +15,7 @@ def writePythonData(fout, task):
     print >> fout, 'grouping="%s",' % task.grouping,
     print >> fout, 'group="%s",' % task.subsys,
     print >> fout, 'numFeds=%d,' % task.numFeds,
-    print >> fout, 'coeffs=[ %s ]' % ", ".join(str(x) for x in task.meanFitResult['coeffs']),
+    print >> fout, 'coeffs=[ %s ],' % ", ".join(str(x) for x in task.meanFitResult['coeffs']),
     print >> fout, 'fedIds=[ %s ],' % ", ".join(str(x) for x in task.fedIds),
 
     print >> fout,"),"
