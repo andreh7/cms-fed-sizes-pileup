@@ -36,10 +36,14 @@ if __name__ == "__main__":
 
     import pickle
 
-    tasks = pickle.load(open(tasksFile))['tasks']
+    reportData = pickle.load(open(tasksFile))
+    tasks   = reportData['tasks']
+    run     = reportData['globalParams']['run']
+    dataset = reportData['globalParams']['dataset']
+    xvar    = reportData['globalParams']['xvar']
 
     plotDir = os.path.dirname(tasksFile)
-    outputFname = os.path.join(plotDir, "fitData.py")
+    outputFname = os.path.join(plotDir, "fitData_%s_%d_vs_%s.py" % (dataset, run, xvar))
     fout = open(outputFname, "w")
 
     from makeEvolutionSpreadSheet import SpreadsheetCreator, getAverageNumVerticesFromTasks
