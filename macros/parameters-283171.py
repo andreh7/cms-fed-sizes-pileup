@@ -29,7 +29,7 @@ fedsInRun = eval("[ " +
 # some global parameters
 #----------------------------------------------------------------------
 
-dataset = "hltphysics"
+dataset = os.environ["DATASET"]
 
 # can be vtx or pu (to plot the size evolution vs. number of vertices
 # or pileup)
