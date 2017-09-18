@@ -35,8 +35,6 @@ dataset = os.environ["DATASET"]
 # or pileup)
 xvar = "pu"
 
-hlt_description = "HLT_Physics"
-
 fitFunctionDegree = 2
 
 # there were three bunch crossings with high pileup in this
@@ -51,7 +49,7 @@ useHighPU = True
 
 input_data_dir = "../../small-tuples/%s-%d" % (dataset,run)
 
-output_data_dir = "data/%s-%d/%s"  % (dataset,run, hlt_description)
+output_data_dir = "data/%s-%d"  % (dataset,run)
 
 #----------------------------------------
 
@@ -63,7 +61,7 @@ if not os.path.exists(output_data_dir):
     os.makedirs(output_data_dir)
 
 
-plots_output_dir = "plots/%s-%d/%s"  % (dataset,run, hlt_description)
+plots_output_dir = "plots/%s-%d"  % (dataset,run)
 if not os.path.exists(plots_output_dir):
     os.makedirs(plots_output_dir)
 
