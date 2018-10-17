@@ -70,6 +70,25 @@ def ensureDasClientExists():
 
 #----------------------------------------------------------------------
 
+def ensureVomsProxy():
+    # checks if a voms proxy exists
+    # (but not necessarily that it is still valid)
+
+    status = os.system("voms-proxy-info -exists")
+
+    if status == 0:
+        return
+
+    print >> sys.stderr, "Could not find a valid voms proxy."
+    print >> sys.stderr, "Initialize one with:"
+    print >> sys.stderr
+    # command taken from the output of das_client
+    print >> sys.stderr, "  voms-proxy-init -voms cms -rfc"
+    print >> sys.stderr
+    sys.exit(1)
+
+#----------------------------------------------------------------------
+
 def printData(output_data, outputFname = None):
     
     if outputFname == None:

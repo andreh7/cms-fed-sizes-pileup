@@ -62,6 +62,7 @@ class FileListMaker:
     def doRun(self):
         import makeFileList
         makeFileList.ensureDasClientExists()
+        makeFileList.ensureVomsProxy()
 
         output_data = makeFileList.findFiles(options.rawDataSet, options.recoDataSet, options.run)
         makeFileList.printData(output_data, self.outputFname)
