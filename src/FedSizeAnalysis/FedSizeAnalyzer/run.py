@@ -6,6 +6,8 @@ scriptDir = os.path.dirname(sys.argv[0])
 sys.path.insert(0,os.path.join(scriptDir, "../../.."))
 import initialize
 
+import psutil
+numPhysicalCores = psutil.cpu_count(logical=False)
 
 
 #----------------------------------------------------------------------
@@ -94,8 +96,8 @@ parser.add_argument("--json",
 parser.add_argument("--num-parallel",
                     type = int,
                     dest = "maxNumThreads",
-                    help = "maximum number of cmsRun executables to run at the same time",
-                    default = 5,
+                    help = "maximum number of cmsRun executables to run at the same time (default: number of physical cores, %d on this machine)" % numPhysicalCores,
+                    default = numPhysicalCores,
                     )
 
 parser.add_argument("--skip",
