@@ -98,6 +98,59 @@ class JsonFileCopy:
 
         print >> sys.stderr,"wrote",self.outputFname
 
+#----------------------------------------------------------------------
+
+class LumiData:
+    """logs into lxplus, runs brilcalc and copies the resulting csv file back to the 
+    host we are running on"""
+
+    def __init__(self, options, prevTasks, runDir):
+        self.name = 'lumi_data'
+
+        self.run = options.run
+
+        self.output_dir = os.path.join("..","lumi-files")
+
+        self.outputFname = os.path.join(self.output_dir,
+                                         "lumi-by-bx-and-ls-%d.csv" % self.run)
+
+    #----------------------------------------
+
+    def needsRunning(self):
+
+        return not os.path.exists(self.outputFname)
+    #----------------------------------------
+
+    def doRun(self):
+
+        # create output directory if not existing
+        if not os.path.exists(self.output_dir):
+            os.makedirs(self.output_dir)
+
+        cmd_parts = [
+            "ssh",
+            "lxplus.cern.ch",
+
+            "\${HOME}/bin/brilcalc",
+            "lumi",
+            "-r " + str(self.run),
+            "--xing",
+            "-u hz/ub",
+            "--output-style csv",
+            ]
+
+        cmd = " ".join(cmd_parts)
+
+        import commands
+        status, output = commands.getstatusoutput(cmd)
+        if status != 0:
+            raise Exception("failed to run command " + cmd)
+
+        fout = open(self.outputFname, "w")
+        fout.write(output)
+        fout.close()
+
+        print >> sys.stderr,"wrote",self.outputFname
 
 #----------------------------------------------------------------------
 
@@ -268,6 +321,7 @@ if __name__ == '__main__':
     for clazz in [
         FileListMaker,
         JsonFileCopy,
+        LumiData,
         Step1ConfigFile,
         MakeRunScript,
         ]:
